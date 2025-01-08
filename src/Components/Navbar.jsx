@@ -9,7 +9,7 @@ import DollarImage from "../assets/Images/dollar.png";
 import { useAccount } from "wagmi";
 import { base_url } from "../Helper/config";
 import toast from "react-hot-toast";
-import { Depositfn } from "../Helper/Web3";
+import { Depositfn, UserDetailsfn } from "../Helper/Web3";
 import { isUserExist } from "../Helper/Web3";
 import { setUserExist, setUserInfo, setWallet } from "../redux/reducer";
 import { useDispatch, useSelector } from "react-redux";
@@ -31,16 +31,30 @@ const Navbar = () => {
   const [tableview, setTableview] = useState("");
   const [inputAmount, setInputAmount] = useState("");
   const [inputAddress, setInputAddress] = useState("");
+  const [inputPin, setInputPin] = useState("");
   const [isLoader, setIsLoader] = useState(false);
   const [isFetch, setIsFetch] = useState(false);
   const [amt, setAmt] = useState("");
   const [adr, setAdr] = useState("");
+  const [pin, setPin] = useState("");
   const [errors, setErrors] = useState({});
+  const [isDepositMode, setIsDepositMode] = useState(false);
+  const [userDetails, setUserDetails] = useState([]);
+  const [freeWallet, setFreeWallet] = useState(0);
+  const [mainInput, setMainInput] = useState(0);
+  const [splitInput, setSplitInput] = useState(0);
+  const [rank, setRank] = useState(0);
+  const [levelPaid, setLevelPaid] = useState({});
   const referralLink = `${base_url}/?ref=${walletAddress}`;
   const toggleMakeDepositModal = () =>
     setShowMakeDepositModal(!showMakeDepositModal);
   const toggleWalletStatisticsModal = () =>
     setShowWalletStatisticsModal(!showWalletStatisticsModal);
+
+  useEffect(() => {
+    console.log(userInfo?.securityPin);
+    setInputPin(userInfo?.securityPin);
+  }, [userInfo?.securityPin]);
 
   const toggleWithdrawalModal = () =>
     setShowWithDrawalModal(!showWithDrawalModal);
@@ -55,9 +69,14 @@ const Navbar = () => {
         toast.error("Failed to copy the referral link.");
       });
   };
+  const handleCancel = () => {
+    setInputAddress("");
+    setInputAmount("");
+    setInputPin("");
 
+    setIsDepositMode(false);
+  };
   useEffect(() => {
-    console.log("in use Effect");
     if (address) {
       dispatch(
         setWallet({
@@ -85,29 +104,82 @@ const Navbar = () => {
         .catch((error) => {
           console.log(error);
         });
+      UserDetailsfn(address).then((res) => {
+        // console.log("UserDetailsfn response", res);
+        setUserDetails(res);
+        console.log(res[10], res[9], "::::::::::");
+        if (Number(res[10]) == 10) {
+          if (Number(res[9]) == 1) {
+            setRank("BRONZE");
+          } else if (Number(res[9]) == 2) {
+            setRank("SILVER");
+          } else if (Number(res[9]) == 3) {
+            setRank("GOLD");
+          } else if (Number(res[9]) == 4) {
+            setRank("DIAMOND");
+          }
+        } else {
+          setRank("Claim now");
+        }
+      });
     }
   }, [dispatch, address, isFetch]);
 
-  const handleDeposit = async () => {
-    const newErrors = { amt: "", adr: "" };
+  const handleIsDeposit = () => {
+    const newErrors = { amt: "", adr: "", pin: "" };
 
     if (!inputAmount) {
       newErrors.amt = "Transaction amount is required.";
-      newErrors.adr = "";
+      // newErrors.adr = "";
+      // newErrors.adr = "";
     }
     console.log(inputAddress, "inputAddress");
     if (!inputAddress) {
-      newErrors.amt = newErrors.amt != "" ? newErrors.amt : "";
+      // newErrors.amt = newErrors.amt != "" ? newErrors.amt : "";
       newErrors.adr = "Address is required.";
+    }
+    if (!inputPin) {
+      // newErrors.amt = newErrors.adr != "" ? newErrors.adr : "";
+      newErrors.pin = "Security Pin  is required.";
     }
     console.log(newErrors, "newErrors");
     setErrors(newErrors);
 
     // Exit if there are errors
-    if (newErrors.amt != "" || newErrors.adr != "") {
+    if (newErrors.amt != "" || newErrors.adr != "" || newErrors.pin != "") {
       setTimeout(() => {
-        setErrors({ amt: "", adr: "" });
-      }, 3000); // 5000 ms = 5 seconds
+        setErrors({ amt: "", adr: "", pin: "" });
+      }, 3000);
+      return;
+    }
+    setIsDepositMode(true);
+    // setInputAmount(`Main-Core : ${userInfo?.splitWallet ?? 0}`);
+    // setInputAddress(`Free-Core : ${userInfo?.airdropWallet ?? 0}`);
+    // setInputPin(`Split-Wallet : ${userInfo?.splitWallet ?? 0}`);
+  };
+  const handleDeposit = async () => {
+    const newErrors = { amt: "", adr: "", pin: "" };
+
+    if (!inputAmount) {
+      newErrors.amt = "Transaction amount is required.";
+      // newErrors.adr = "";
+    }
+    console.log(inputAddress, "inputAddress");
+    if (!inputAddress) {
+      // newErrors.amt = newErrors.amt != "" ? newErrors.amt : "";
+      newErrors.adr = "Address is required.";
+    }
+    if (!inputPin) {
+      // newErrors.amt = newErrors.adr != "" ? newErrors.adr : "";
+      newErrors.pin = "Security Pin  is required.";
+    }
+    console.log(newErrors, "newErrors");
+    setErrors(newErrors);
+
+    if (newErrors.amt != "" || newErrors.adr != "" || newErrors.pin != "") {
+      setTimeout(() => {
+        setErrors({ amt: "", adr: "", pin: "" });
+      }, 3000);
       return;
     }
 
@@ -146,7 +218,7 @@ const Navbar = () => {
     },
     {
       label1: "Left Free Core:",
-      value: userInfo?.airdropWallet ?? 0,
+      value: Number(userDetails[12]) > 0 ? Number(userDetails[12]) : 0,
       label2: "Click to View :",
       buttonText: "View History",
       image: DAOIcon,
@@ -160,28 +232,29 @@ const Navbar = () => {
       image: DAOIcon,
       name: "LSW",
     },
-    {
-      label1: "My Investment :",
-      value: userInfo?.firstDepositAmount ?? 0,
-      label2: "Click to View :",
-      buttonText: "View History",
-      image: DollarImage,
-      name: "MI",
-    },
-    {
-      label1: "My Re-investment :",
-      value: userInfo?.depositWallet - userInfo?.firstDepositAmount,
-      label2: "Click to View :",
-      buttonText: "View History",
-      image: DollarImage,
-      name: "MRI",
-    },
+    // {
+    //   label1: "My Investment :",
+    //   value: userInfo?.firstDepositAmount ?? 0,
+    //   label2: "Click to View :",
+    //   buttonText: "View History",
+    //   image: DAOIcon,
+    //   name: "MI",
+    // },
+    // {
+    //   label1: "My Re-investment :",
+    //   value:
+    //     (userInfo?.depositWallet ?? 0) - (userInfo?.firstDepositAmount ?? 0),
+    //   label2: "Click to View :",
+    //   buttonText: "View History",
+    //   image: DAOIcon,
+    //   name: "MRI",
+    // },
     {
       label1: "Total Investment :",
-      value: userInfo?.depositWallet ?? 0,
+      value: Number(userDetails[5]) > 0 ? Number(userDetails[5]) / 1e18 : 0,
       label2: "",
       buttonText: "Deposit History",
-      image: DollarImage,
+      image: DAOIcon,
       name: "TI",
     },
     {
@@ -189,7 +262,7 @@ const Navbar = () => {
       value: 0,
       label2: "",
       buttonText: "Withdraw History",
-      image: DollarImage,
+      image: DAOIcon,
       name: "TW",
     },
     {
@@ -197,8 +270,8 @@ const Navbar = () => {
       value: userInfo?.walletBalance ?? 0,
       label2: "Request withdraw:",
       buttonText: "Withdraw ",
-      image: DollarImage,
-      name: "TW",
+      image: DAOIcon,
+      name: "B",
       text: "**In the event of an unsuccessful withdrawal resulting in a zero balance display, re-initiate the withdrawal process, disregarding the current balance state. This will re-trigger the pending withdrawal request, facilitating the successful transfer of funds to your designated wallet address*",
     },
   ];
@@ -207,9 +280,9 @@ const Navbar = () => {
     {
       id: 0,
       label: "Total Free Core:",
-      value: userInfo?.airdropWallet ?? 0,
+      value: Number(userDetails[10]) > 0 ? Number(userDetails[10]) : 0,
       label2: "Request to get :",
-      buttonText: "Claim Now",
+      buttonText: rank,
 
       text: "Click Get button, and you will get instantly your today pool earnings as a single transaction. Your personal hold-bonus will be reseted.",
     },
@@ -226,7 +299,7 @@ const Navbar = () => {
       id: 2,
       label: "C50 Team",
       heading: "All/Paid",
-      value: 0,
+      value: `${levelPaid?.all ?? 0}/${levelPaid?.paid ?? 0}`,
       label2: "Click to View:",
       buttonText: "View Team",
       isTable: true,
@@ -244,7 +317,7 @@ const Navbar = () => {
       value: userInfo?.directBonus ?? 0,
       label2: "Click to View:",
       buttonText: "View Direct Team",
-      image: DollarImage,
+      image: DAOIcon,
     },
     {
       id: 5,
@@ -252,7 +325,7 @@ const Navbar = () => {
       value: userInfo?.teamBusiness ?? 0,
       label2: "Click to View:",
       buttonText: "Magic Team",
-      image: DollarImage,
+      image: DAOIcon,
     },
     {
       id: 6,
@@ -260,7 +333,7 @@ const Navbar = () => {
       value: 0,
       label2: "Offer History:",
       buttonText: "Offer History",
-      image: DollarImage,
+      image: DAOIcon,
     },
     {
       id: 7,
@@ -268,7 +341,7 @@ const Navbar = () => {
       value: 0,
       label2: "C50 Flushed History:",
       buttonText: "C50 Flushed History",
-      image: DollarImage,
+      image: DAOIcon,
     },
 
     {
@@ -277,7 +350,7 @@ const Navbar = () => {
       value: 0,
       label2: "Recent Days Income Total:",
       buttonText: "F50 Income History",
-      image: DollarImage,
+      image: DAOIcon,
     },
 
     {
@@ -286,7 +359,7 @@ const Navbar = () => {
       value: userInfo?.magicIncome ?? 0,
       label2: "Magic Income History:",
       buttonText: "Magic Income History",
-      image: DollarImage,
+      image: DAOIcon,
     },
 
     {
@@ -295,7 +368,7 @@ const Navbar = () => {
       value: 0,
       label2: "Offer Income History:",
       buttonText: "Offer Income History",
-      image: DollarImage,
+      image: DAOIcon,
     },
 
     {
@@ -304,7 +377,7 @@ const Navbar = () => {
       value: 0,
       label2: "All Earning History:",
       buttonText: "All Earning History",
-      image: DollarImage,
+      image: DAOIcon,
     },
 
     {
@@ -313,76 +386,32 @@ const Navbar = () => {
       value: userInfo?.withdrawalReward ?? 0,
       label2: "Withdraw History:",
       buttonText: "View History",
-      image: DollarImage,
+      image: DAOIcon,
     },
   ];
 
-  // const [scrollPosition, setScrollPosition] = useState({ x: 0, y: 0 });
   const [isShrunk, setIsShrunk] = useState(false);
-
-  // // Function to update scroll position
-  // const handleScroll = () => {
-  //   console.log(window.scrollX, window.scrollY, "sadsa");
-  //   // setIsShrunk(window.scrollY > 10);
-  //   setScrollPosition({
-  //     x: window.scrollX,
-  //     y: window.scrollY,
-  //   });
-  // };
-  // // console.log(scrollPosition);
-
-  // useEffect(() => {
-  //   // Add scroll event listener
-  //   window.addEventListener("scroll", handleScroll);
-
-  //   // Cleanup the event listener on component unmount
-  //   return () => {
-  //     window.removeEventListener("scroll", handleScroll);
-  //   };
-  // }, []);
-  // Empty dependency array ensures this runs only once
-  // console.log(scrollPosition, "scrollPosition");
-  // useEffect(() => {
-  //   const handleWheel = (event) => {
-  //     console.log(event, "wheel event triggered"); // Log the event object for debugging
-  //     const scrollPosition =
-  //       window.pageYOffset || document.documentElement.scrollTop;
-  //     console.log(scrollPosition, "scrollPosition");
-  //     setIsShrunk(scrollPosition > 10); // Add class when scrolled more than 10px
-  //   };
-
-  //   // Add wheel event listener
-  //   document.addEventListener("wheel", handleWheel);
-
-  //   // Cleanup on unmount
-  //   return () => {
-  //     document.removeEventListener("wheel", handleWheel);
-  //   };
-  // }, [window.pageYOffset, document.documentElement.scrollTop]);
 
   const [showElement, setShowElement] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
-  // console.log(window.scrollY, "::::::151");
 
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
 
       if (currentScrollY > lastScrollY && window.innerWidth <= 420) {
-        // Scrolling down
         setShowElement(false);
       } else {
-        // Scrolling up
         setShowElement(true);
       }
 
-      setLastScrollY(currentScrollY); // Update the last scroll position
+      setLastScrollY(currentScrollY);
     };
 
-    window.addEventListener("scroll", handleScroll); // Attach scroll listener
+    window.addEventListener("scroll", handleScroll);
 
     return () => {
-      window.removeEventListener("scroll", handleScroll); // Cleanup on unmount
+      window.removeEventListener("scroll", handleScroll);
     };
   }, [lastScrollY]);
 
@@ -411,7 +440,13 @@ const Navbar = () => {
                 </a>
               )}
 
-              <a href="#" id="depositDeal" onClick={toggleMakeDepositModal}>
+              <a
+                href="#"
+                id="depositDeal"
+                onClick={toggleMakeDepositModal}
+                data-toggle="modal"
+                data-target="#exampleModalLong"
+              >
                 <FaDonate /> Make deposit
               </a>
 
@@ -448,6 +483,13 @@ const Navbar = () => {
           handleCopy={() => handleCopy()}
           setTableview={setTableview}
           errors={errors}
+          setInputPin={setInputPin}
+          handleIsDeposit={handleIsDeposit}
+          handleCancel={handleCancel}
+          isDepositMode={isDepositMode}
+          mainInput={mainInput}
+          freeWallet={freeWallet}
+          splitInput={splitInput}
         />
       )}
       {showWalletStatisticsModal && (
@@ -459,6 +501,9 @@ const Navbar = () => {
           walletStatisticModalData={walletStatisticModalData}
           tableview={tableview}
           setTableview={setTableview}
+          isFetch={isFetch}
+          setIsFetch={setIsFetch}
+          setLevelPaid={setLevelPaid}
         />
       )}
       {showWithDrawalModal && (

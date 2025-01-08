@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
-// import "./App.css";
+import "./App.css";
 import Navbar from "./Components/Navbar";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
@@ -34,7 +34,7 @@ function App() {
     const lastShown = localStorage.getItem("warningModalLastShown");
     const now = new Date().getTime();
     const sixHoursInMs = 6 * 60 * 60 * 1000;
-    console.log(lastShown, "lastShown");
+
     if (!lastShown || now - parseInt(lastShown) > sixHoursInMs) {
       setShowWarningModal(true);
       localStorage.setItem("warningModalLastShown", now.toString());

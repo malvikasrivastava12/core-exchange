@@ -1,6 +1,11 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { IoIosLink } from "react-icons/io";
 import DAOIcon from "../assets/Images/Core_Exchange_Logo_favicon.png";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { URLApi } from "../Helper/Api_function";
+import { userClaimedRegistrationTokenfn } from "../Helper/Web3";
+import { useSelector } from "react-redux";
 export default function WalletStatisticModal(props) {
   const {
     toggleWalletStatisticsModal,
@@ -10,7 +15,76 @@ export default function WalletStatisticModal(props) {
     walletStatisticModalData,
     tableview,
     setTableview,
+    isFetch,
+    setIsFetch,
+    setLevelPaid,
   } = props;
+  const [securityPin, setSecurityPin] = useState(false);
+  const [newPasskey, setNewPasskey] = useState("");
+  const [confirmPasskey, setConfirmPasskey] = useState("");
+  const { userInfo } = useSelector((state) => state.login);
+  console.log(userInfo.securityPin, "::::011211564");
+  const [tableUser, setTableUser] = useState(0);
+
+  const handleSecurityPin = () => {
+    setSecurityPin((prev) => !prev);
+  };
+
+  const handleUpdatepasskey = async () => {
+    if (newPasskey != confirmPasskey) {
+      toast.error("Pin not match");
+      setNewPasskey("");
+      setConfirmPasskey("");
+      return;
+    }
+    if (newPasskey == 0 || confirmPasskey == 0) {
+      toast.error("Pin can not be zero");
+      setNewPasskey("");
+      setConfirmPasskey("");
+      return;
+    }
+    if (newPasskey === confirmPasskey) {
+      try {
+        const response = await axios.post(`${URLApi}/securityPin`, {
+          pin: newPasskey,
+          user: walletAddress,
+        });
+        console.log(response, "response");
+        if (response?.data?.status == 200) {
+          toast.success(response?.data?.message);
+          setIsFetch(!isFetch);
+        } else {
+          toast.error(response?.data?.message);
+        }
+        setNewPasskey("");
+        setConfirmPasskey("");
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${URLApi}/getLevelAndPaid`, {
+          params: {
+            user: walletAddress,
+          },
+        });
+        console.log(response.data, "getLevelAndPaid1");
+
+        setTableUser(response.data.data);
+        setLevelPaid(response.data);
+        console.log(response.data.all, "response.data.all");
+        console.log(tableUser, "tableUser");
+      } catch (error) {
+        console.log("Error getLevelAndPaid :", error);
+      }
+    };
+
+    fetchData();
+  }, [walletAddress]);
   return (
     <div
       className="modal fade show"
@@ -83,7 +157,7 @@ export default function WalletStatisticModal(props) {
                     }}
                     alt="DAO Icon"
                   />
-                  Core Wallet Address
+                  DAO Wallet Address
                 </h6>
                 <input
                   type="text"
@@ -107,7 +181,7 @@ export default function WalletStatisticModal(props) {
 
                 {/* <div className="modaldash"></div> */}
               </form>
-              <div className="modal-contents-section">
+              <div className="depositp">
                 {walletStatisticModalData.map((item, index) => (
                   <>
                     <div class="modaldesc">
@@ -132,8 +206,16 @@ export default function WalletStatisticModal(props) {
                               type="button"
                               class="maindescbut getButton"
                               style={{ marginTop: "4px" }}
-                              onClick={() => {
-                                setTableview(item.id);
+                              onClick={async () => {
+                                if (
+                                  item?.id === 0 &&
+                                  item.buttonText == "Claim now"
+                                ) {
+                                  await userClaimedRegistrationTokenfn();
+                                  setIsFetch(!isFetch);
+                                } else {
+                                  setTableview(item.id);
+                                }
                               }}
                             >
                               {item.buttonText}
@@ -147,87 +229,143 @@ export default function WalletStatisticModal(props) {
                     </div>
                     {tableview === item.id && (
                       <>
-                        <div
-                          className="d-flex align-items-center justify-content-center"
-                          onClick={() => setTableview("")}
-                        >
-                          <div class="closee">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                            <svg viewBox="0 0 36 36" class="circlu">
-                              <path
-                                stroke-dasharray="100, 100"
-                                d="M18 2.0845
+                        <div className="table-container">
+                          <div
+                            className="d-flex align-items-center justify-content-center"
+                            onClick={() => setTableview("")}
+                          >
+                            <div class="closee">
+                              <span></span>
+                              <span></span>
+                              <span></span>
+                              <span></span>
+                              <svg viewBox="0 0 36 36" class="circlu">
+                                <path
+                                  stroke-dasharray="100, 100"
+                                  d="M18 2.0845
                     a 15.9155 15.9155 0 0 1 0 31.831
                     a 15.9155 15.9155 0 0 1 0 -31.831"
-                              ></path>
-                            </svg>
+                                ></path>
+                              </svg>
+                            </div>
                           </div>
-                        </div>
-                        <div className="table-responsive">
-                          <table class="table table-dark">
-                            <thead>
-                              <tr>
-                                <th scope="col">SNo</th>
-                                <th scope="col">Address</th>
-                                <th scope="col">level</th>
-                                <th scope="col">Direct</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr>
-                                <th scope="row">1</th>
-                                <td>Mark</td>
-                                <td>Otto</td>
-                                <td>mdo</td>
-                              </tr>
-                              <tr>
-                                <th scope="row">1</th>
-                                <td>Mark</td>
-                                <td>Otto</td>
-                                <td>mdo</td>
-                              </tr>
-                              <tr>
-                                <th scope="row">1</th>
-                                <td>Mark</td>
-                                <td>Otto</td>
-                                <td>mdo</td>
-                              </tr>
-                              <tr>
-                                <th scope="row">1</th>
-                                <td>Mark</td>
-                                <td>Otto</td>
-                                <td>mdo</td>
-                              </tr>
-                            </tbody>
-                          </table>
+
+                          <div className="table-responsive">
+                            <table class="table table-dark">
+                              <thead className="k-grid-header " role="rowgroup">
+                                <tr role="row">
+                                  <th
+                                    role="columnheader"
+                                    data-field="SNO"
+                                    data-title="Name"
+                                    class="k-header"
+                                  >
+                                    Level
+                                  </th>
+                                  <th
+                                    role="columnheader"
+                                    data-field="SNO"
+                                    data-title="Name"
+                                    class="k-header"
+                                  >
+                                    User
+                                  </th>
+                                </tr>
+                              </thead>
+                              {tableUser &&
+                                tableUser?.map((user) => (
+                                  <tbody
+                                    className="table-body"
+                                    key={user.id || user.level}
+                                  >
+                                    <tr>
+                                      <td>{user?.level}</td>
+                                      <td>{user?.people}</td>
+                                    </tr>
+                                  </tbody>
+                                ))}
+                              {/* <tbody className="table-body">
+                                <tr>
+                                  <td>Mark</td>
+                                  <td>Mark</td>
+                                </tr>
+                              </tbody> */}
+                            </table>
+                          </div>
                         </div>
                       </>
                     )}
                   </>
                 ))}
 
-                <h5>Your Refferal Link</h5>
-                <form className="maincontform authFalse">
-                  <input
-                    type="text"
-                    placeholder=""
-                    value={walletAddress}
-                    readOnly
-                  />
-                </form>
-                <button
-                  className="maindescbut"
-                  style={{ marginTop: "0px" }}
-                  onClick={handleCopy}
-                >
-                  Copy Refferal link
-                </button>
-                <span>
-                  <p>Your PIN has already been setup</p>
-                </span>
+                <div class="modaldesc">
+                  <form class="maincontform" style={{ marginBottom: "0px" }}>
+                    <label>Your referral link:</label>
+                    <input
+                      type="text"
+                      placeholder=""
+                      value={walletAddress}
+                      readOnly
+                    />
+                    <button class="maindescbut buttoncopy" onClick={handleCopy}>
+                      Copy referral link
+                    </button>
+                    {!userInfo.securityPin ? (
+                      <div>
+                        {!securityPin ? (
+                          // Show this button when securityPin is false
+                          <button
+                            className="maindescbut"
+                            onClick={handleSecurityPin}
+                          >
+                            Security Pass Code
+                          </button>
+                        ) : (
+                          // Show this form when securityPin is true
+                          <>
+                            <label>
+                              Specify deposit and withdrawal security pin here
+                            </label>
+                            <div className="deposit-input-container">
+                              <input
+                                type="password"
+                                placeholder="New Pass Key"
+                                value={newPasskey}
+                                onChange={(e) => setNewPasskey(e.target.value)}
+                              />
+                              <input
+                                type="password"
+                                placeholder="Confirm New Pass Key"
+                                value={confirmPasskey}
+                                onChange={(e) =>
+                                  setConfirmPasskey(e.target.value)
+                                }
+                              />
+                              <button
+                                className="maindescbut"
+                                onClick={handleUpdatepasskey}
+                              >
+                                Update
+                              </button>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    ) : (
+                      <div
+                        class="maincontform authTrue d-block "
+                        style={{ width: "fit-content" }}
+                      >
+                        <h3
+                          className="h3"
+                          style={{ fontSize: "18px", opacity: "0.7" }}
+                        >
+                          Your PIN has already been setup.
+                        </h3>
+                      </div>
+                    )}
+                  </form>
+                </div>
               </div>
             </>
           )}

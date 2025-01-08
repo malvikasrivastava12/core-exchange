@@ -20,6 +20,7 @@ const MainContent = () => {
   const day7 = userInfo?.firstDepositAt * 1000 + 7 * 24 * 60 * 60 * 1000;
   const day30 = userInfo?.firstDepositAt * 1000 + 30 * 24 * 60 * 60 * 1000;
   const day10 = userInfo?.firstDepositAt * 1000 + 10 * 24 * 60 * 60 * 1000;
+  const [con, setCon] = useState(false);
   useEffect(() => {
     AOS.init({
       duration: 1000,
@@ -44,13 +45,14 @@ const MainContent = () => {
     if (address) {
       isUserExist(address)
         .then((res) => {
+          console.log(res, ":in userexist");
           setUserExit(res);
         })
         .catch((e) => {
           console.log("error", e);
         });
     }
-  }, [address]);
+  }, [address, con]);
   const handleRegister = async () => {
     try {
       if (!ref) {
@@ -66,15 +68,16 @@ const MainContent = () => {
       }
 
       if (!isRef) {
-        toast.error("Referral is not valid");
+        toast.error("Referral Address is not valid");
         return;
       }
       const register = await registerfn(ref);
-      // await toast.promise(register, {
-      //   loading: "Transaction is pending",
-      //   success: "Transaction is successful",
-      //   error: "Transaction failed",
-      // });
+      if (register) {
+        setTimeout(() => {
+          setCon(!con);
+        }, 1000);
+      }
+      console.log(register, "::::regitser");
     } catch (error) {
       console.log(error);
     }
@@ -130,7 +133,9 @@ const MainContent = () => {
 
           setTimeRemaining((prev) => ({
             ...prev,
-            [timer.id]: `${days}d ${hours}h ${minutes}m ${seconds}s`,
+            [timer.id]: `${days || 0}d ${hours || 0}h ${minutes || 0}m ${
+              seconds || 0
+            }s`,
           }));
         }
       }, 1000);
@@ -162,11 +167,7 @@ const MainContent = () => {
                 <div className="perfection">perfection in details</div>
               </div>
               <div className="mainbackwrap">
-                <div
-                  className="mainbackdesc"
-                  data-aos="fade-left"
-                  // data-aos-duration="1000"
-                >
+                <div className="mainbackdesc" data-aos="fade-left">
                   <h1>Reliable investments with</h1>
                   <img src={LogoWhite} className="mainico" alt="Tron Full" />
                   <h1>
@@ -224,24 +225,24 @@ const MainContent = () => {
                           required
                         />
                       </div>
-                      {address ? (
-                        userExit ? (
-                          <div
-                            className="maindescbut"
-                            onClick={toggleShowAccountModal}
-                          >
-                            Account Information
-                          </div>
-                        ) : (
-                          <div
-                            className="maindescbut"
-                            onClick={() => handleRegister()}
-                          >
-                            Register Now
-                          </div>
-                        )
-                      ) : (
-                        <ConnectBtn />
+
+                      {!address && <ConnectBtn />}
+                      {address && !userExit && (
+                        <div
+                          className="maindescbut"
+                          onClick={() => handleRegister()}
+                        >
+                          Register Now
+                        </div>
+                      )}
+
+                      {address && userExit && (
+                        <div
+                          className="maindescbut"
+                          onClick={toggleShowAccountModal}
+                        >
+                          Account Information
+                        </div>
                       )}
 
                       {/* <p id="invsttbutton" className="maindescbut">
@@ -284,10 +285,10 @@ const MainContent = () => {
           </div>
         </div>
       </div>
-      <div className="content" style={{ marginTop: "56px" }}>
+      <div className="content">
         <div className="mainabout" id="about">
           <div className="wrap">
-            <h2>
+            <h2 data-aos="fade-up">
               We will <span className="gt">multiply</span> your funds{" "}
               <span className="gt">unlimited</span>
               <small>without any risks</small>
@@ -299,22 +300,21 @@ const MainContent = () => {
               <div className="aboutdashright"></div>
               <div
                 className="mainaboutitem aboutitemgrad1 "
-
                 // data-aos-anchor="#example-anchor"
                 // data-aos-offset="500"
                 // data-aos-duration="1000"
                 //fromLeftOut
-                // data-aos="fade-up"
+                data-aos="fade-right"
               >
                 <h3>Unlimited earnings with always growing rates</h3>
                 We provide investment conditions with growing percentage,
                 depending on basic interest rate, smart-contract total balance
                 bonus and personal "hold-bonus". Maximal available profit: +100%
-                Polygon of referral's daily reward
+                Core of referral's daily reward
               </div>
               <div
-                className="mainaboutitem aboutitemgrad2"
-                // data-aos="fade-left"
+                className="mainaboutitem aboutitemgrad2 "
+                data-aos="fade-right"
               >
                 <h3>Worldwide legal company with professional team</h3>
                 We are the officially registered company with team of trusted
@@ -322,7 +322,7 @@ const MainContent = () => {
                 increase platform popularity and make it truly worldwide. Join
                 us and get your profit!
               </div>
-              <div className="mainaboutitem2 aboutitemgrad">
+              <div className="mainaboutitem2 aboutitemgrad" data-aos="fade-up">
                 <a href="#" target="_blank" rel="noopener noreferrer">
                   <h3 style={{ color: "#fd9500", fontWeight: "bold" }}>
                     See Core Scan
@@ -361,7 +361,7 @@ const MainContent = () => {
                 simple <span className="gt">3 steps</span> to get earnings
               </small>
             </h2>
-            <div className="stepsline">
+            <div className="stepsline" data-aos="fade-right">
               <div className="bigstepline"></div>
               <div className="bigsteplinecic1"></div>
               <div className="stepslinewrap">
@@ -403,7 +403,7 @@ const MainContent = () => {
             </div>
 
             {/* Step #2 */}
-            <div className="stepsline">
+            <div className="stepsline" data-aos="fade-up">
               <div className="bigsteplinecic1"></div>
               <div className="stepslinewrap ">
                 <div className="icosteps2">
@@ -438,7 +438,10 @@ const MainContent = () => {
                   </a>
                 </form>
               </div>
-              <div className="stepslinewrap stepslinewrapright ">
+              <div
+                className="stepslinewrap stepslinewrapright "
+                data-aos="fade-right"
+              >
                 <h3>Step #2: Get Dao earnings</h3>
                 <div className="stepsblock stepsblockfull">
                   <h4>
@@ -454,9 +457,9 @@ const MainContent = () => {
                     You will get benefit of 1 DAO from every level up to 11
                     Levels
                   </b>
-                  <br /> Self - <b style={{ color: "#fd9500" }}>10 Polygon</b>
+                  <br /> Self - <b style={{ color: "#fd9500" }}>10 Core</b>
                   <br /> Each Level ={" "}
-                  <b style={{ color: "#fd9500" }}> 1 Polygon</b>
+                  <b style={{ color: "#fd9500" }}> 1 Core</b>
                   <a
                     href="#"
                     data-remodal-target="wallet"
@@ -469,19 +472,19 @@ const MainContent = () => {
             </div>
 
             {/* Step #3  //fromLeftOut*/}
-            <div className="stepsline">
+            <div className="stepsline" data-aos="fade-up">
               <div className="bigsteplinecic1"></div>
               <div className="stepslinewrap ">
-                <h3>Step #3: Get Benefit of F50</h3>
+                <h3>Step #3: Get Benefit of C50</h3>
                 <div className="stepsblock stepsblockfull2">
                   <h4>
                     Get your <img src={DAOIcon} alt="" /> DAO Program
                   </h4>
                   <FaRegCheckCircle /> Get a Huge Team in{" "}
-                  <b style={{ color: "#fd9500" }}>F50 Program</b>
+                  <b style={{ color: "#fd9500" }}>C50 Program</b>
                   <br />
                   <br />
-                  <FaRegCheckCircle /> F50 Program is Designed and Developed by
+                  <FaRegCheckCircle /> C50 Program is Designed and Developed by
                   Unique and Smart Way from which You will get a Huge Team
                   <br />
                   <br />
@@ -490,7 +493,7 @@ const MainContent = () => {
                 </div>
               </div>
             </div>
-            <div className="stepsline">
+            <div className="stepsline" data-aos="fade-up">
               <div className="bigsteplinecic1"></div>
               <div className="stepslinewrap stepslinewrapright ">
                 <h3>Step #4: Get Benefit of Magic Income</h3>
@@ -528,7 +531,7 @@ const MainContent = () => {
               </div>
             </div>
 
-            <div className="stepsline">
+            <div className="stepsline" data-aos="fade-up">
               <div className="bigsteplinecic1"></div>
               <div className="stepslinewrap ">
                 <h3>Step #5: Get Benefit of Pre Launching Bonanza</h3>
@@ -538,6 +541,27 @@ const MainContent = () => {
                   </h4>
                   <FaRegCheckCircle /> Get 100% Direct income from your Active
                   Direct's Upgraded Package.
+                  <br />
+                  <br />
+                  <FaRegCheckCircle /> Offer valid for 30 days from your TOP-UP
+                  Day.
+                  <br />
+                  <br />
+                </div>
+              </div>
+            </div>
+
+            <div className="stepsline" data-aos="fade-up">
+              <div className="bigsteplinecic1"></div>
+              <div className="stepslinewrap ">
+                <h3>Step #6: Get Rank and Reward</h3>
+                <div className="stepsblock stepsblockfull2">
+                  <h4>
+                    <img src={DAOIcon} alt="" /> Get your rank and reward
+                  </h4>
+                  <FaRegCheckCircle />
+                  100% Direct Income: Earn the full value of your direct
+                  referrals' upgraded packages.
                   <br />
                   <br />
                   <FaRegCheckCircle /> Offer valid for 30 days from your TOP-UP

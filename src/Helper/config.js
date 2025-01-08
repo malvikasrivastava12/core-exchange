@@ -1,4 +1,4 @@
-export const CONTRACT_ADDRESS = "0x8af8bdBD504a9d302e251a9f6AF4fD5bC3C65b4C";
+export const CONTRACT_ADDRESS = "0x5a1c203D8148acd94d3B2785bb57288eaD3D8CC9";
 export const CONTRACT_ADDRESS_ABI = [
   {
     inputs: [
@@ -37,6 +37,37 @@ export const CONTRACT_ADDRESS_ABI = [
       },
     ],
     name: "UserStakeDetail",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "user",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "incomeType",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "time",
+        type: "uint256",
+      },
+    ],
+    name: "centraliseIncomeUpdate",
     type: "event",
   },
   {
@@ -102,11 +133,29 @@ export const CONTRACT_ADDRESS_ABI = [
     type: "event",
   },
   {
-    inputs: [],
-    name: "CORE",
-    outputs: [{ internalType: "contract IERC20", name: "", type: "address" }],
-    stateMutability: "view",
-    type: "function",
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "user",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "time",
+        type: "uint256",
+      },
+    ],
+    name: "userVirtualTokenClaimDetailOfRegistration",
+    type: "event",
   },
   {
     inputs: [{ internalType: "address", name: "", type: "address" }],
@@ -120,14 +169,15 @@ export const CONTRACT_ADDRESS_ABI = [
     name: "UserDetail",
     outputs: [
       { internalType: "uint256", name: "userID", type: "uint256" },
-      {
-        internalType: "address",
-        name: "userReferalAddress",
-        type: "address",
-      },
-      { internalType: "uint256", name: "myTotalbussiness", type: "uint256" },
+      { internalType: "address", name: "userReferalAddress", type: "address" },
       { internalType: "uint256", name: "totalDirects", type: "uint256" },
-      { internalType: "uint256", name: "totalVirtualToken", type: "uint256" },
+      { internalType: "uint256", name: "RegistrationTime", type: "uint256" },
+      { internalType: "uint256", name: "firstDeposit", type: "uint256" },
+      { internalType: "uint256", name: "myTotalbussiness", type: "uint256" },
+      { internalType: "uint256", name: "total4XAmount", type: "uint256" },
+      { internalType: "uint256", name: "totalOrganicAmount", type: "uint256" },
+      { internalType: "uint256", name: "mydirectBussiness", type: "uint256" },
+      { internalType: "uint256", name: "latestRank", type: "uint256" },
       {
         internalType: "uint256",
         name: "registrationTimeVirtualToken",
@@ -143,10 +193,11 @@ export const CONTRACT_ADDRESS_ABI = [
         name: "TotalLevelVirtualTokenAvailable",
         type: "uint256",
       },
-      { internalType: "uint256", name: "RegistrationTime", type: "uint256" },
-      { internalType: "uint256", name: "latestRank", type: "uint256" },
-      { internalType: "uint256", name: "mydirectBussiness", type: "uint256" },
-      { internalType: "uint256", name: "firstDeposit", type: "uint256" },
+      {
+        internalType: "uint256",
+        name: "TotalLevelVirtualTokenUsed",
+        type: "uint256",
+      },
     ],
     stateMutability: "view",
     type: "function",
@@ -166,6 +217,13 @@ export const CONTRACT_ADDRESS_ABI = [
     type: "function",
   },
   {
+    inputs: [{ internalType: "uint256", name: "amount", type: "uint256" }],
+    name: "deposit",
+    outputs: [],
+    stateMutability: "payable",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "idProvider",
     outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
@@ -176,6 +234,13 @@ export const CONTRACT_ADDRESS_ABI = [
     inputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     name: "idToAddress",
     outputs: [{ internalType: "address", name: "", type: "address" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "", type: "address" }],
+    name: "isRegistrationVirtualTokenClaimed",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
     stateMutability: "view",
     type: "function",
   },
@@ -229,20 +294,49 @@ export const CONTRACT_ADDRESS_ABI = [
     type: "function",
   },
   {
-    inputs: [{ internalType: "uint256", name: "amount", type: "uint256" }],
-    name: "stake",
-    outputs: [],
-    stateMutability: "payable",
+    inputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    name: "returnRankMaximumLimit",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    name: "returnRankPercent",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "userAddress", type: "address" }],
+    name: "returnVirtualTokenAmountCanBeUsed",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "", type: "address" }],
+    name: "totalIncomeExceptRoi",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
     type: "function",
   },
   {
     inputs: [
-      { internalType: "address", name: "", type: "address" },
-      { internalType: "uint256", name: "", type: "uint256" },
+      { internalType: "address", name: "user", type: "address" },
+      { internalType: "uint256", name: "amt", type: "uint256" },
+      { internalType: "uint256", name: "incomeType", type: "uint256" },
     ],
-    name: "totalVirtualCoinUsedAccordintToLevel",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
+    name: "updateUserIcome",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "userClaimedRegistredToken",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
 ];
