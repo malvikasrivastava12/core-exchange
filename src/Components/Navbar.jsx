@@ -15,7 +15,7 @@ import { setUserExist, setUserInfo, setWallet } from "../redux/reducer";
 import { useDispatch, useSelector } from "react-redux";
 import DepositModel from "../model/DepositModel";
 import WalletStatisticModal from "../model/WalletStatisticModal";
-import { getUserInfo } from "../Helper/Api_function";
+import { getFetchTeams, getUserInfo } from "../Helper/Api_function";
 import classNames from "classnames";
 
 const Navbar = () => {
@@ -29,6 +29,7 @@ const Navbar = () => {
   const [showWithDrawalModal, setShowWithDrawalModal] = useState(false);
   const [userReferer, setUserReferer] = useState("");
   const [tableview, setTableview] = useState("");
+
   const [inputAmount, setInputAmount] = useState("");
   const [inputAddress, setInputAddress] = useState("");
   const [inputPin, setInputPin] = useState("");
@@ -45,6 +46,10 @@ const Navbar = () => {
   const [splitInput, setSplitInput] = useState(0);
   const [rank, setRank] = useState(0);
   const [levelPaid, setLevelPaid] = useState({});
+  const [filteredTeam, setFilteredTeam] = useState([]);
+  // const [DirectTeam, setDirectTeam] = useState({});
+  const [levelTeam, setLevelTeam] = useState([]);
+
   const referralLink = `${base_url}/?ref=${walletAddress}`;
   const toggleMakeDepositModal = () =>
     setShowMakeDepositModal(!showMakeDepositModal);
@@ -76,6 +81,7 @@ const Navbar = () => {
 
     setIsDepositMode(false);
   };
+
   useEffect(() => {
     if (address) {
       dispatch(
@@ -107,7 +113,7 @@ const Navbar = () => {
       UserDetailsfn(address).then((res) => {
         // console.log("UserDetailsfn response", res);
         setUserDetails(res);
-        console.log(res[10], res[9], "::::::::::");
+
         if (Number(res[10]) == 10) {
           if (Number(res[9]) == 1) {
             setRank("BRONZE");
@@ -206,9 +212,27 @@ const Navbar = () => {
   const handleAmountInputChange = (event) => {
     setInputAmount(event.target.value);
   };
+  const handleLevelTeam = async () => {
+    if (walletAddress) {
+      const data = await getFetchTeams(walletAddress);
+      console.log(walletAddress, "walletAddress");
+      console.log(data, "::::::::::in getFetchTeams11");
+      const users = Array.isArray(data.data.users) ? data.data.users : [];
+      console.log(users, "directTeam");
+      setLevelTeam(users);
 
+      const filteredUsers = users.filter((user) => user.totalDeposit > 0);
+      console.log(filteredTeam?.length, ":::::::12231115");
+      setFilteredTeam(filteredUsers?.length);
+    }
+  };
+
+  useEffect(() => {
+    handleLevelTeam();
+  }, [walletAddress]);
   const MakeDepositModalData = [
     {
+      id: 0,
       label1: "Split Wallet :",
       value: userInfo?.splitWallet ?? 0,
       label2: "Click to View :",
@@ -217,6 +241,7 @@ const Navbar = () => {
       name: "SW",
     },
     {
+      id: 1,
       label1: "Left Free Core:",
       value: Number(userDetails[12]) > 0 ? Number(userDetails[12]) : 0,
       label2: "Click to View :",
@@ -225,6 +250,7 @@ const Navbar = () => {
       name: "LFPOP",
     },
     {
+      id: 2,
       label1: "Left Split Wallet :",
       value: 0,
       label2: "Click to View :",
@@ -250,6 +276,7 @@ const Navbar = () => {
     //   name: "MRI",
     // },
     {
+      id: 3,
       label1: "Total Investment :",
       value: Number(userDetails[5]) > 0 ? Number(userDetails[5]) / 1e18 : 0,
       label2: "",
@@ -258,6 +285,7 @@ const Navbar = () => {
       name: "TI",
     },
     {
+      id: 4,
       label1: "Total withdrawn :",
       value: 0,
       label2: "",
@@ -266,6 +294,25 @@ const Navbar = () => {
       name: "TW",
     },
     {
+      id: 6,
+      label1: "Total Core Remaining Account Income :",
+      value: 0,
+      label2: "Request withdraw:",
+      buttonText: "Withdraw History",
+      image: DAOIcon,
+      name: "TW",
+    },
+    {
+      id: 7,
+      label1: "Rank and Reward  Income:",
+      value: 0,
+      label2: "Request withdraw:",
+      buttonText: "Withdraw History ",
+      image: DAOIcon,
+      name: "B",
+    },
+    {
+      id: 5,
       label1: "Balance:",
       value: userInfo?.walletBalance ?? 0,
       label2: "Request withdraw:",
@@ -290,7 +337,10 @@ const Navbar = () => {
       id: 1,
       label: "Level Team:",
       heading: "All/Paid",
-      value: userInfo?.levelBonus ?? 0,
+      value: `${userInfo?.teamCount ?? 0}/${
+        filteredTeam > 0 ? filteredTeam : 0
+      }`,
+
       label2: "Click to View:",
       buttonText: "View Team",
       isTable: true,
@@ -504,6 +554,7 @@ const Navbar = () => {
           isFetch={isFetch}
           setIsFetch={setIsFetch}
           setLevelPaid={setLevelPaid}
+          levelTeam={levelTeam}
         />
       )}
       {showWithDrawalModal && (

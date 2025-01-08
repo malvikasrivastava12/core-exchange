@@ -83,3 +83,14 @@ export async function userClaimedRegistrationTokenfn() {
   });
   return data;
 }
+
+export async function getReturnVirtualTokenAmountCanBeUsed(address) {
+  const result = await readContract(config, {
+    abi: CONTRACT_ADDRESS_ABI,
+    address: CONTRACT_ADDRESS,
+    functionName: "returnVirtualTokenAmountCanBeUsed",
+    args: [address],
+  });
+  console.log(result, "getReturnVirtualTokenAmountCanBeUsed");
+  return result;
+}

@@ -45,7 +45,6 @@ const MainContent = () => {
     if (address) {
       isUserExist(address)
         .then((res) => {
-          console.log(res, ":in userexist");
           setUserExit(res);
         })
         .catch((e) => {

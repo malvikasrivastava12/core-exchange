@@ -3,9 +3,15 @@ import { IoIosLink } from "react-icons/io";
 import DAOIcon from "../assets/Images/Core_Exchange_Logo_favicon.png";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { URLApi } from "../Helper/Api_function";
+import {
+  URLApi,
+  getDirectTeam,
+  getFetchTeams,
+  setUserSecurityPin,
+} from "../Helper/Api_function";
 import { userClaimedRegistrationTokenfn } from "../Helper/Web3";
 import { useSelector } from "react-redux";
+
 export default function WalletStatisticModal(props) {
   const {
     toggleWalletStatisticsModal,
@@ -18,14 +24,20 @@ export default function WalletStatisticModal(props) {
     isFetch,
     setIsFetch,
     setLevelPaid,
+    levelTeam,
   } = props;
   const [securityPin, setSecurityPin] = useState(false);
   const [newPasskey, setNewPasskey] = useState("");
   const [confirmPasskey, setConfirmPasskey] = useState("");
   const { userInfo } = useSelector((state) => state.login);
-  console.log(userInfo.securityPin, "::::011211564");
+  const [directTeam, setDirectTeam] = useState([]);
+  // const [levelTeam, setLevelTeam] = useState([]);
   const [tableUser, setTableUser] = useState(0);
 
+  const [viewC50TeamTable, setViewC50TeamTable] = useState("");
+  const [viewLevelTeamTable, setViewLevelTeamTable] = useState("");
+  const [viewDirectTeamTable, setViewDirectTeamTable] = useState("");
+  // const [filteredTeam, setFilteredTeam] = useState([]);
   const handleSecurityPin = () => {
     setSecurityPin((prev) => !prev);
   };
@@ -63,6 +75,12 @@ export default function WalletStatisticModal(props) {
       }
     }
   };
+  const handleDirectTeam = async () => {
+    const data = await getDirectTeam(walletAddress);
+    console.log(data, "::::::::::in safdbjsabdfj");
+    setDirectTeam(Array.isArray(data.data) ? data.data : []);
+    console.log(directTeam, "directTeam");
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -76,8 +94,6 @@ export default function WalletStatisticModal(props) {
 
         setTableUser(response.data.data);
         setLevelPaid(response.data);
-        console.log(response.data.all, "response.data.all");
-        console.log(tableUser, "tableUser");
       } catch (error) {
         console.log("Error getLevelAndPaid :", error);
       }
@@ -146,7 +162,7 @@ export default function WalletStatisticModal(props) {
                 className="maincontform authFalse"
                 style={{ paddingBottom: "30px" }}
               >
-                <h6>
+                <h6 className="d-flex justify-content-center align-items-center pb-2">
                   Your
                   <img
                     src={DAOIcon}
@@ -165,24 +181,28 @@ export default function WalletStatisticModal(props) {
                   value={walletAddress}
                   readOnly
                 />
-                <div onClick={handleCopy} style={{ wordBreak: "break-word" }}>
+                <div className="d-flex flex-column gap-2 text-break">
                   <h6 style={{ paddingTop: "10px", fontSize: "14px" }}>
                     <IoIosLink />
                     Your Refferal link
                   </h6>
-                  <a href="javascript:(void:0)" style={{ color: "#fd9500" }}>
+                  <a
+                    href="javascript:(void:0)"
+                    style={{ color: "#fd9500", lineHeight: "1.4" }}
+                    className="custom-underline"
+                    onClick={handleCopy}
+                  >
                     {referralLink}
                   </a>
+                  <p style={{ textAlign: "center", fontSize: "14px" }}>
+                    Share this link with your partners to get free core
+                  </p>
                 </div>
-
-                <p style={{ textAlign: "center", fontSize: "14px" }}>
-                  Share this link with your partners to get free core
-                </p>
 
                 {/* <div className="modaldash"></div> */}
               </form>
               <div className="depositp">
-                {walletStatisticModalData.map((item, index) => (
+                {walletStatisticModalData?.map((item, index) => (
                   <>
                     <div class="modaldesc">
                       <div class="dashmodal"></div>
@@ -213,6 +233,14 @@ export default function WalletStatisticModal(props) {
                                 ) {
                                   await userClaimedRegistrationTokenfn();
                                   setIsFetch(!isFetch);
+                                } else if (item?.id === 1) {
+                                  // await handleLevelTeam();
+                                  setViewLevelTeamTable(item.id);
+                                } else if (item?.id === 2) {
+                                  setViewC50TeamTable(item.id);
+                                } else if (item?.id === 4) {
+                                  await handleDirectTeam();
+                                  setViewDirectTeamTable(item.id);
                                 } else {
                                   setTableview(item.id);
                                 }
@@ -227,12 +255,13 @@ export default function WalletStatisticModal(props) {
                         </div>
                       </div>
                     </div>
-                    {tableview === item.id && (
+
+                    {viewC50TeamTable === item.id && item.id === 2 && (
                       <>
                         <div className="table-container">
                           <div
                             className="d-flex align-items-center justify-content-center"
-                            onClick={() => setTableview("")}
+                            onClick={() => setViewC50TeamTable("")}
                           >
                             <div class="closee">
                               <span></span>
@@ -273,14 +302,220 @@ export default function WalletStatisticModal(props) {
                                 </tr>
                               </thead>
                               {tableUser &&
-                                tableUser?.map((user) => (
-                                  <tbody
-                                    className="table-body"
-                                    key={user.id || user.level}
-                                  >
-                                    <tr>
+                                tableUser?.map((user, index) => (
+                                  <tbody className="table-body">
+                                    <tr key={index}>
                                       <td>{user?.level}</td>
                                       <td>{user?.people}</td>
+                                    </tr>
+                                  </tbody>
+                                ))}
+
+                              {/* <tbody className="table-body">
+                                <tr>
+                                  <td>Mark</td>
+                                  <td>Mark</td>
+                                </tr>
+                              </tbody> */}
+                            </table>
+                            <div></div>
+                            {tableUser.length === 0 && (
+                              <div className="p-4 d-flex justify-content-center">
+                                <div>No Data Found!</div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* <div
+                            class="k-pager-wrap k-grid-pager k-widget"
+                            data-role="pager"
+                          >
+                            <a
+                              class="k-link k-pager-nav  k-state-disabled"
+                              aria-controls="DataTables_Table_0"
+                              data-dt-idx="0"
+                              tabindex="0"
+                              id="DataTables_Table_0_previous"
+                            >
+                              <i class="k-icon k-i-seek-w"></i>
+                            </a>
+                            <a
+                              class="k-link k-pager-nav  k-state-disabled"
+                              aria-controls="DataTables_Table_0"
+                              data-dt-idx="0"
+                              tabindex="0"
+                              id="DataTables_Table_0_previous"
+                            >
+                              <i class="k-icon k-i-arrow-w"></i>
+                            </a>
+                            <ul class="k-pager-numbers k-reset">
+                              <li>
+                                <a
+                                  class="k-state-selected"
+                                  aria-controls="DataTables_Table_0"
+                                  data-dt-idx="1"
+                                  tabindex="0"
+                                  value="1"
+                                >
+                                  1
+                                </a>
+                              </li>
+                            </ul>
+                            <a
+                              class="k-link k-pager-nav k-state-disabled"
+                              aria-controls="DataTables_Table_0"
+                              data-dt-idx="3"
+                              tabindex="0"
+                              id="DataTables_Table_0_next"
+                            >
+                              <i class="k-icon k-i-arrow-e"></i>
+                            </a>
+                            <a
+                              class="k-link k-pager-nav k-state-disabled"
+                              aria-controls="DataTables_Table_0"
+                              data-dt-idx="3"
+                              tabindex="0"
+                              id="DataTables_Table_0_next"
+                            >
+                              <i class="k-icon k-i-seek-e"></i>
+                            </a>
+
+                            <span class="k-pager-info k-label">
+                              Displaying 1 to 7 out of 7 items{" "}
+                            </span>
+                          </div> */}
+                        </div>
+                      </>
+                    )}
+                    {viewDirectTeamTable === item.id && item.id === 4 && (
+                      <>
+                        <div className="table-container">
+                          <div
+                            className="d-flex align-items-center justify-content-center"
+                            onClick={() => setViewDirectTeamTable("")}
+                          >
+                            <div class="closee">
+                              <span></span>
+                              <span></span>
+                              <span></span>
+                              <span></span>
+                              <svg viewBox="0 0 36 36" class="circlu">
+                                <path
+                                  stroke-dasharray="100, 100"
+                                  d="M18 2.0845
+                    a 15.9155 15.9155 0 0 1 0 31.831
+                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                                ></path>
+                              </svg>
+                            </div>
+                          </div>
+
+                          <div className="table-responsive">
+                            <table class="table table-dark">
+                              <thead className="k-grid-header " role="rowgroup">
+                                <tr role="row">
+                                  <th
+                                    role="columnheader"
+                                    data-field="SNO"
+                                    data-title="Name"
+                                    class="k-header"
+                                  >
+                                    SNo
+                                  </th>
+                                  <th
+                                    role="columnheader"
+                                    data-field="SNO"
+                                    data-title="Name"
+                                    class="k-header"
+                                  >
+                                    Address
+                                  </th>
+                                  <th
+                                    role="columnheader"
+                                    data-field="SNO"
+                                    data-title="Name"
+                                    class="k-header"
+                                  >
+                                    Invested
+                                  </th>
+                                </tr>
+                              </thead>
+                              {directTeam?.length > 0 &&
+                                directTeam?.map((user, index) => (
+                                  <tbody className="table-body">
+                                    <tr key={index}>
+                                      <td>{index + 1}</td>
+                                      <td>{user?.user}</td>
+                                      <td>{user?.depositWallet}</td>
+                                    </tr>
+                                  </tbody>
+                                ))}
+                            </table>
+                          </div>
+                        </div>
+                      </>
+                    )}
+
+                    {viewLevelTeamTable === item.id && item.id === 1 && (
+                      <>
+                        <div className="table-container">
+                          <div
+                            className="d-flex align-items-center justify-content-center"
+                            onClick={() => setViewLevelTeamTable("")}
+                          >
+                            <div class="closee">
+                              <span></span>
+                              <span></span>
+                              <span></span>
+                              <span></span>
+                              <svg viewBox="0 0 36 36" class="circlu">
+                                <path
+                                  stroke-dasharray="100, 100"
+                                  d="M18 2.0845
+                    a 15.9155 15.9155 0 0 1 0 31.831
+                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                                ></path>
+                              </svg>
+                            </div>
+                          </div>
+
+                          <div className="table-responsive">
+                            <table class="table table-dark">
+                              <thead className="k-grid-header " role="rowgroup">
+                                <tr role="row">
+                                  <th
+                                    role="columnheader"
+                                    data-field="SNO"
+                                    data-title="Name"
+                                    class="k-header"
+                                  >
+                                    Level
+                                  </th>
+                                  <th
+                                    role="columnheader"
+                                    data-field="SNO"
+                                    data-title="Name"
+                                    class="k-header"
+                                  >
+                                    Address
+                                  </th>
+                                  <th
+                                    role="columnheader"
+                                    data-field="SNO"
+                                    data-title="Name"
+                                    class="k-header"
+                                  >
+                                    Total Deposit
+                                  </th>
+                                </tr>
+                              </thead>
+                              {levelTeam?.length > 0 &&
+                                levelTeam?.map((user, index) => (
+                                  <tbody className="table-body">
+                                    <tr key={index}>
+                                      <td>{user?.level}</td>
+                                      <td>{user?.user}</td>
+                                      <td>{user?.totalDeposit}</td>
                                     </tr>
                                   </tbody>
                                 ))}
@@ -313,7 +548,6 @@ export default function WalletStatisticModal(props) {
                     {!userInfo.securityPin ? (
                       <div>
                         {!securityPin ? (
-                          // Show this button when securityPin is false
                           <button
                             className="maindescbut"
                             onClick={handleSecurityPin}
@@ -321,7 +555,6 @@ export default function WalletStatisticModal(props) {
                             Security Pass Code
                           </button>
                         ) : (
-                          // Show this form when securityPin is true
                           <>
                             <label>
                               Specify deposit and withdrawal security pin here

@@ -1,3 +1,7 @@
+.k-icon {
+  font-family: "KendoIcons";
+  display: inline-block;
+}
 .modal {
   padding-top: 0px !important;
   background-color: rgb(0 0 0 / 83%) !important ;
@@ -1346,6 +1350,7 @@ cbp-af-header.cbp-af-header-shrink {
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.4);
   border-bottom: 1px solid #444;
   padding: 10px;
+  text-align: left;
 }
 
 .table-dark {
@@ -1355,7 +1360,7 @@ cbp-af-header.cbp-af-header-shrink {
 .table-body {
   background-color: #444 !important;
   color: #fff !important;
-  text-align: center !important;
+  text-align: left !important;
   padding: 15px !important;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.4) !important;
 
@@ -1365,4 +1370,307 @@ cbp-af-header.cbp-af-header-shrink {
 .table-container th,
 .table-container td {
   background-color: #444 !important;
+}
+
+.custom-underline {
+  text-decoration: underline;
+  text-decoration-color: #fd9500;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 2px;
+}
+
+.k-header,
+.k-grid-header-wrap,
+.k-grid .k-grouping-header,
+.k-grid-header,
+.k-pager-wrap,
+.k-pager-wrap .k-textbox,
+.k-pager-wrap .k-link,
+.k-grouping-header .k-group-indicator {
+  border-color: #2b2b2b;
+}
+
+.k-widget,
+.k-button {
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+.k-pager-wrap {
+  background-color: #1d1d1d !important;
+  color: #fff !important;
+}
+
+.k-block,
+.k-header,
+.k-grid-header,
+.k-toolbar,
+.k-grouping-header,
+.k-pager-wrap,
+.k-button,
+.k-draghandle,
+html .km-pane-wrapper .k-header {
+  background-color: #1d1d1d;
+}
+
+.k-header,
+.k-grid-header,
+.k-toolbar,
+.k-dropdown-wrap,
+.k-picker-wrap,
+.k-numeric-wrap,
+.k-grouping-header,
+.k-pager-wrap,
+.k-textbox,
+.k-button,
+.k-progressbar,
+.k-draghandle,
+.k-autocomplete,
+.k-state-highlight,
+.k-tabstrip-items .k-item,
+.km-pane-wrapper > .km-pane > .km-view > .km-content {
+  background-image: url(textures/glass.png);
+  background-image: none,
+    -webkit-linear-gradient(top, rgba(255, 255, 255, 0.12) 0, rgba(
+            255,
+            255,
+            255,
+            0.2
+          )
+          50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.07) 100%);
+  background-image: none,
+    -moz-linear-gradient(top, rgba(255, 255, 255, 0.12) 0, rgba(
+            255,
+            255,
+            255,
+            0.2
+          )
+          50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.07) 100%);
+  background-image: none,
+    -o-linear-gradient(top, rgba(255, 255, 255, 0.12) 0, rgba(
+            255,
+            255,
+            255,
+            0.2
+          )
+          50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.07) 100%);
+  background-image: none,
+    linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.12) 0,
+      rgba(255, 255, 255, 0.2) 50%,
+      rgba(255, 255, 255, 0.15) 50%,
+      rgba(255, 255, 255, 0.07) 100%
+    );
+  background-position: 50% 50%;
+  background-color: #1d1d1d;
+}
+.k-block,
+.k-widget,
+.k-grid,
+.k-slider,
+.k-splitter,
+.k-treeview,
+.k-panelbar,
+.k-content,
+.k-header-column-menu {
+  outline: 0;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+.k-grid-pager {
+  border-width: 1px 0 0;
+}
+
+.k-pager-wrap {
+  clear: both;
+  overflow: hidden;
+  border-style: solid !important;
+  border-width: 1px;
+  line-height: 2em;
+  padding: 0.333em 0 0.333em 0.25em;
+}
+
+.k-widget,
+.k-widget * {
+  -moz-background-clip: border-box;
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
+}
+
+.k-animation-container,
+.k-widget,
+.k-widget *,
+.k-animation-container *,
+.k-widget *:before,
+.k-animation-container *:after,
+.k-block .k-header,
+.k-list-container {
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+}
+
+.k-widget,
+.k-block,
+.k-inline-block,
+.k-draghandle {
+  border-style: solid;
+  border-width: 1px;
+  -webkit-appearance: none;
+}
+
+.k-block,
+.k-button,
+.k-header,
+.k-grid-header,
+.k-toolbar,
+.k-grouping-header,
+.k-tooltip,
+.k-pager-wrap,
+.k-tabstrip-items .k-item,
+.k-link.k-state-hover,
+.k-textbox,
+.k-textbox:hover,
+.k-autocomplete,
+.k-dropdown-wrap,
+.k-picker-wrap,
+.k-numeric-wrap,
+.k-autocomplete.k-state-hover,
+.k-dropdown-wrap.k-state-hover,
+.k-picker-wrap.k-state-hover,
+.k-numeric-wrap.k-state-hover,
+.k-draghandle {
+  background-repeat: repeat;
+  background-position: 0 center;
+}
+
+.k-pager-wrap > .k-link {
+  border-style: solid;
+  border-width: 1px;
+}
+
+.k-pager-wrap > .k-link {
+  float: left;
+  margin: 0 0.08333em;
+  height: 2em;
+  line-height: 2em;
+  border-radius: 1.0833em;
+  cursor: pointer;
+  text-align: center;
+}
+
+.k-pager-wrap > .k-link,
+.k-pager-numbers .k-link,
+.k-pager-numbers .k-state-selected {
+  min-width: 2em;
+}
+
+.k-state-disabled,
+.k-state-disabled .k-link,
+.k-state-disabled .k-button,
+.k-other-month,
+.k-other-month .k-link,
+.k-dropzone em,
+.k-dropzone .k-upload-status,
+.k-tile-empty strong,
+.k-slider .k-draghandle {
+  color: #7a7a7a;
+}
+
+.k-state-disabled {
+  filter: alpha(opacity = 70);
+  opacity: 0.7;
+}
+
+.k-state-disabled,
+.k-state-disabled .k-link,
+.k-state-disabled .k-icon,
+.k-state-disabled .k-button,
+.k-state-disabled .k-draghandle,
+.k-state-disabled .k-upload-button input {
+  cursor: default !important;
+  outline: 0;
+}
+
+.k-link {
+  cursor: pointer;
+  outline: 0;
+  text-decoration: none;
+}
+
+.k-grid .k-pager-numbers {
+  float: left;
+  cursor: default;
+}
+
+.k-grid .k-pager-numbers,
+.k-pager-numbers .k-link,
+.k-pager-numbers .k-state-selected {
+  display: inline-block;
+  vertical-align: top;
+  margin-right: 1px;
+}
+
+.k-pager-numbers {
+  margin: 0 2px;
+}
+
+.k-reset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  text-decoration: none;
+  font-size: 100%;
+  list-style: none;
+}
+
+.k-pager-numbers li,
+.k-pager-input {
+  float: left;
+}
+
+.k-pager-numbers li,
+.k-pager-input {
+  float: left;
+}
+
+.k-pager-numbers .k-state-selected {
+  border-style: solid;
+  border-width: 1px;
+  text-align: center;
+  border-radius: 1.0833em;
+}
+.k-pager-wrap > .k-link,
+.k-pager-numbers .k-link,
+.k-pager-numbers .k-state-selected {
+  min-width: 2em;
+}
+.k-pager-numbers .k-state-selected {
+  vertical-align: top;
+}
+
+.k-grid .k-pager-numbers,
+.k-pager-numbers .k-link,
+.k-pager-numbers .k-state-selected {
+  display: inline-block;
+  vertical-align: top;
+  margin-right: 1px;
+}
+
+.k-state-selected,
+.k-state-selected:link,
+.k-state-selected:visited,
+.k-list > .k-state-selected,
+.k-list > .k-state-highlight,
+.k-panel > .k-state-selected,
+.k-ghost-splitbar-vertical,
+.k-ghost-splitbar-horizontal,
+.k-draghandle.k-state-selected:hover,
+.k-scheduler .k-scheduler-toolbar .k-state-selected,
+.k-scheduler .k-today.k-state-selected,
+.k-marquee-color {
+  color: #fff;
+  background-color: #06c;
+  border-color: #06c;
 }

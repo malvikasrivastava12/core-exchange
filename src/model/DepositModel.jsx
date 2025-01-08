@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import DAOIcon from "../assets/Images/Core_Exchange_Logo_favicon.png";
 import { useSelector } from "react-redux";
-
+import { getUserDepositList } from "../Helper/Api_function";
+import { getReturnVirtualTokenAmountCanBeUsed } from "../Helper/Web3";
+import toast from "react-hot-toast";
 export default function DepositModel(props) {
   const { userInfo } = useSelector((state) => state.login);
   const {
@@ -27,7 +29,27 @@ export default function DepositModel(props) {
     handleCancel,
     handleIsDeposit,
   } = props;
+  const handleSecurityPin = () => {
+    setSecurityPin((prev) => !prev);
+  };
+  const handleFreeCore = async () => {
+    await getReturnVirtualTokenAmountCanBeUsed();
+  };
+  const [depositHistory, setDepositHistory] = useState([]);
+  const [viewDepositHistoryTable, setViewDepositHistoryTable] = useState("");
+  const handleDepositHistory = async () => {
+    const data = await getUserDepositList(walletAddress);
+    console.log(data, "::::::::::in getUserDepositList");
+    setDepositHistory(Array.isArray(data.data) ? data.data : []);
+    console.log(depositHistory, "depositHistory");
+  };
+  const [inputDeposit, setInputDeposit] = useState(false);
+  const [isWithdraw, setIsWithdraw] = useState(false);
+  const [inputPinWithdwaw, setInputPinWithdwaw] = useState("");
 
+  const handleCancelWithdraw = () => {
+    setIsWithdraw("");
+  };
   return (
     <>
       <div
@@ -102,7 +124,7 @@ export default function DepositModel(props) {
               <>
                 <form className="maincontform authFalse">
                   <div style={{ paddingBottom: "15px" }}>
-                    <h6>
+                    <h6 className="d-flex justify-content-center align-items-center pb-2">
                       Specify deposit
                       <img
                         src={DAOIcon}
@@ -133,25 +155,10 @@ export default function DepositModel(props) {
                           onChange={(e) => setInputAddress(e.target.value)}
                         />
                         {errors.adr && <p className="error">{errors.adr}</p>}
-                        {/* {!userInfo.securityPin ? (
-                          <input
-                            type="password"
-                            value={userInfo.securityPin}
-                            onChange={(e) => setInputPin(e.target.value)}
-                          />
-                        ) : (
-                          <input
-                            type="password"
-                            placeholder="Enter Security Pin"
-                            value={inputPin}
-                            onChange={(e) => setInputPin(e.target.value)}
-                          />
-                        )} */}
+
                         <input
                           type="password"
-                          // placeholder={
-                          //   !userInfo.securityPin ? "Enter Security Pin" : ""
-                          // }
+                          placeholder="Enter Security Pin"
                           value={userInfo.securityPin}
                           onChange={(e) => setInputPin(e.target.value)}
                           // disabled={!userInfo.securityPin}
@@ -245,17 +252,123 @@ export default function DepositModel(props) {
                             </div>
                             <div class="modallinewrap">
                               {item.label2}
-                              <p
-                                type="button"
-                                class="maindescbut getButton"
-                                style={{ marginTop: "4px" }}
-                                onClick={() => {
-                                  setTableview(item.name);
-                                }}
-                              >
-                                {item.buttonText}
-                              </p>
+                              {(item.id === 5
+                                ? !inputDeposit && item.id === 5
+                                : true) && (
+                                <p
+                                  type="button"
+                                  class="maindescbut getButton"
+                                  style={{ marginTop: "4px" }}
+                                  onClick={async () => {
+                                    if (item.id === 5) {
+                                      setInputDeposit(true);
+                                    } else if (item?.id === 3) {
+                                      await handleDepositHistory();
+                                      setViewDepositHistoryTable(item.id);
+                                    } else {
+                                      setTableview(item.id);
+                                    }
+                                  }}
+                                  // onClick={() => {
+
+                                  //   if (item.id === 5) {
+                                  //     setInputDeposit(true);
+                                  //   } else setTableview(item.id);
+                                  // }}
+                                >
+                                  {item.buttonText}
+                                </p>
+                              )}
+                              {inputDeposit && item.id === 5 && (
+                                <>
+                                  {!isWithdraw ? (
+                                    <div className="maincontform authFalse">
+                                      <div
+                                        className="deposit-input-container"
+                                        style={{ paddingTop: "10px" }}
+                                      >
+                                        <input
+                                          type="password"
+                                          placeholder="Security Pin"
+                                          value={inputPinWithdwaw}
+                                          onChange={(e) => {
+                                            console.log(e.target.value);
+                                            setInputPinWithdwaw(e.target.value);
+                                          }}
+                                        />
+                                        <button
+                                          className="maindescbut"
+                                          onClick={() => {
+                                            console.log(
+                                              inputPinWithdwaw,
+                                              userInfo?.securityPin,
+                                              "inputPinWithdwaw"
+                                            );
+                                            if (
+                                              userInfo?.securityPin ==
+                                              inputPinWithdwaw
+                                            ) {
+                                              setIsWithdraw(true);
+                                            } else {
+                                              toast.error("Pin Not Match!!");
+                                            }
+                                          }}
+                                        >
+                                          Withdraw
+                                        </button>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <>
+                                      <div className="maincontform authFalse">
+                                        {" "}
+                                        <div className="deposit-input-container">
+                                          <input
+                                            type="text"
+                                            value={`Transfer to wallet (Core) : 0`}
+                                            readOnly
+                                          />
+                                          <input
+                                            type="text"
+                                            value={`Transfer to Split Wallet(Core) : 0`}
+                                            readOnly
+                                          />
+                                          <input
+                                            type="text"
+                                            value={`Re-Invest(USD) : 0 `}
+                                            readOnly
+                                          />
+                                          <div
+                                            style={{
+                                              display: "flex",
+                                              gap: "5px",
+                                              marginBottom: "10px",
+                                            }}
+                                          >
+                                            <button
+                                              className="maindescbut cancel"
+                                              type="button"
+                                              onClick={handleCancelWithdraw}
+                                              style={{ width: "50%" }}
+                                            >
+                                              CANCEL
+                                            </button>
+                                            <button
+                                              className="maindescbut"
+                                              type="button"
+                                              // onClick={handleDeposit}
+                                            >
+                                              Withdraw NOW
+                                            </button>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </>
+                                  )}
+                                </>
+                              )}
                             </div>
+
                             <div className="cardtext-container">
                               <p className="cardtext">{item.text}</p>
                             </div>
@@ -337,6 +450,94 @@ export default function DepositModel(props) {
                                     <td>mdo</td>
                                   </tr>
                                 </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </>
+                      )}
+                      {viewDepositHistoryTable === item.id && (
+                        <>
+                          <div className="table-container">
+                            <div
+                              className="d-flex align-items-center justify-content-center"
+                              onClick={() => setViewDepositHistoryTable("")}
+                            >
+                              <div class="closee">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <svg viewBox="0 0 36 36" class="circlu">
+                                  <path
+                                    stroke-dasharray="100, 100"
+                                    d="M18 2.0845
+                    a 15.9155 15.9155 0 0 1 0 31.831
+                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                                  ></path>
+                                </svg>
+                              </div>
+                            </div>
+
+                            <div className="table-responsive">
+                              <table class="table table-dark">
+                                <thead
+                                  className="k-grid-header "
+                                  role="rowgroup"
+                                >
+                                  <tr role="row">
+                                    <th
+                                      role="columnheader"
+                                      data-field="SNO"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      SNO
+                                    </th>
+                                    <th
+                                      role="columnheader"
+                                      data-field="SNO"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      Credit Amount
+                                    </th>
+
+                                    <th
+                                      role="columnheader"
+                                      data-field="Name"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      Dated
+                                    </th>
+                                    <th
+                                      role="columnheader"
+                                      data-field="Name"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      Description
+                                    </th>
+                                  </tr>
+                                </thead>
+                                {depositHistory?.length > 0 &&
+                                  depositHistory?.map((user, index) => (
+                                    <tbody className="table-body" key={index}>
+                                      <tr>
+                                        <td>{index + 1}</td>
+                                        <td>{user?.user}</td>
+                                        <td>{user?.depositWallet}</td>
+                                      </tr>
+                                    </tbody>
+                                  ))}
+                                {/* <tbody className="table-body">
+                                  <tr>
+                                    <th scope="row">1</th>
+                                    <td>Mark</td>
+                                    <td>Otto</td>
+                                    <td>mdo</td>
+                                  </tr>
+                                </tbody> */}
                               </table>
                             </div>
                           </div>
