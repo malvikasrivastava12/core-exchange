@@ -9,7 +9,11 @@ import DollarImage from "../assets/Images/dollar.png";
 import { useAccount } from "wagmi";
 import { base_url } from "../Helper/config";
 import toast from "react-hot-toast";
-import { Depositfn, UserDetailsfn } from "../Helper/Web3";
+import {
+  Depositfn,
+  getReturnVirtualTokenAmountCanBeUsed,
+  UserDetailsfn,
+} from "../Helper/Web3";
 import { isUserExist } from "../Helper/Web3";
 import { setUserExist, setUserInfo, setWallet } from "../redux/reducer";
 import { useDispatch, useSelector } from "react-redux";
@@ -35,9 +39,7 @@ const Navbar = () => {
   const [inputPin, setInputPin] = useState("");
   const [isLoader, setIsLoader] = useState(false);
   const [isFetch, setIsFetch] = useState(false);
-  const [amt, setAmt] = useState("");
-  const [adr, setAdr] = useState("");
-  const [pin, setPin] = useState("");
+
   const [errors, setErrors] = useState({});
   const [isDepositMode, setIsDepositMode] = useState(false);
   const [userDetails, setUserDetails] = useState([]);
@@ -136,22 +138,17 @@ const Navbar = () => {
 
     if (!inputAmount) {
       newErrors.amt = "Transaction amount is required.";
-      // newErrors.adr = "";
-      // newErrors.adr = "";
     }
     console.log(inputAddress, "inputAddress");
     if (!inputAddress) {
-      // newErrors.amt = newErrors.amt != "" ? newErrors.amt : "";
       newErrors.adr = "Address is required.";
     }
     if (!inputPin) {
-      // newErrors.amt = newErrors.adr != "" ? newErrors.adr : "";
       newErrors.pin = "Security Pin  is required.";
     }
     console.log(newErrors, "newErrors");
     setErrors(newErrors);
 
-    // Exit if there are errors
     if (newErrors.amt != "" || newErrors.adr != "" || newErrors.pin != "") {
       setTimeout(() => {
         setErrors({ amt: "", adr: "", pin: "" });
@@ -159,24 +156,20 @@ const Navbar = () => {
       return;
     }
     setIsDepositMode(true);
-    // setInputAmount(`Main-Core : ${userInfo?.splitWallet ?? 0}`);
-    // setInputAddress(`Free-Core : ${userInfo?.airdropWallet ?? 0}`);
-    // setInputPin(`Split-Wallet : ${userInfo?.splitWallet ?? 0}`);
+    // handleMainandFreeCore(walletAddress, inputAmount, 1);
   };
+
   const handleDeposit = async () => {
     const newErrors = { amt: "", adr: "", pin: "" };
 
     if (!inputAmount) {
       newErrors.amt = "Transaction amount is required.";
-      // newErrors.adr = "";
     }
     console.log(inputAddress, "inputAddress");
     if (!inputAddress) {
-      // newErrors.amt = newErrors.amt != "" ? newErrors.amt : "";
       newErrors.adr = "Address is required.";
     }
     if (!inputPin) {
-      // newErrors.amt = newErrors.adr != "" ? newErrors.adr : "";
       newErrors.pin = "Security Pin  is required.";
     }
     console.log(newErrors, "newErrors");
@@ -192,12 +185,11 @@ const Navbar = () => {
     setIsLoader(true);
     if (walletAddress) {
       try {
-        // const res = await isUserExist(address);
         if (!userExist) {
           toast.error("Please register Your self");
           return;
         }
-        // setUserExit(res);
+
         await Depositfn(0, inputAmount);
         setIsLoader(false);
         setIsFetch(!isFetch);
@@ -208,21 +200,25 @@ const Navbar = () => {
         console.log("error", e);
       }
     }
+    setIsDepositMode(false);
+    setInputAmount("");
+    setInputAddress("");
   };
+
   const handleAmountInputChange = (event) => {
     setInputAmount(event.target.value);
   };
   const handleLevelTeam = async () => {
     if (walletAddress) {
       const data = await getFetchTeams(walletAddress);
-      console.log(walletAddress, "walletAddress");
-      console.log(data, "::::::::::in getFetchTeams11");
+      // console.log(walletAddress, "walletAddress");
+      // console.log(data, "::::::::::in getFetchTeams11");
       const users = Array.isArray(data.data.users) ? data.data.users : [];
-      console.log(users, "directTeam");
+      // console.log(users, "directTeam");
       setLevelTeam(users);
 
       const filteredUsers = users.filter((user) => user.totalDeposit > 0);
-      console.log(filteredTeam?.length, ":::::::12231115");
+      // console.log(filteredTeam?.length, ":::::::12231115");
       setFilteredTeam(filteredUsers?.length);
     }
   };
@@ -284,33 +280,16 @@ const Navbar = () => {
       image: DAOIcon,
       name: "TI",
     },
-    {
-      id: 4,
-      label1: "Total withdrawn :",
-      value: 0,
-      label2: "",
-      buttonText: "Withdraw History",
-      image: DAOIcon,
-      name: "TW",
-    },
-    {
-      id: 6,
-      label1: "Total Core Remaining Account Income :",
-      value: 0,
-      label2: "Request withdraw:",
-      buttonText: "Withdraw History",
-      image: DAOIcon,
-      name: "TW",
-    },
-    {
-      id: 7,
-      label1: "Rank and Reward  Income:",
-      value: 0,
-      label2: "Request withdraw:",
-      buttonText: "Withdraw History ",
-      image: DAOIcon,
-      name: "B",
-    },
+    // {
+    //   id: 4,
+    //   label1: "Total withdrawn :",
+    //   value: 0,
+    //   label2: "",
+    //   buttonText: "Withdraw History",
+    //   image: DAOIcon,
+    //   name: "TW",
+    // },
+
     {
       id: 5,
       label1: "Balance:",
@@ -333,6 +312,16 @@ const Navbar = () => {
 
       text: "Click Get button, and you will get instantly your today pool earnings as a single transaction. Your personal hold-bonus will be reseted.",
     },
+    {
+      id: 13,
+      label: "Total Core Remaining Account Income :",
+      value: 0,
+      label2: "Request withdraw:",
+      buttonText: "Withdraw History",
+      image: DAOIcon,
+      name: "TW",
+    },
+
     {
       id: 1,
       label: "Level Team:",
@@ -378,11 +367,20 @@ const Navbar = () => {
       image: DAOIcon,
     },
     {
+      id: 14,
+      label: "Rank and Reward Income:",
+      value: userInfo?.starRankIncome ?? 0,
+      label2: "Request withdraw:",
+      buttonText: "Withdraw History",
+      image: DAOIcon,
+      name: "B",
+    },
+    {
       id: 6,
-      label: "Offer:",
-      value: 0,
-      label2: "Offer History:",
-      buttonText: "Offer History",
+      label: "Magic Income:",
+      value: userInfo?.magicIncome ?? 0,
+      label2: "Magic Income History:",
+      buttonText: "Magic Income History",
       image: DAOIcon,
     },
     {
@@ -399,27 +397,27 @@ const Navbar = () => {
       label: "C50 Income:",
       value: 0,
       label2: "Recent Days Income Total:",
-      buttonText: "F50 Income History",
+      buttonText: "C50 Income History",
       image: DAOIcon,
     },
 
     {
       id: 9,
-      label: "Magic Income:",
-      value: userInfo?.magicIncome ?? 0,
-      label2: "Magic Income History:",
-      buttonText: "Magic Income History",
-      image: DAOIcon,
-    },
-
-    {
-      id: 10,
-      label: "Offer Income:",
-      value: 0,
+      label: "Offer",
+      value: userInfo?.magicBoosterIncome ?? 0,
       label2: "Offer Income History:",
       buttonText: "Offer Income History",
       image: DAOIcon,
     },
+
+    // {
+    //   id: 10,
+    //   label: "Offer Income:",
+    //   value: 0,
+    //   label2: "Offer Income History:",
+    //   buttonText: "Offer Income History",
+    //   image: DAOIcon,
+    // },
 
     {
       id: 11,
@@ -464,6 +462,21 @@ const Navbar = () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, [lastScrollY]);
+
+  const handleMainandFreeCore = async (walletAddress, inputAmount, rank) => {
+    const virtualToken = await getReturnVirtualTokenAmountCanBeUsed(
+      walletAddress,
+      inputAmount,
+      rank
+    );
+    const reg = Number(virtualToken[0]);
+    const level = Number(virtualToken[1]) / 1e18;
+    const split = Number(virtualToken[2]);
+    setFreeWallet(reg + level);
+    setSplitInput(split);
+    setMainInput(inputAmount - (reg + level + split));
+    // console.log(reg, level, split, "virtualToken");
+  };
 
   return (
     <>

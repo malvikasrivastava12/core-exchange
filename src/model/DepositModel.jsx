@@ -3,6 +3,8 @@ import DAOIcon from "../assets/Images/Core_Exchange_Logo_favicon.png";
 import { useSelector } from "react-redux";
 import { getUserDepositList } from "../Helper/Api_function";
 import { getReturnVirtualTokenAmountCanBeUsed } from "../Helper/Web3";
+import { IoCaretForwardOutline } from "react-icons/io5";
+import { IoCaretBackOutline } from "react-icons/io5";
 import toast from "react-hot-toast";
 export default function DepositModel(props) {
   const { userInfo } = useSelector((state) => state.login);
@@ -32,9 +34,7 @@ export default function DepositModel(props) {
   const handleSecurityPin = () => {
     setSecurityPin((prev) => !prev);
   };
-  const handleFreeCore = async () => {
-    await getReturnVirtualTokenAmountCanBeUsed();
-  };
+
   const [depositHistory, setDepositHistory] = useState([]);
   const [viewDepositHistoryTable, setViewDepositHistoryTable] = useState("");
   const handleDepositHistory = async () => {
@@ -42,14 +42,16 @@ export default function DepositModel(props) {
     console.log(data, "::::::::::in getUserDepositList");
     setDepositHistory(Array.isArray(data.data) ? data.data : []);
     console.log(depositHistory, "depositHistory");
+    console.log(walletAddress, "walletAddress-------");
   };
   const [inputDeposit, setInputDeposit] = useState(false);
   const [isWithdraw, setIsWithdraw] = useState(false);
   const [inputPinWithdwaw, setInputPinWithdwaw] = useState("");
-
+  const [viewSplitwalletTable, setViewSplitwalletTable] = useState("");
   const handleCancelWithdraw = () => {
     setIsWithdraw("");
   };
+
   return (
     <>
       <div
@@ -111,8 +113,8 @@ export default function DepositModel(props) {
                 </div>
               </form>
             )}
-
-            {/* {!userExist && walletAddress && (
+            {/* 
+            {!userExist && walletAddress && (
               <form className="maincontform authFalse">
                 <p>You need to register before deposition</p>
                 <button className="maindescbut">Register Now</button>
@@ -159,7 +161,9 @@ export default function DepositModel(props) {
                         <input
                           type="password"
                           placeholder="Enter Security Pin"
-                          value={userInfo.securityPin}
+                          value={
+                            userInfo.securityPin ? userInfo.securityPin : ""
+                          }
                           onChange={(e) => setInputPin(e.target.value)}
                           // disabled={!userInfo.securityPin}
                         />
@@ -262,6 +266,8 @@ export default function DepositModel(props) {
                                   onClick={async () => {
                                     if (item.id === 5) {
                                       setInputDeposit(true);
+                                    } else if (item?.id === 0) {
+                                      setViewSplitwalletTable(item.id);
                                     } else if (item?.id === 3) {
                                       await handleDepositHistory();
                                       setViewDepositHistoryTable(item.id);
@@ -455,6 +461,93 @@ export default function DepositModel(props) {
                           </div>
                         </>
                       )}
+                      {viewSplitwalletTable === item.id && (
+                        <>
+                          <div className="table-container">
+                            <div
+                              className="d-flex align-items-center justify-content-center"
+                              onClick={() => setViewSplitwalletTable("")}
+                            >
+                              <div class="closee">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <svg viewBox="0 0 36 36" class="circlu">
+                                  <path
+                                    stroke-dasharray="100, 100"
+                                    d="M18 2.0845
+                    a 15.9155 15.9155 0 0 1 0 31.831
+                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                                  ></path>
+                                </svg>
+                              </div>
+                            </div>
+
+                            <div className="table-responsive">
+                              <table class="table table-dark">
+                                <thead
+                                  className="k-grid-header "
+                                  role="rowgroup"
+                                >
+                                  <tr role="row">
+                                    <th
+                                      role="columnheader"
+                                      data-field="SNO"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      SNO
+                                    </th>
+                                    <th
+                                      role="columnheader"
+                                      data-field="SNO"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      User Address
+                                    </th>
+
+                                    <th
+                                      role="columnheader"
+                                      data-field="Name"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      Amount 123
+                                    </th>
+                                    {/* <th
+                                      role="columnheader"
+                                      data-field="Name"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      Description
+                                    </th> */}
+                                  </tr>
+                                </thead>
+                                {/* {depositHistory?.length > 0 &&
+                                  depositHistory?.map((user, index) => (
+                                    <tbody className="table-body" key={index}>
+                                      <tr>
+                                        <td>{index + 1}</td>
+                                        <td>{user?.user}</td>
+                                        <td>{user?.depositWallet}</td>
+                                      </tr>
+                                    </tbody>
+                                  ))} */}
+                                <tbody className="table-body">
+                                  <tr>
+                                    <th scope="row">1</th>
+                                    <td>Mark</td>
+                                    <td>Otto</td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </>
+                      )}
                       {viewDepositHistoryTable === item.id && (
                         <>
                           <div className="table-container">
@@ -499,7 +592,7 @@ export default function DepositModel(props) {
                                       data-title="Name"
                                       class="k-header"
                                     >
-                                      Credit Amount
+                                      User Address
                                     </th>
 
                                     <th
@@ -508,16 +601,16 @@ export default function DepositModel(props) {
                                       data-title="Name"
                                       class="k-header"
                                     >
-                                      Dated
+                                      Amount
                                     </th>
-                                    <th
+                                    {/* <th
                                       role="columnheader"
                                       data-field="Name"
                                       data-title="Name"
                                       class="k-header"
                                     >
                                       Description
-                                    </th>
+                                    </th> */}
                                   </tr>
                                 </thead>
                                 {depositHistory?.length > 0 &&
@@ -526,7 +619,7 @@ export default function DepositModel(props) {
                                       <tr>
                                         <td>{index + 1}</td>
                                         <td>{user?.user}</td>
-                                        <td>{user?.depositWallet}</td>
+                                        <td>{user?.amount}</td>
                                       </tr>
                                     </tbody>
                                   ))}
@@ -539,6 +632,72 @@ export default function DepositModel(props) {
                                   </tr>
                                 </tbody> */}
                               </table>
+
+                              {depositHistory.length === 0 && (
+                                <div className="p-4 d-flex justify-content-center">
+                                  <div>No Data Found!</div>
+                                </div>
+                              )}
+                            </div>
+
+                            <div
+                              class="k-pager-wrap k-grid-pager k-widget"
+                              data-role="pager"
+                            >
+                              <a
+                                class="k-link k-pager-nav  k-state-disabled"
+                                aria-controls="DataTables_Table_0"
+                                data-dt-idx="0"
+                                tabindex="0"
+                                id="DataTables_Table_0_previous"
+                              >
+                                <IoCaretBackOutline />
+                              </a>
+                              <a
+                                class="k-link k-pager-nav  k-state-disabled"
+                                aria-controls="DataTables_Table_0"
+                                data-dt-idx="0"
+                                tabindex="0"
+                                id="DataTables_Table_0_previous"
+                              >
+                                <IoCaretBackOutline />
+                              </a>
+                              <ul class="k-pager-numbers k-reset">
+                                <li>
+                                  <a
+                                    class="k-state-selected"
+                                    aria-controls="DataTables_Table_0"
+                                    data-dt-idx="1"
+                                    tabindex="0"
+                                    value="1"
+                                  >
+                                    1
+                                  </a>
+                                </li>
+                              </ul>
+                              <a
+                                class="k-link k-pager-nav k-state-disabled"
+                                aria-controls="DataTables_Table_0"
+                                data-dt-idx="3"
+                                tabindex="0"
+                                id="DataTables_Table_0_next"
+                              >
+                                {/* <i class="k-icon k-i-arrow-e"></i> */}
+                                <IoCaretForwardOutline />
+                              </a>
+                              <a
+                                class="k-link k-pager-nav k-state-disabled"
+                                aria-controls="DataTables_Table_0"
+                                data-dt-idx="3"
+                                tabindex="0"
+                                id="DataTables_Table_0_next"
+                              >
+                                <IoCaretForwardOutline />
+                              </a>
+
+                              <span class="k-pager-info k-label">
+                                Displaying 1 to 7 out of 7 items{" "}
+                              </span>
                             </div>
                           </div>
                         </>

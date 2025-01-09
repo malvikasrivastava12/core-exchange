@@ -1,4 +1,4 @@
-export const CONTRACT_ADDRESS = "0x5a1c203D8148acd94d3B2785bb57288eaD3D8CC9";
+export const CONTRACT_ADDRESS = "0x1bcd4A91427b0F492946506Fe0Adda6e2B7f7FFD";
 export const CONTRACT_ADDRESS_ABI = [
   {
     inputs: [
@@ -35,8 +35,14 @@ export const CONTRACT_ADDRESS_ABI = [
         name: "userReferal",
         type: "address",
       },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "virtualTokenUsed",
+        type: "uint256",
+      },
     ],
-    name: "UserStakeDetail",
+    name: "UserDepositDetail",
     type: "event",
   },
   {
@@ -56,9 +62,9 @@ export const CONTRACT_ADDRESS_ABI = [
       },
       {
         indexed: false,
-        internalType: "uint256",
+        internalType: "string",
         name: "incomeType",
-        type: "uint256",
+        type: "string",
       },
       {
         indexed: false,
@@ -68,6 +74,37 @@ export const CONTRACT_ADDRESS_ABI = [
       },
     ],
     name: "centraliseIncomeUpdate",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "time",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "user",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "userReferal",
+        type: "address",
+      },
+    ],
+    name: "depositForFriend",
     type: "event",
   },
   {
@@ -112,6 +149,37 @@ export const CONTRACT_ADDRESS_ABI = [
     inputs: [
       {
         indexed: false,
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "time",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "user",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "userReferal",
+        type: "address",
+      },
+    ],
+    name: "reTopup",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
         internalType: "address",
         name: "user",
         type: "address",
@@ -138,6 +206,63 @@ export const CONTRACT_ADDRESS_ABI = [
       {
         indexed: false,
         internalType: "uint256",
+        name: "time",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "user",
+        type: "address",
+      },
+    ],
+    name: "user2xDetail",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "time",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "user",
+        type: "address",
+      },
+    ],
+    name: "user4xDetail",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "time",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "user",
+        type: "address",
+      },
+    ],
+    name: "userStandardRoiDetail",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint256",
         name: "amount",
         type: "uint256",
       },
@@ -156,6 +281,16 @@ export const CONTRACT_ADDRESS_ABI = [
     ],
     name: "userVirtualTokenClaimDetailOfRegistration",
     type: "event",
+  },
+  {
+    inputs: [
+      { internalType: "uint256", name: "amount", type: "uint256" },
+      { internalType: "address", name: "userAddr", type: "address" },
+    ],
+    name: "ReTopupOnAddressUsingSplitWalletFund",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
   },
   {
     inputs: [{ internalType: "address", name: "", type: "address" }],
@@ -210,13 +345,6 @@ export const CONTRACT_ADDRESS_ABI = [
     type: "function",
   },
   {
-    inputs: [{ internalType: "address", name: "user", type: "address" }],
-    name: "calculateRoi",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
     inputs: [{ internalType: "uint256", name: "amount", type: "uint256" }],
     name: "deposit",
     outputs: [],
@@ -239,7 +367,21 @@ export const CONTRACT_ADDRESS_ABI = [
   },
   {
     inputs: [{ internalType: "address", name: "", type: "address" }],
+    name: "isC50Started",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "", type: "address" }],
     name: "isRegistrationVirtualTokenClaimed",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "", type: "address" }],
+    name: "isStandardRoiActive",
     outputs: [{ internalType: "bool", name: "", type: "bool" }],
     stateMutability: "view",
     type: "function",
@@ -287,6 +429,13 @@ export const CONTRACT_ADDRESS_ABI = [
     type: "function",
   },
   {
+    inputs: [{ internalType: "address", name: "userAdr", type: "address" }],
+    name: "returnAvailableSplitWalletFund",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     name: "returnRank",
     outputs: [{ internalType: "string", name: "", type: "string" }],
@@ -308,15 +457,52 @@ export const CONTRACT_ADDRESS_ABI = [
     type: "function",
   },
   {
-    inputs: [{ internalType: "address", name: "userAddress", type: "address" }],
+    inputs: [
+      { internalType: "address", name: "userAddress", type: "address" },
+      { internalType: "uint256", name: "amount", type: "uint256" },
+      { internalType: "uint256", name: "rankInUint", type: "uint256" },
+    ],
     name: "returnVirtualTokenAmountCanBeUsed",
+    outputs: [
+      { internalType: "uint256", name: "", type: "uint256" },
+      { internalType: "uint256", name: "", type: "uint256" },
+      { internalType: "uint256", name: "", type: "uint256" },
+      { internalType: "uint256", name: "", type: "uint256" },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "roiEndTimeSetByAdmin",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "roiPercentSetByAdmin",
     outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "view",
     type: "function",
   },
   {
     inputs: [{ internalType: "address", name: "", type: "address" }],
-    name: "totalIncomeExceptRoi",
+    name: "totalClaimableIncome",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "", type: "address" }],
+    name: "totalIncome",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "", type: "address" }],
+    name: "totalWithdrawl",
     outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "view",
     type: "function",
@@ -325,7 +511,7 @@ export const CONTRACT_ADDRESS_ABI = [
     inputs: [
       { internalType: "address", name: "user", type: "address" },
       { internalType: "uint256", name: "amt", type: "uint256" },
-      { internalType: "uint256", name: "incomeType", type: "uint256" },
+      { internalType: "string", name: "incomeType", type: "string" },
     ],
     name: "updateUserIcome",
     outputs: [],
@@ -335,6 +521,44 @@ export const CONTRACT_ADDRESS_ABI = [
   {
     inputs: [],
     name: "userClaimedRegistredToken",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "address", name: "", type: "address" },
+      { internalType: "uint256", name: "", type: "uint256" },
+    ],
+    name: "userQualificationDetail",
+    outputs: [
+      { internalType: "uint256", name: "amount", type: "uint256" },
+      { internalType: "uint256", name: "timeOfDeposit", type: "uint256" },
+      { internalType: "bool", name: "c50Active", type: "bool" },
+      { internalType: "uint256", name: "c50ActiveTime", type: "uint256" },
+      { internalType: "bool", name: "standardActive", type: "bool" },
+      { internalType: "uint256", name: "standardActiveTime", type: "uint256" },
+      { internalType: "uint256", name: "lastClaimTime", type: "uint256" },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "address", name: "", type: "address" },
+      { internalType: "uint256", name: "", type: "uint256" },
+    ],
+    name: "userSplitPackage",
+    outputs: [
+      { internalType: "uint256", name: "amount", type: "uint256" },
+      { internalType: "uint256", name: "time", type: "uint256" },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "withdrawBalance",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

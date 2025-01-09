@@ -13,7 +13,7 @@ const Footer = () => {
             <p>
               Copyrights:
               <br />
-              Maticverious LTD |
+              Core Exchange LTD |
               <a href="index.html" style={{ color: "#fd9500" }}>
                 https://core-exchange.com/
               </a>

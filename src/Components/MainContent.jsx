@@ -20,6 +20,7 @@ const MainContent = () => {
   const day7 = userInfo?.firstDepositAt * 1000 + 7 * 24 * 60 * 60 * 1000;
   const day30 = userInfo?.firstDepositAt * 1000 + 30 * 24 * 60 * 60 * 1000;
   const day10 = userInfo?.firstDepositAt * 1000 + 10 * 24 * 60 * 60 * 1000;
+  const day50 = userInfo?.firstDepositAt * 1000 + 50 * 24 * 60 * 60 * 1000;
   const [con, setCon] = useState(false);
   useEffect(() => {
     AOS.init({
@@ -38,7 +39,6 @@ const MainContent = () => {
     setShowAccountModal(!showAccountModal);
   };
   const [userExit, setUserExit] = useState(false);
-
   const data = new URLSearchParams(window.location.search);
   const ref = data.get("ref");
   useEffect(() => {
@@ -96,6 +96,11 @@ const MainContent = () => {
       label: "100% D B OFFER TIME",
       id: "displaydbtimer",
       date: day30,
+    },
+    {
+      label: "RANK REWARD OFFER TIME",
+      id: "displayranktimer",
+      date: day50,
     },
   ];
 
@@ -225,7 +230,7 @@ const MainContent = () => {
                         />
                       </div>
 
-                      {!address && <ConnectBtn />}
+                      {/* {!address && <ConnectBtn />} */}
                       {address && !userExit && (
                         <div
                           className="maindescbut"

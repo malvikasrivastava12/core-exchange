@@ -49,11 +49,11 @@ export async function Depositfn(payAmount, amount) {
 
   const res = waitForTransactionReceipt(config, { hash: result });
   const data = await toast.promise(res, {
-    loading: "Stake is pending...",
-    success: " Stake Successfully",
+    loading: "Deposit is pending...",
+    success: " Deposit Successfully",
     error: "request failed.",
   });
-  console.log(data, "data::::::");
+
   return data;
 }
 
@@ -84,12 +84,20 @@ export async function userClaimedRegistrationTokenfn() {
   return data;
 }
 
-export async function getReturnVirtualTokenAmountCanBeUsed(address) {
+export async function getReturnVirtualTokenAmountCanBeUsed(
+  address,
+  amount,
+  rank
+) {
   const result = await readContract(config, {
     abi: CONTRACT_ADDRESS_ABI,
     address: CONTRACT_ADDRESS,
     functionName: "returnVirtualTokenAmountCanBeUsed",
-    args: [address],
+    args: [
+      address,
+      (amount * 1e18).toLocaleString("fullwide", { useGrouping: false }),
+      rank,
+    ],
   });
   console.log(result, "getReturnVirtualTokenAmountCanBeUsed");
   return result;

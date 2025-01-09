@@ -1,8 +1,8 @@
 import axios from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
-export const URLApi = "https://core-exchange.com/api";
-// export const URLApi = "http://192.168.1.37:1414/api";
+// export const URLApi = "https://core-exchange.com/api";
+export const URLApi = "http://192.168.1.104:1414/api";
 export async function getUserInfo(address) {
   try {
     const response = await axios.get(`${URLApi}/user-info`, {
@@ -42,7 +42,7 @@ export async function getFetchTeams(address) {
         limit: 10,
       },
     });
-    console.log(response.data, "getFetchTeams");
+
     return response.data;
   } catch (error) {
     console.log("Error getUserInfo Admin:", error);
@@ -52,7 +52,7 @@ export async function getUserDepositList(address) {
   try {
     const response = await axios.get(`${URLApi}/user-deposit-list`, {
       params: {
-        user: address,
+        userAddress: address,
         page: 1,
         limit: 10,
       },
@@ -81,5 +81,52 @@ export async function setUserSecurityPin(address) {
     setConfirmPasskey("");
   } catch (error) {
     console.log(error);
+  }
+}
+export async function getMagicBoosterHistoryfn(address) {
+  try {
+    const response = await axios.get(`${URLApi}/getMagicBoosterHistory`, {
+      params: {
+        user: address,
+        page: 1,
+        limit: 10,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.log("Error getUserInfo Admin:", error);
+  }
+}
+
+export async function getMagicIncomeHistoryfn(address) {
+  try {
+    const response = await axios.get(`${URLApi}/getMagicIncomeHistory`, {
+      params: {
+        user: address,
+        page: 1,
+        limit: 10,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.log("Error getUserInfo Admin:", error);
+  }
+}
+
+export async function getStarIncomeHistoryfn(address, page, limit) {
+  try {
+    const response = await axios.get(`${URLApi}/getStarIncomeHistory`, {
+      params: {
+        user: address,
+        page: page,
+        limit: limit,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.log("Error getUserInfo Admin:", error);
   }
 }
