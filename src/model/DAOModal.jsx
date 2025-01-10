@@ -1,6 +1,7 @@
 import React from "react";
-
-export default function DAOModal() {
+import { IoWarning } from "react-icons/io5";
+import { FaExclamationTriangle } from "react-icons/fa";
+export default function DAOModal({ closeDAOModal, showDAOModal }) {
   return (
     <div
       className="remodal-overlay remodal-is-opened"
@@ -13,7 +14,7 @@ export default function DAOModal() {
           tabIndex="-1"
           role="dialog"
           aria-labelledby="exampleModalCenterTitle"
-          aria-hidden={!showWarningModal}
+          aria-hidden={!showDAOModal}
           style={{
             display: "flex",
             justifyContent: "center",
@@ -28,53 +29,123 @@ export default function DAOModal() {
             <button
               // data-remodal-action="close"
               className="remodal-close"
-              onClick={closeModal}
+              onClick={closeDAOModal}
             ></button>
-            <h1>Warning: Beware of Fake Websites</h1>
-            <div className="modaldesc" style={{ opacity: "0.7" }}>
-              <p>
-                "It has come to our attention that a fraudulent website has been
-                created, copying our content and design. Please be aware that
-                this website is not affiliated with us and is attempting to scam
-                users."
+            <div className="DAOLogo">
+              <img
+                src="/src/assets/Images/Core_Exchange_Logo.png"
+                className="modallogo"
+                alt="Core Logo"
+              />
+            </div>
+
+            {/* Modal Description */}
+            <div className="modaldesc">
+              {/* Core Logo and Description */}
+              <img
+                src="/src/assets/Images/Core_Exchange_Logo_favicon.png"
+                alt="Core Logo"
+              />
+              <b>CORE (DAO)</b>{" "}
+              <span className="Modalopacity">
+                - one of the largest blockchain-based operating systems in the
+                world. The world needs a decentralized, secure, and scalable
+                blockchain at its Core.
+              </span>
+              {/* How to Get DAO Section */}
+              <h3 className="Modalopacity" style={{ fontSize: "20px" }}>
+                How to get DAO?
+              </h3>
+              <p className="Modalopacity">
+                You can easily get DAO on every popular exchanger like{" "}
+                <a
+                  href="https://binance.com/"
+                  className="modallink"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Binance
+                </a>
+                ,{" "}
+                <a
+                  href="https://poloniex.com/"
+                  className="modallink"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Matic
+                </a>
+                ,{" "}
+                <a
+                  href="https://www.bitfinex.com/"
+                  className="modallink"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Bitfinex
+                </a>
+                , and{" "}
+                <a
+                  href="https://okex.com/"
+                  className="modallink"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  OKX
+                </a>
+                . After exchange, send DAO to your personal wallet and then send
+                it to our smart-contract address.
               </p>
-
               <br />
-              <br />
-
+              {/* Important Note */}
               <b className="gt">
-                <IoWarning size={25} /> IMPORTANT!
-              </b>
-              <ul>
-                <li>
-                  Our official website is{" "}
-                  <a href="https://core-exchange.com/" className="gt">
-                    https://core-exchange.com
-                  </a>
-                </li>
-                <li>We have not launched any new websites or platforms.</li>
-                <li>
-                  Do not provide personal or financial information to any
-                  unauthorized websites.
-                </li>
-              </ul>
-
-              <h3>How to Identify the Fake Website:</h3>
-              <ul>
-                <li>
-                  - Check the URL carefully. Our official website URL is{" "}
-                  <a href="https://core-exchange.com/" className="gt">
-                    https://core-exchange.com
-                  </a>
-                </li>
-                <li>
-                  Look for SSL certification (https) and verify our website's
-                  security.
-                </li>
-                <li>
-                  Be cautious of websites with similar design and content.
-                </li>
-              </ul>
+                <FaExclamationTriangle /> IMPORTANT!
+              </b>{" "}
+              <span className="Modalopacity">
+                {" "}
+                We are working only with personal wallets. Do not make deposits
+                from exchanger accounts; you will lose funds because payouts
+                will be sent to the exchanger address, not yours!
+              </span>
+              {/* Wallets Section */}
+              <h3 className="Modalopacity" style={{ fontSize: "20px" }}>
+                What DAO personal wallets to use?
+              </h3>
+              <p>
+                <span className="Modalopacity">
+                  You can use two types of wallets:
+                </span>
+                <br />- <b>Browser extensions</b>.{" "}
+                <span className="Modalopacity">
+                  For example, <b>MetaMask</b> / <b>TokenPocket</b>. Just
+                  install the extension on your favorite browser and create a
+                  personal wallet address.
+                </span>
+                <br />
+                <br />- <b>Mobile crypto wallets</b>.{" "}
+                <span className="Modalopacity">
+                  You can use any personal crypto wallet that supports DAO
+                  cryptocurrency and "CORE dapps" technology, for example:{" "}
+                </span>
+                <a
+                  href="https://tronwallet.me/"
+                  className="modallink"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  TokenPocket
+                </a>
+                ,{" "}
+                <a
+                  href="https://bankowallet.com/"
+                  className="modallink"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Banko
+                </a>
+                , <span className="Modalopacity">and others.</span>
+              </p>
             </div>
           </div>
         </div>

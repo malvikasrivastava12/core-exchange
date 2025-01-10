@@ -254,23 +254,25 @@ const Navbar = () => {
       image: DAOIcon,
       name: "LSW",
     },
-    // {
-    //   label1: "My Investment :",
-    //   value: userInfo?.firstDepositAmount ?? 0,
-    //   label2: "Click to View :",
-    //   buttonText: "View History",
-    //   image: DAOIcon,
-    //   name: "MI",
-    // },
-    // {
-    //   label1: "My Re-investment :",
-    //   value:
-    //     (userInfo?.depositWallet ?? 0) - (userInfo?.firstDepositAmount ?? 0),
-    //   label2: "Click to View :",
-    //   buttonText: "View History",
-    //   image: DAOIcon,
-    //   name: "MRI",
-    // },
+    {
+      id: 6,
+      label1: "My Investment :",
+      value: userInfo?.firstDepositAmount ?? 0,
+      label2: "Click to View :",
+      buttonText: "View History",
+      image: DAOIcon,
+      name: "MI",
+    },
+    {
+      id: 7,
+      label1: "My Re-investment :",
+      value:
+        (userInfo?.depositWallet ?? 0) - (userInfo?.firstDepositAmount ?? 0),
+      label2: "Click to View :",
+      buttonText: "View History",
+      image: DAOIcon,
+      name: "MRI",
+    },
     {
       id: 3,
       label1: "Total Investment :",
@@ -410,14 +412,14 @@ const Navbar = () => {
       image: DAOIcon,
     },
 
-    // {
-    //   id: 10,
-    //   label: "Offer Income:",
-    //   value: 0,
-    //   label2: "Offer Income History:",
-    //   buttonText: "Offer Income History",
-    //   image: DAOIcon,
-    // },
+    {
+      id: 10,
+      label: "Offer Income:",
+      value: 0,
+      label2: "Offer Income History:",
+      buttonText: "Offer Income History",
+      image: DAOIcon,
+    },
 
     {
       id: 11,

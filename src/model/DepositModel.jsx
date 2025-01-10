@@ -113,16 +113,16 @@ export default function DepositModel(props) {
                 </div>
               </form>
             )}
-            {/* 
+
             {!userExist && walletAddress && (
               <form className="maincontform authFalse">
                 <p>You need to register before deposition</p>
                 <button className="maindescbut">Register Now</button>
                 <div className="modaldash" style={{ top: "200px" }}></div>
               </form>
-            )} */}
+            )}
 
-            {!userExist && (
+            {userExist && (
               <>
                 <form className="maincontform authFalse">
                   <div style={{ paddingBottom: "15px" }}>

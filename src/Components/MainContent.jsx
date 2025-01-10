@@ -13,6 +13,7 @@ import { isUserExist, registerfn } from "../Helper/Web3";
 import { getUserInfo } from "../Helper/Api_function";
 import { useSelector } from "react-redux";
 import Countdown from "react-countdown";
+import DAOModal from "../model/DAOModal";
 
 const MainContent = () => {
   const { address, isConnected, chain, chainId } = useAccount();
@@ -35,8 +36,16 @@ const MainContent = () => {
     };
   }, []);
   const [showAccountModal, setShowAccountModal] = useState(false);
+  const [showDAOModal, setShowDAOModal] = useState(false);
+
   const toggleShowAccountModal = () => {
     setShowAccountModal(!showAccountModal);
+  };
+  const toggleShowDAOModal = () => {
+    setShowDAOModal(!showDAOModal);
+  };
+  const closeDAOModal = () => {
+    setShowDAOModal(false);
   };
   const [userExit, setUserExit] = useState(false);
   const data = new URLSearchParams(window.location.search);
@@ -230,7 +239,7 @@ const MainContent = () => {
                         />
                       </div>
 
-                      {/* {!address && <ConnectBtn />} */}
+                      {!address && <ConnectBtn />}
                       {address && !userExit && (
                         <div
                           className="maindescbut"
@@ -383,6 +392,7 @@ const MainContent = () => {
                     href="#"
                     data-remodal-target="tron"
                     className="maindescbut"
+                    onClick={toggleShowDAOModal}
                   >
                     How to get DAO
                   </a>
@@ -620,7 +630,12 @@ const MainContent = () => {
                 </div>
               </div>
             )}
-
+            {showDAOModal && (
+              <DAOModal
+                showDAOModal={showDAOModal}
+                closeDAOModal={() => closeDAOModal()}
+              />
+            )}
             {/* MODAL */}
           </div>
         </div>
