@@ -1,8 +1,8 @@
 import axios from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
-// export const URLApi = "https://core-exchange.com/api";
-export const URLApi = "http://192.168.1.104:1414/api";
+export const URLApi = "https://core-exchange.com/api";
+// export const URLApi = "http://192.168.1.104:1414/api";
 export async function getUserInfo(address) {
   try {
     const response = await axios.get(`${URLApi}/user-info`, {
@@ -125,6 +125,21 @@ export async function getStarIncomeHistoryfn(address, page, limit) {
       },
     });
 
+    return response.data;
+  } catch (error) {
+    console.log("Error getUserInfo Admin:", error);
+  }
+}
+
+export async function getRoiOfUserfn(address, depositLenght) {
+  try {
+    const response = await axios.get(`${URLApi}/getRoiOfUser`, {
+      params: {
+        user: address,
+        depositLenght: depositLenght,
+      },
+    });
+    console.log("getRoiOfUserfn", response.data);
     return response.data;
   } catch (error) {
     console.log("Error getUserInfo Admin:", error);

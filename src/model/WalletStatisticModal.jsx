@@ -13,8 +13,15 @@ import {
   getMagicBoosterHistoryfn,
   getMagicIncomeHistoryfn,
   getStarIncomeHistoryfn,
+  getRoiOfUserfn,
 } from "../Helper/Api_function";
-import { userClaimedRegistrationTokenfn } from "../Helper/Web3";
+import {
+  userClaimedRegistrationTokenfn,
+  UserDetailsfn,
+  ReturnUserQualificationLengthfn,
+  TotalClaimableIncomefn,
+  TotalIncomefn,
+} from "../Helper/Web3";
 import { useSelector } from "react-redux";
 
 export default function WalletStatisticModal(props) {
@@ -23,14 +30,13 @@ export default function WalletStatisticModal(props) {
     walletAddress,
     handleCopy,
     referralLink,
-    walletStatisticModalData,
-    tableview,
-    setTableview,
     isFetch,
     setIsFetch,
-    setLevelPaid,
-    levelTeam,
+    userExist,
   } = props;
+  const [tableview, setTableview] = useState("");
+  const [levelPaid, setLevelPaid] = useState({});
+
   const [securityPin, setSecurityPin] = useState(false);
   const [newPasskey, setNewPasskey] = useState("");
   const [confirmPasskey, setConfirmPasskey] = useState("");
@@ -50,12 +56,17 @@ export default function WalletStatisticModal(props) {
     useState("");
   const [viewRankRewardHistoryTable, setViewRankRewardHistoryTable] =
     useState("");
-
+  const [levelTeam, setLevelTeam] = useState([]);
+  const [C50Income, setC50Income] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const totalItems = rankReward?.pageinate?.totalCount || 0;
   const itemsPerPage = 2; // Or you can use rankReward?.itemsPerPage if available
   const totalPages = Math.ceil(totalItems / itemsPerPage);
-
+  const [rank, setRank] = useState(0);
+  const [userDetails, setUserDetails] = useState([]);
+  const [filteredTeam, setFilteredTeam] = useState([]);
+  const [totalEarned, setTotalEarned] = useState(0);
+  const [totalWithdraw, setTotalWithdraw] = useState(0);
   // const [filteredTeam, setFilteredTeam] = useState([]);
   const handleSecurityPin = () => {
     setSecurityPin((prev) => !prev);
@@ -74,6 +85,10 @@ export default function WalletStatisticModal(props) {
       setConfirmPasskey("");
       return;
     }
+    if (!userExist) {
+      toast.error("Wallet not Connected!!");
+      return;
+    }
     if (newPasskey === confirmPasskey) {
       try {
         const response = await axios.post(`${URLApi}/securityPin`, {
@@ -83,9 +98,10 @@ export default function WalletStatisticModal(props) {
         console.log(response, "response");
         if (response?.data?.status == 200) {
           toast.success(response?.data?.message);
-          setTimeout(() => {
-            setIsFetch(!isFetch);
-          }, 2000);
+          setIsFetch(!isFetch);
+          // setTimeout(() => {
+          //   setIsFetch(!isFetch);
+          // }, 2000);
         } else {
           toast.error(response?.data?.message);
         }
@@ -97,26 +113,65 @@ export default function WalletStatisticModal(props) {
     }
   };
   const handleDirectTeam = async () => {
-    const data = await getDirectTeam(walletAddress);
-    // console.log(data, "::::::::::in safdbjsabdfj");
-    setDirectTeam(Array.isArray(data.data) ? data.data : []);
-    setIsLoading(-1);
-
-    // console.log(directTeam, "directTeam");
+    if (userExist) {
+      const data = await getDirectTeam(walletAddress);
+      setDirectTeam(Array.isArray(data.data) ? data.data : []);
+      // setIsLoading(-1);
+    } else toast.error("Wallet is not connected!!");
   };
 
   const handleMagicBooster = async () => {
-    const data = await getMagicBoosterHistoryfn(walletAddress);
-    setMagicBooster(Array.isArray(data.data) ? data.data : []);
-    setIsLoading(-1);
+    if (userExist) {
+      const data = await getMagicBoosterHistoryfn(walletAddress);
+      setMagicBooster(Array.isArray(data.data) ? data.data : []);
+      setIsLoading(-1);
+    } else toast.error("Wallet is not connected!!");
   };
 
   const handleMagicIncome = async () => {
+    if (userExist) {
+      const data = await getMagicIncomeHistoryfn(walletAddress);
+      setMagicIncome(Array.isArray(data.data) ? data.data : []);
+      setIsLoading(-1);
+    } else toast.error("Wallet is not connected!!");
+  };
+
+  const handleC50Income = async () => {
     const data = await getMagicIncomeHistoryfn(walletAddress);
     console.log(data, "::::::::::in getMagicIncomeHistoryfn");
     setMagicIncome(Array.isArray(data.data) ? data.data : []);
     setIsLoading(-1);
   };
+
+  const ReturnUserQualificationLength = async () => {
+    const UserQualificationLength = await ReturnUserQualificationLengthfn(
+      walletAddress
+    );
+    // console.log(Number(UserQualificationLength), "UserQualificationLength");
+    const C50IncomeRes = await getRoiOfUserfn(
+      walletAddress,
+      Number(UserQualificationLength)
+    );
+    setC50Income(C50IncomeRes.message);
+    console.log("C50Income", C50IncomeRes, C50IncomeRes.deposits);
+  };
+
+  const handletotalEarned = async () => {
+    const TotalClaimableIncome = await TotalClaimableIncomefn(walletAddress);
+    setTotalEarned(TotalClaimableIncome / 1e18);
+    // console.log(TotalClaimableIncome / 1e18?.toFixed(2), "totalEarned");
+  };
+
+  const handleTotalWithdraw = async () => {
+    const TotalIncome = await TotalIncomefn(walletAddress);
+    setTotalWithdraw(TotalIncome / 1e18);
+    // console.log(TotalIncome / 1e18?.toFixed(2), "TotalIncome");
+  };
+  useEffect(() => {
+    ReturnUserQualificationLength(walletAddress);
+    handletotalEarned();
+    handleTotalWithdraw();
+  }, [walletAddress]);
 
   const handleRankReward = async () => {
     const data = await getStarIncomeHistoryfn(
@@ -154,11 +209,6 @@ export default function WalletStatisticModal(props) {
     fetchData();
   }, [walletAddress]);
 
-  // useEffect(() => {
-  //   if (walletAddress) {
-  //     handleRankReward();
-  //   }
-  // }, [walletAddress, currentPage]);
   const handlePrevious = () => {
     if (currentPage > 1) {
       const newPage = currentPage - 1;
@@ -174,6 +224,191 @@ export default function WalletStatisticModal(props) {
       handleRankReward(newPage); // Fetch data for the next page
     }
   };
+
+  const handleLevelTeam = async () => {
+    if (walletAddress) {
+      const data = await getFetchTeams(walletAddress);
+      // console.log(walletAddress, "walletAddress");
+      // console.log(data, "::::::::::in getFetchTeams11");
+      const users = Array.isArray(data.data.users) ? data.data.users : [];
+      // console.log(users, "directTeam");
+      setLevelTeam(users);
+
+      const filteredUsers = users.filter((user) => user.totalDeposit > 0);
+      // console.log(filteredTeam?.length, ":::::::12231115");
+      setFilteredTeam(filteredUsers?.length);
+    }
+  };
+
+  useEffect(() => {
+    handleLevelTeam();
+  }, [walletAddress]);
+
+  useEffect(() => {
+    UserDetailsfn(walletAddress).then((res) => {
+      console.log("UserDetailsfn response", res);
+      setUserDetails(res);
+
+      if (Number(res[10]) === Number(10 * 1e18)) {
+        if (Number(res[9]) == 1) {
+          setRank("BRONZE");
+        } else if (Number(res[9]) == 2) {
+          setRank("SILVER");
+        } else if (Number(res[9]) == 3) {
+          setRank("GOLD");
+        } else if (Number(res[9]) == 4) {
+          setRank("DIAMOND");
+        }
+      } else {
+        setRank("Claim now");
+      }
+    });
+  }, [walletAddress, isFetch]);
+
+  const walletStatisticModalData = [
+    {
+      id: 0,
+      label: "Total Free Core:",
+      value:
+        Number(userDetails[10]) / 1e18 > 0
+          ? (
+              Number(userDetails[10]) / 1e18 +
+              Number(userDetails[12]) / 1e18
+            ).toFixed(4)
+          : 0,
+      label2: "Request to get :",
+      buttonText: rank,
+
+      text: "Click Get button, and you will get instantly your today pool earnings as a single transaction. Your personal hold-bonus will be reseted.",
+    },
+    {
+      id: 13,
+      label: "Total Core Remaining Amount:",
+      value:
+        Number(userDetails[6]) / 1e18 > 0
+          ? (Number(userDetails[6]) / 1e18 - totalWithdraw)?.toFixed(2)
+          : 0,
+      label2: "Request withdraw:",
+      buttonText: "DAO User",
+      image: DAOIcon,
+      name: "TW",
+    },
+
+    {
+      id: 1,
+      label: "Level Team:",
+      heading: "All/Paid",
+      value: `${userInfo?.teamCount ?? 0}/${
+        filteredTeam > 0 ? filteredTeam : 0
+      }`,
+
+      label2: "Click to View:",
+      buttonText: "View Team",
+      isTable: true,
+    },
+    {
+      id: 2,
+      label: "C50 Team",
+      heading: "All/Paid",
+      value: `${levelPaid?.all ?? 0}/${levelPaid?.paid ?? 0}`,
+      label2: "Click to View:",
+      buttonText: "View Team",
+      isTable: true,
+    },
+    {
+      id: 3,
+      label: "C50 Capping",
+      value: 0,
+      label2: "Click to View:",
+      buttonText: "View Team",
+    },
+    {
+      id: 4,
+      label: "Direct Businesses:",
+      value: userInfo?.directBonus ?? 0,
+      label2: "Click to View:",
+      buttonText: "View Direct Team",
+      image: DAOIcon,
+    },
+    {
+      id: 5,
+      label: "Total Businesses:",
+      value: userInfo?.teamBusiness ?? 0,
+      label2: "Click to View:",
+      buttonText: "Magic Team",
+      image: DAOIcon,
+    },
+    {
+      id: 14,
+      label: "Rank and Reward Income:",
+      value: userInfo?.starRankIncome ?? 0,
+      label2: "Request withdraw:",
+      buttonText: "RANK AND REWARD HISTORY",
+      image: DAOIcon,
+      name: "B",
+    },
+    {
+      id: 6,
+      label: "Magic Income:",
+      value: userInfo?.magicIncome ?? 0,
+      label2: "Magic Income History:",
+      buttonText: "Magic Income History",
+      image: DAOIcon,
+    },
+    {
+      id: 8,
+      label: "C50 Income:",
+      value: C50Income?.totalRoi?.toFixed(4),
+      label2: "Recent Days Income Total:",
+      buttonText: "C50 Income History",
+      image: DAOIcon,
+    },
+
+    {
+      id: 7,
+      label: "C50 Flushed:",
+      value: C50Income?.totalRoi && (C50Income?.totalRoi * 20)?.toFixed(4),
+      label2: "C50 Flushed History:",
+      buttonText: "C50 Flushed History",
+      image: DAOIcon,
+    },
+
+    {
+      id: 9,
+      label: "Offer",
+      value: userInfo?.magicBoosterIncome ?? 0,
+      label2: "Offer Income History:",
+      buttonText: "Offer Income History",
+      image: DAOIcon,
+    },
+
+    {
+      id: 10,
+      label: "Offer Income:",
+      value: 0,
+      label2: "Offer Income History:",
+      buttonText: "Offer Income History",
+      image: DAOIcon,
+    },
+
+    {
+      id: 11,
+      label: "Total earned:",
+      value: totalEarned?.toFixed(4),
+      label2: "All Earning History:",
+      buttonText: "All Earning History",
+      image: DAOIcon,
+    },
+
+    {
+      id: 12,
+      label: "Total Withdrawn:",
+      value: totalWithdraw?.toFixed(4),
+      label2: "Withdraw History:",
+      buttonText: "View History",
+      image: DAOIcon,
+    },
+  ];
   return (
     <div
       className="modal fade show"
@@ -315,8 +550,12 @@ export default function WalletStatisticModal(props) {
                                     item?.id === 0 &&
                                     item.buttonText == "Claim now"
                                   ) {
-                                    await userClaimedRegistrationTokenfn();
-                                    setIsFetch(!isFetch);
+                                    await userClaimedRegistrationTokenfn(
+                                      walletAddress
+                                    );
+                                    setTimeout(() => {
+                                      setIsFetch(!isFetch);
+                                    }, 2000);
                                   } else if (item?.id === 1) {
                                     // setIsLoading(item?.id);
                                     // await handleLevelTeam();
@@ -325,7 +564,7 @@ export default function WalletStatisticModal(props) {
                                     // setIsLoading(item?.id);
                                     setViewC50TeamTable(item.id);
                                   } else if (item?.id === 4) {
-                                    setIsLoading(item?.id);
+                                    // setIsLoading(item?.id);
                                     await handleDirectTeam();
                                     setViewDirectTeamTable(item.id);
                                   } else if (item?.id === 5) {
@@ -360,272 +599,283 @@ export default function WalletStatisticModal(props) {
                       </div>
                     </div>
 
-                    {viewC50TeamTable === item.id && item.id === 2 && (
-                      <>
-                        <div className="table-container">
-                          <div
-                            className="d-flex align-items-center justify-content-center"
-                            onClick={() => setViewC50TeamTable("")}
-                          >
-                            <div class="closee">
-                              <span></span>
-                              <span></span>
-                              <span></span>
-                              <span></span>
-                              <svg viewBox="0 0 36 36" class="circlu">
-                                <path
-                                  stroke-dasharray="100, 100"
-                                  d="M18 2.0845
+                    {userExist &&
+                      viewC50TeamTable === item.id &&
+                      item.id === 2 && (
+                        <>
+                          <div className="table-container">
+                            <div
+                              className="d-flex align-items-center justify-content-center"
+                              onClick={() => setViewC50TeamTable("")}
+                            >
+                              <div class="closee">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <svg viewBox="0 0 36 36" class="circlu">
+                                  <path
+                                    stroke-dasharray="100, 100"
+                                    d="M18 2.0845
                     a 15.9155 15.9155 0 0 1 0 31.831
                     a 15.9155 15.9155 0 0 1 0 -31.831"
-                                ></path>
-                              </svg>
+                                  ></path>
+                                </svg>
+                              </div>
                             </div>
-                          </div>
 
-                          <div className="table-responsive">
-                            <table class="table table-dark">
-                              <thead className="k-grid-header " role="rowgroup">
-                                <tr role="row">
-                                  <th
-                                    role="columnheader"
-                                    data-field="SNO"
-                                    data-title="Name"
-                                    class="k-header"
-                                  >
-                                    Level
-                                  </th>
-                                  <th
-                                    role="columnheader"
-                                    data-field="SNO"
-                                    data-title="Name"
-                                    class="k-header"
-                                  >
-                                    User
-                                  </th>
-                                </tr>
-                              </thead>
-                              {C50Team &&
-                                C50Team?.map((user, index) => (
-                                  <tbody className="table-body">
-                                    <tr key={index}>
-                                      <td>{user?.level}</td>
-                                      <td>{user?.people}</td>
-                                    </tr>
-                                  </tbody>
-                                ))}
+                            <div className="table-responsive">
+                              <table class="table table-dark">
+                                <thead
+                                  className="k-grid-header "
+                                  role="rowgroup"
+                                >
+                                  <tr role="row">
+                                    <th
+                                      role="columnheader"
+                                      data-field="SNO"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      Level
+                                    </th>
+                                    <th
+                                      role="columnheader"
+                                      data-field="SNO"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      User
+                                    </th>
+                                  </tr>
+                                </thead>
+                                {C50Team &&
+                                  C50Team?.map((user, index) => (
+                                    <tbody className="table-body">
+                                      <tr key={index}>
+                                        <td>{user?.level}</td>
+                                        <td>{user?.people}</td>
+                                      </tr>
+                                    </tbody>
+                                  ))}
 
-                              {/* <tbody className="table-body">
+                                {/* <tbody className="table-body">
                                 <tr>
                                   <td>Mark</td>
                                   <td>Mark</td>
                                 </tr>
                               </tbody> */}
-                            </table>
+                              </table>
 
-                            {C50Team.length === 0 && (
-                              <div className="p-4 d-flex justify-content-center">
-                                <div>No Data Found!</div>
-                              </div>
-                            )}
-                          </div>
+                              {C50Team.length === 0 && (
+                                <div className="p-4 d-flex justify-content-center">
+                                  <div>No Data Found!</div>
+                                </div>
+                              )}
+                            </div>
 
-                          <div
-                            class="k-pager-wrap k-grid-pager k-widget"
-                            data-role="pager"
-                          >
-                            <a
-                              class="k-link k-pager-nav  k-state-disabled"
-                              aria-controls="DataTables_Table_0"
-                              data-dt-idx="0"
-                              tabindex="0"
-                              id="DataTables_Table_0_previous"
+                            <div
+                              class="k-pager-wrap k-grid-pager k-widget"
+                              data-role="pager"
                             >
-                              <IoCaretBackOutline />
-                            </a>
-                            <a
-                              class="k-link k-pager-nav  k-state-disabled"
-                              aria-controls="DataTables_Table_0"
-                              data-dt-idx="0"
-                              tabindex="0"
-                              id="DataTables_Table_0_previous"
-                            >
-                              <IoCaretBackOutline />
-                            </a>
-                            <ul class="k-pager-numbers k-reset">
-                              <li>
-                                <a
-                                  class="k-state-selected"
-                                  aria-controls="DataTables_Table_0"
-                                  data-dt-idx="1"
-                                  tabindex="0"
-                                  value="1"
-                                >
-                                  1
-                                </a>
-                              </li>
-                            </ul>
-                            <a
-                              class="k-link k-pager-nav k-state-disabled"
-                              aria-controls="DataTables_Table_0"
-                              data-dt-idx="3"
-                              tabindex="0"
-                              id="DataTables_Table_0_next"
-                            >
-                              {/* <i class="k-icon k-i-arrow-e"></i> */}
-                              <IoCaretForwardOutline />
-                            </a>
-                            <a
-                              class="k-link k-pager-nav k-state-disabled"
-                              aria-controls="DataTables_Table_0"
-                              data-dt-idx="3"
-                              tabindex="0"
-                              id="DataTables_Table_0_next"
-                            >
-                              <IoCaretForwardOutline />
-                            </a>
+                              <a
+                                class="k-link k-pager-nav  k-state-disabled"
+                                aria-controls="DataTables_Table_0"
+                                data-dt-idx="0"
+                                tabindex="0"
+                                id="DataTables_Table_0_previous"
+                              >
+                                <IoCaretBackOutline />
+                              </a>
+                              <a
+                                class="k-link k-pager-nav  k-state-disabled"
+                                aria-controls="DataTables_Table_0"
+                                data-dt-idx="0"
+                                tabindex="0"
+                                id="DataTables_Table_0_previous"
+                              >
+                                <IoCaretBackOutline />
+                              </a>
+                              <ul class="k-pager-numbers k-reset">
+                                <li>
+                                  <a
+                                    class="k-state-selected"
+                                    aria-controls="DataTables_Table_0"
+                                    data-dt-idx="1"
+                                    tabindex="0"
+                                    value="1"
+                                  >
+                                    1
+                                  </a>
+                                </li>
+                              </ul>
+                              <a
+                                class="k-link k-pager-nav k-state-disabled"
+                                aria-controls="DataTables_Table_0"
+                                data-dt-idx="3"
+                                tabindex="0"
+                                id="DataTables_Table_0_next"
+                              >
+                                {/* <i class="k-icon k-i-arrow-e"></i> */}
+                                <IoCaretForwardOutline />
+                              </a>
+                              <a
+                                class="k-link k-pager-nav k-state-disabled"
+                                aria-controls="DataTables_Table_0"
+                                data-dt-idx="3"
+                                tabindex="0"
+                                id="DataTables_Table_0_next"
+                              >
+                                <IoCaretForwardOutline />
+                              </a>
 
-                            <span class="k-pager-info k-label">
-                              Displaying 1 to 7 out of 7 items{" "}
-                            </span>
-                          </div>
-                        </div>
-                      </>
-                    )}
-                    {viewDirectTeamTable === item.id && item.id === 4 && (
-                      <>
-                        <div className="table-container">
-                          <div
-                            className="d-flex align-items-center justify-content-center"
-                            onClick={() => setViewDirectTeamTable("")}
-                          >
-                            <div class="closee">
-                              <span></span>
-                              <span></span>
-                              <span></span>
-                              <span></span>
-                              <svg viewBox="0 0 36 36" class="circlu">
-                                <path
-                                  stroke-dasharray="100, 100"
-                                  d="M18 2.0845
-                    a 15.9155 15.9155 0 0 1 0 31.831
-                    a 15.9155 15.9155 0 0 1 0 -31.831"
-                                ></path>
-                              </svg>
+                              <span class="k-pager-info k-label">
+                                Displaying 1 to 7 out of 7 items{" "}
+                              </span>
                             </div>
                           </div>
-
-                          <div className="table-responsive">
-                            <table class="table table-dark">
-                              <thead className="k-grid-header " role="rowgroup">
-                                <tr role="row">
-                                  <th
-                                    role="columnheader"
-                                    data-field="SNO"
-                                    data-title="Name"
-                                    class="k-header"
-                                  >
-                                    SNo
-                                  </th>
-                                  <th
-                                    role="columnheader"
-                                    data-field="SNO"
-                                    data-title="Name"
-                                    class="k-header"
-                                  >
-                                    Address
-                                  </th>
-                                  <th
-                                    role="columnheader"
-                                    data-field="SNO"
-                                    data-title="Name"
-                                    class="k-header"
-                                  >
-                                    Invested
-                                  </th>
-                                </tr>
-                              </thead>
-                              {directTeam?.length > 0 &&
-                                directTeam?.map((user, index) => (
-                                  <tbody className="table-body">
-                                    <tr key={index}>
-                                      <td>{index + 1}</td>
-                                      <td>{user?.user}</td>
-                                      <td>{user?.depositWallet}</td>
-                                    </tr>
-                                  </tbody>
-                                ))}
-                            </table>
-                            {directTeam.length === 0 && (
-                              <div className="p-4 d-flex justify-content-center">
-                                <div>No Data Found!</div>
+                        </>
+                      )}
+                    {userExist &&
+                      viewDirectTeamTable === item.id &&
+                      item.id === 4 && (
+                        <>
+                          <div className="table-container">
+                            <div
+                              className="d-flex align-items-center justify-content-center"
+                              onClick={() => setViewDirectTeamTable("")}
+                            >
+                              <div class="closee">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <svg viewBox="0 0 36 36" class="circlu">
+                                  <path
+                                    stroke-dasharray="100, 100"
+                                    d="M18 2.0845
+                    a 15.9155 15.9155 0 0 1 0 31.831
+                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                                  ></path>
+                                </svg>
                               </div>
-                            )}
-                          </div>
+                            </div>
 
-                          <div
-                            class="k-pager-wrap k-grid-pager k-widget"
-                            data-role="pager"
-                          >
-                            <a
-                              class="k-link k-pager-nav  k-state-disabled"
-                              aria-controls="DataTables_Table_0"
-                              data-dt-idx="0"
-                              tabindex="0"
-                              id="DataTables_Table_0_previous"
-                            >
-                              <IoCaretBackOutline />
-                            </a>
-                            <a
-                              class="k-link k-pager-nav  k-state-disabled"
-                              aria-controls="DataTables_Table_0"
-                              data-dt-idx="0"
-                              tabindex="0"
-                              id="DataTables_Table_0_previous"
-                            >
-                              <IoCaretBackOutline />
-                            </a>
-                            <ul class="k-pager-numbers k-reset">
-                              <li>
-                                <a
-                                  class="k-state-selected"
-                                  aria-controls="DataTables_Table_0"
-                                  data-dt-idx="1"
-                                  tabindex="0"
-                                  value="1"
+                            <div className="table-responsive">
+                              <table class="table table-dark">
+                                <thead
+                                  className="k-grid-header "
+                                  role="rowgroup"
                                 >
-                                  1
-                                </a>
-                              </li>
-                            </ul>
-                            <a
-                              class="k-link k-pager-nav k-state-disabled"
-                              aria-controls="DataTables_Table_0"
-                              data-dt-idx="3"
-                              tabindex="0"
-                              id="DataTables_Table_0_next"
-                            >
-                              {/* <i class="k-icon k-i-arrow-e"></i> */}
-                              <IoCaretForwardOutline />
-                            </a>
-                            <a
-                              class="k-link k-pager-nav k-state-disabled"
-                              aria-controls="DataTables_Table_0"
-                              data-dt-idx="3"
-                              tabindex="0"
-                              id="DataTables_Table_0_next"
-                            >
-                              <IoCaretForwardOutline />
-                            </a>
-                            <span class="k-pager-info k-label">
-                              Displaying 1 to 7 out of 7 items
-                            </span>
-                          </div>
-                        </div>
-                      </>
-                    )}
+                                  <tr role="row">
+                                    <th
+                                      role="columnheader"
+                                      data-field="SNO"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      SNo
+                                    </th>
+                                    <th
+                                      role="columnheader"
+                                      data-field="SNO"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      Address
+                                    </th>
+                                    <th
+                                      role="columnheader"
+                                      data-field="SNO"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      Invested
+                                    </th>
+                                  </tr>
+                                </thead>
+                                {directTeam?.length > 0 &&
+                                  directTeam?.map((user, index) => (
+                                    <tbody className="table-body">
+                                      <tr key={index}>
+                                        <td>{index + 1}</td>
+                                        <td>{user?.user}</td>
+                                        <td>{user?.depositWallet}</td>
+                                      </tr>
+                                    </tbody>
+                                  ))}
+                              </table>
+                              {directTeam.length === 0 && (
+                                <div className="p-4 d-flex justify-content-center">
+                                  <div>No Data Found!</div>
+                                </div>
+                              )}
+                            </div>
 
-                    {viewLevelTeamTable === item.id &&
+                            <div
+                              class="k-pager-wrap k-grid-pager k-widget"
+                              data-role="pager"
+                            >
+                              <a
+                                class="k-link k-pager-nav  k-state-disabled"
+                                aria-controls="DataTables_Table_0"
+                                data-dt-idx="0"
+                                tabindex="0"
+                                id="DataTables_Table_0_previous"
+                              >
+                                <IoCaretBackOutline />
+                              </a>
+                              <a
+                                class="k-link k-pager-nav  k-state-disabled"
+                                aria-controls="DataTables_Table_0"
+                                data-dt-idx="0"
+                                tabindex="0"
+                                id="DataTables_Table_0_previous"
+                              >
+                                <IoCaretBackOutline />
+                              </a>
+                              <ul class="k-pager-numbers k-reset">
+                                <li>
+                                  <a
+                                    class="k-state-selected"
+                                    aria-controls="DataTables_Table_0"
+                                    data-dt-idx="1"
+                                    tabindex="0"
+                                    value="1"
+                                  >
+                                    1
+                                  </a>
+                                </li>
+                              </ul>
+                              <a
+                                class="k-link k-pager-nav k-state-disabled"
+                                aria-controls="DataTables_Table_0"
+                                data-dt-idx="3"
+                                tabindex="0"
+                                id="DataTables_Table_0_next"
+                              >
+                                {/* <i class="k-icon k-i-arrow-e"></i> */}
+                                <IoCaretForwardOutline />
+                              </a>
+                              <a
+                                class="k-link k-pager-nav k-state-disabled"
+                                aria-controls="DataTables_Table_0"
+                                data-dt-idx="3"
+                                tabindex="0"
+                                id="DataTables_Table_0_next"
+                              >
+                                <IoCaretForwardOutline />
+                              </a>
+                              <span class="k-pager-info k-label">
+                                Displaying 1 to 7 out of 7 items
+                              </span>
+                            </div>
+                          </div>
+                        </>
+                      )}
+
+                    {userExist &&
+                      viewLevelTeamTable === item.id &&
                       (item.id === 1 || item.id === 5) && (
                         <>
                           <div className="table-container">
@@ -768,138 +1018,144 @@ export default function WalletStatisticModal(props) {
                         </>
                       )}
                     {/* magic booster is offer */}
-                    {viewMagicBoosterTable === item.id && item.id === 9 && (
-                      <>
-                        <div className="table-container">
-                          <div
-                            className="d-flex align-items-center justify-content-center"
-                            onClick={() => setViewMagicBoosterTable("")}
-                          >
-                            <div class="closee">
-                              <span></span>
-                              <span></span>
-                              <span></span>
-                              <span></span>
-                              <svg viewBox="0 0 36 36" class="circlu">
-                                <path
-                                  stroke-dasharray="100, 100"
-                                  d="M18 2.0845
+                    {userExist &&
+                      viewMagicBoosterTable === item.id &&
+                      item.id === 9 && (
+                        <>
+                          <div className="table-container">
+                            <div
+                              className="d-flex align-items-center justify-content-center"
+                              onClick={() => setViewMagicBoosterTable("")}
+                            >
+                              <div class="closee">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <svg viewBox="0 0 36 36" class="circlu">
+                                  <path
+                                    stroke-dasharray="100, 100"
+                                    d="M18 2.0845
                     a 15.9155 15.9155 0 0 1 0 31.831
                     a 15.9155 15.9155 0 0 1 0 -31.831"
-                                ></path>
-                              </svg>
+                                  ></path>
+                                </svg>
+                              </div>
                             </div>
-                          </div>
 
-                          <div className="table-responsive">
-                            <table class="table table-dark">
-                              <thead className="k-grid-header " role="rowgroup">
-                                <tr role="row">
-                                  <th
-                                    role="columnheader"
-                                    data-field="SNO"
-                                    data-title="Name"
-                                    class="k-header"
-                                  >
-                                    Address
-                                  </th>
-                                  <th
-                                    role="columnheader"
-                                    data-field="SNO"
-                                    data-title="Name"
-                                    class="k-header"
-                                  >
-                                    Amount
-                                  </th>
-                                </tr>
-                              </thead>
-                              {magicBooster?.length > 0 &&
-                                magicBooster?.map((user, index) => (
-                                  <tbody className="table-body">
-                                    <tr key={index}>
-                                      <td>{user?.user}</td>
-                                      <td>{user?.amount}</td>
-                                    </tr>
-                                  </tbody>
-                                ))}
-                              {/* <tbody className="table-body">
+                            <div className="table-responsive">
+                              <table class="table table-dark">
+                                <thead
+                                  className="k-grid-header "
+                                  role="rowgroup"
+                                >
+                                  <tr role="row">
+                                    <th
+                                      role="columnheader"
+                                      data-field="SNO"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      Address
+                                    </th>
+                                    <th
+                                      role="columnheader"
+                                      data-field="SNO"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      Amount
+                                    </th>
+                                  </tr>
+                                </thead>
+                                {magicBooster?.length > 0 &&
+                                  magicBooster?.map((user, index) => (
+                                    <tbody className="table-body">
+                                      <tr key={index}>
+                                        <td>{user?.user}</td>
+                                        <td>{user?.amount}</td>
+                                      </tr>
+                                    </tbody>
+                                  ))}
+                                {/* <tbody className="table-body">
                                 <tr>
                                   <td>Mark</td>
                                   <td>Mark</td>
                                 </tr>
                               </tbody> */}
-                            </table>
-                            {magicBooster.length === 0 && (
-                              <div className="p-4 d-flex justify-content-center">
-                                <div>No Data Found!</div>
-                              </div>
-                            )}
-                            <div
-                              class="k-pager-wrap k-grid-pager k-widget"
-                              data-role="pager"
-                            >
-                              <a
-                                class="k-link k-pager-nav  k-state-disabled"
-                                aria-controls="DataTables_Table_0"
-                                data-dt-idx="0"
-                                tabindex="0"
-                                id="DataTables_Table_0_previous"
+                              </table>
+                              {magicBooster.length === 0 && (
+                                <div className="p-4 d-flex justify-content-center">
+                                  <div>No Data Found!</div>
+                                </div>
+                              )}
+                              <div
+                                class="k-pager-wrap k-grid-pager k-widget"
+                                data-role="pager"
                               >
-                                <IoCaretBackOutline />
-                              </a>
-                              <a
-                                class="k-link k-pager-nav  k-state-disabled"
-                                aria-controls="DataTables_Table_0"
-                                data-dt-idx="0"
-                                tabindex="0"
-                                id="DataTables_Table_0_previous"
-                              >
-                                <IoCaretBackOutline />
-                              </a>
-                              <ul class="k-pager-numbers k-reset">
-                                <li>
-                                  <a
-                                    class="k-state-selected"
-                                    aria-controls="DataTables_Table_0"
-                                    data-dt-idx="1"
-                                    tabindex="0"
-                                    value="1"
-                                  >
-                                    1
-                                  </a>
-                                </li>
-                              </ul>
-                              <a
-                                class="k-link k-pager-nav k-state-disabled"
-                                aria-controls="DataTables_Table_0"
-                                data-dt-idx="3"
-                                tabindex="0"
-                                id="DataTables_Table_0_next"
-                              >
-                                {/* <i class="k-icon k-i-arrow-e"></i> */}
-                                <IoCaretForwardOutline />
-                              </a>
-                              <a
-                                class="k-link k-pager-nav k-state-disabled"
-                                aria-controls="DataTables_Table_0"
-                                data-dt-idx="3"
-                                tabindex="0"
-                                id="DataTables_Table_0_next"
-                              >
-                                <IoCaretForwardOutline />
-                              </a>
+                                <a
+                                  class="k-link k-pager-nav  k-state-disabled"
+                                  aria-controls="DataTables_Table_0"
+                                  data-dt-idx="0"
+                                  tabindex="0"
+                                  id="DataTables_Table_0_previous"
+                                >
+                                  <IoCaretBackOutline />
+                                </a>
+                                <a
+                                  class="k-link k-pager-nav  k-state-disabled"
+                                  aria-controls="DataTables_Table_0"
+                                  data-dt-idx="0"
+                                  tabindex="0"
+                                  id="DataTables_Table_0_previous"
+                                >
+                                  <IoCaretBackOutline />
+                                </a>
+                                <ul class="k-pager-numbers k-reset">
+                                  <li>
+                                    <a
+                                      class="k-state-selected"
+                                      aria-controls="DataTables_Table_0"
+                                      data-dt-idx="1"
+                                      tabindex="0"
+                                      value="1"
+                                    >
+                                      1
+                                    </a>
+                                  </li>
+                                </ul>
+                                <a
+                                  class="k-link k-pager-nav k-state-disabled"
+                                  aria-controls="DataTables_Table_0"
+                                  data-dt-idx="3"
+                                  tabindex="0"
+                                  id="DataTables_Table_0_next"
+                                >
+                                  {/* <i class="k-icon k-i-arrow-e"></i> */}
+                                  <IoCaretForwardOutline />
+                                </a>
+                                <a
+                                  class="k-link k-pager-nav k-state-disabled"
+                                  aria-controls="DataTables_Table_0"
+                                  data-dt-idx="3"
+                                  tabindex="0"
+                                  id="DataTables_Table_0_next"
+                                >
+                                  <IoCaretForwardOutline />
+                                </a>
 
-                              <span class="k-pager-info k-label">
-                                Displaying 1 to 7 out of 7 items{" "}
-                              </span>
+                                <span class="k-pager-info k-label">
+                                  Displaying 1 to 7 out of 7 items{" "}
+                                </span>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </>
-                    )}
+                        </>
+                      )}
                     {/* magic booster is offer */}
 
-                    {viewMagicIncomeHistoryTable === item.id &&
+                    {userExist &&
+                      viewMagicIncomeHistoryTable === item.id &&
                       item.id === 6 && (
                         <>
                           <div className="table-container">
@@ -1033,7 +1289,8 @@ export default function WalletStatisticModal(props) {
                         </>
                       )}
 
-                    {viewRankRewardHistoryTable === item.id &&
+                    {userExist &&
+                      viewRankRewardHistoryTable === item.id &&
                       item.id === 14 && (
                         <>
                           <div className="table-container">

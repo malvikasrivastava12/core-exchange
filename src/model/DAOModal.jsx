@@ -1,6 +1,8 @@
 import React from "react";
 import { IoWarning } from "react-icons/io5";
 import { FaExclamationTriangle } from "react-icons/fa";
+import DAOIcon from "../assets/Images/Core_Exchange_Logo.png";
+import DAOFavIcon from "../assets/Images/Core_Exchange_Logo_favicon.png";
 export default function DAOModal({ closeDAOModal, showDAOModal }) {
   return (
     <div
@@ -32,20 +34,13 @@ export default function DAOModal({ closeDAOModal, showDAOModal }) {
               onClick={closeDAOModal}
             ></button>
             <div className="DAOLogo">
-              <img
-                src="/src/assets/Images/Core_Exchange_Logo.png"
-                className="modallogo"
-                alt="Core Logo"
-              />
+              <img src={DAOIcon} className="modallogo" alt="Core Logo" />
             </div>
 
             {/* Modal Description */}
             <div className="modaldesc">
               {/* Core Logo and Description */}
-              <img
-                src="/src/assets/Images/Core_Exchange_Logo_favicon.png"
-                alt="Core Logo"
-              />
+              <img src={DAOFavIcon} alt="Core Logo" />
               <b>CORE (DAO)</b>{" "}
               <span className="Modalopacity">
                 - one of the largest blockchain-based operating systems in the

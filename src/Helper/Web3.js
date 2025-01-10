@@ -8,6 +8,7 @@ import { CONTRACT_ADDRESS_ABI, CONTRACT_ADDRESS } from "../Helper/config";
 import { config } from "../main";
 
 export async function isUserExist(address) {
+  console.log(config, "config");
   const result = await readContract(config, {
     abi: CONTRACT_ADDRESS_ABI,
     address: CONTRACT_ADDRESS,
@@ -68,7 +69,12 @@ export async function UserDetailsfn(address) {
   return result;
 }
 
-export async function userClaimedRegistrationTokenfn() {
+export async function userClaimedRegistrationTokenfn(address) {
+  const userExit = await isUserExist(address);
+  if (!userExit) {
+    toast.error("Wallet not Connected!!");
+    return;
+  }
   const result = await writeContract(config, {
     abi: CONTRACT_ADDRESS_ABI,
     address: CONTRACT_ADDRESS,
@@ -101,4 +107,37 @@ export async function getReturnVirtualTokenAmountCanBeUsed(
   });
   console.log(result, "getReturnVirtualTokenAmountCanBeUsed");
   return result;
+}
+
+export async function ReturnUserQualificationLengthfn(address) {
+  const result = await readContract(config, {
+    abi: CONTRACT_ADDRESS_ABI,
+    address: CONTRACT_ADDRESS,
+    functionName: "returnUserQualificationLength",
+    args: [address],
+  });
+
+  return result;
+}
+
+export async function TotalClaimableIncomefn(address) {
+  const result = await readContract(config, {
+    abi: CONTRACT_ADDRESS_ABI,
+    address: CONTRACT_ADDRESS,
+    functionName: "totalClaimableIncome",
+    args: [address],
+  });
+
+  console.log(result, "::::+>>>>>>>>");
+  return Number(result);
+}
+export async function TotalIncomefn(address) {
+  const result = await readContract(config, {
+    abi: CONTRACT_ADDRESS_ABI,
+    address: CONTRACT_ADDRESS,
+    functionName: "totalIncome",
+    args: [address],
+  });
+
+  return Number(result);
 }

@@ -1,4 +1,4 @@
-export const CONTRACT_ADDRESS = "0x1bcd4A91427b0F492946506Fe0Adda6e2B7f7FFD";
+export const CONTRACT_ADDRESS = "0xE16De78e45A62a323DFAc54e731503B46FbCf4fc";
 export const CONTRACT_ADDRESS_ABI = [
   {
     inputs: [
@@ -283,13 +283,47 @@ export const CONTRACT_ADDRESS_ABI = [
     type: "event",
   },
   {
+    anonymous: false,
     inputs: [
-      { internalType: "uint256", name: "amount", type: "uint256" },
-      { internalType: "address", name: "userAddr", type: "address" },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "retopup",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "split",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "wallet",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "time",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "user",
+        type: "address",
+      },
     ],
-    name: "ReTopupOnAddressUsingSplitWalletFund",
+    name: "withdrawBalanceEvent",
+    type: "event",
+  },
+  {
+    inputs: [],
+    name: "ReturnWithdrawBalance",
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "view",
     type: "function",
   },
   {
@@ -452,6 +486,13 @@ export const CONTRACT_ADDRESS_ABI = [
   {
     inputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     name: "returnRankPercent",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "user", type: "address" }],
+    name: "returnUserQualificationLength",
     outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "view",
     type: "function",

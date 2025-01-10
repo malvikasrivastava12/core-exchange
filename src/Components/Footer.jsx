@@ -1,6 +1,31 @@
-import React from "react";
+import React, { useState } from "react";
 import Icon from "../assets/Images/Core_Exchange_Logo_favicon.png";
+import DepositModel from "../model/DepositModel";
+import { useSelector } from "react-redux";
+import { base_url } from "../Helper/config";
+import WalletStatisticModal from "../model/WalletStatisticModal";
 const Footer = () => {
+  const { wallet, userExist, userInfo } = useSelector((state) => state.login);
+  const walletAddress = wallet.address;
+  const [showMakeDepositModal, setShowMakeDepositModal] = useState(false);
+  const [showWalletStatisticsModal, setShowWalletStatisticsModal] =
+    useState(false);
+  const toggleMakeDepositModal = () =>
+    setShowMakeDepositModal(!showMakeDepositModal);
+  const toggleWalletStatisticsModal = () =>
+    setShowWalletStatisticsModal(!showWalletStatisticsModal);
+  const referralLink = `${base_url}/?ref=${walletAddress}`;
+  const [isFetch, setIsFetch] = useState(false);
+  const handleCopy = () => {
+    navigator.clipboard
+      .writeText(referralLink)
+      .then(() => {
+        toast.success("Referral link copied to clipboard!");
+      })
+      .catch(() => {
+        toast.error("Failed to copy the referral link.");
+      });
+  };
   return (
     <footer className="footer">
       <div className="wrap">
@@ -51,6 +76,7 @@ const Footer = () => {
               style={{ height: "40px", lineHeight: "42px", fontSize: "20px" }}
               className="maindescbut"
               data-remodal-target="invest"
+              onClick={toggleMakeDepositModal}
             >
               Make Deposit
             </a>
@@ -60,12 +86,32 @@ const Footer = () => {
               style={{ height: "40px", lineHeight: "42px", fontSize: "20px" }}
               className="maindescbut"
               data-remodal-target="wallet"
+              onClick={toggleWalletStatisticsModal}
             >
               Wallet statistic
             </a>
           </div>
         </div>
       </div>
+      {showMakeDepositModal && (
+        <DepositModel
+          referralLink={referralLink}
+          toggleMakeDepositModal={() => toggleMakeDepositModal()}
+          walletAddress={walletAddress}
+          userExist={userExist}
+          handleCopy={() => handleCopy()}
+        />
+      )}
+      {showWalletStatisticsModal && (
+        <WalletStatisticModal
+          toggleWalletStatisticsModal={() => toggleWalletStatisticsModal()}
+          walletAddress={walletAddress}
+          handleCopy={() => handleCopy()}
+          referralLink={referralLink}
+          isFetch={isFetch}
+          setIsFetch={setIsFetch}
+        />
+      )}
     </footer>
   );
 };
