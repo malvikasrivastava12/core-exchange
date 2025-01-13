@@ -35,7 +35,7 @@ export async function registerfn(refAddress) {
   return data;
 }
 
-export async function Depositfn(payAmount, amount) {
+export async function Depositfn(payAmount, amount, address) {
   const result = await writeContract(config, {
     abi: CONTRACT_ADDRESS_ABI,
     address: CONTRACT_ADDRESS,
@@ -44,6 +44,7 @@ export async function Depositfn(payAmount, amount) {
       (Number(amount) * 1e18).toLocaleString("fullwide", {
         useGrouping: false,
       }),
+      address,
     ],
     value: payAmount,
   });
@@ -54,7 +55,7 @@ export async function Depositfn(payAmount, amount) {
     success: " Deposit Successfully",
     error: "request failed.",
   });
-
+  console.log(data, "Depositfn");
   return data;
 }
 
@@ -136,6 +137,33 @@ export async function TotalIncomefn(address) {
     abi: CONTRACT_ADDRESS_ABI,
     address: CONTRACT_ADDRESS,
     functionName: "totalIncome",
+    args: [address],
+  });
+
+  return Number(result);
+}
+
+export async function withdrawBalancefn() {
+  const result = await writeContract(config, {
+    abi: CONTRACT_ADDRESS_ABI,
+    address: CONTRACT_ADDRESS,
+    functionName: "withdrawBalance",
+    args: [],
+  });
+  const res = waitForTransactionReceipt(config, { hash: result });
+  const data = await toast.promise(res, {
+    loading: " Withdraw is pending...",
+    success: " Withdraw Successfully",
+    error: "Withdraw failed",
+  });
+  return data;
+}
+
+export async function returnAvailableSplitWalletFundfn(address) {
+  const result = await readContract(config, {
+    abi: CONTRACT_ADDRESS_ABI,
+    address: CONTRACT_ADDRESS,
+    functionName: "returnAvailableSplitWalletFund",
     args: [address],
   });
 

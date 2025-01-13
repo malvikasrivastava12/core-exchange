@@ -1,4 +1,4 @@
-export const CONTRACT_ADDRESS = "0xE16De78e45A62a323DFAc54e731503B46FbCf4fc";
+export const CONTRACT_ADDRESS = "0xd1DC0D9e032e66946e332d159092b751F93345EB";
 export const CONTRACT_ADDRESS_ABI = [
   {
     inputs: [
@@ -39,6 +39,18 @@ export const CONTRACT_ADDRESS_ABI = [
         indexed: false,
         internalType: "uint256",
         name: "virtualTokenUsed",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "split",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "level",
         type: "uint256",
       },
     ],
@@ -349,11 +361,6 @@ export const CONTRACT_ADDRESS_ABI = [
       { internalType: "uint256", name: "latestRank", type: "uint256" },
       {
         internalType: "uint256",
-        name: "registrationTimeVirtualToken",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
         name: "TotalLevelVirtualToken",
         type: "uint256",
       },
@@ -379,7 +386,10 @@ export const CONTRACT_ADDRESS_ABI = [
     type: "function",
   },
   {
-    inputs: [{ internalType: "uint256", name: "amount", type: "uint256" }],
+    inputs: [
+      { internalType: "uint256", name: "amount", type: "uint256" },
+      { internalType: "address", name: "userAddr", type: "address" },
+    ],
     name: "deposit",
     outputs: [],
     stateMutability: "payable",
@@ -508,22 +518,7 @@ export const CONTRACT_ADDRESS_ABI = [
       { internalType: "uint256", name: "", type: "uint256" },
       { internalType: "uint256", name: "", type: "uint256" },
       { internalType: "uint256", name: "", type: "uint256" },
-      { internalType: "uint256", name: "", type: "uint256" },
     ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "roiEndTimeSetByAdmin",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "roiPercentSetByAdmin",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "view",
     type: "function",
   },
@@ -564,6 +559,16 @@ export const CONTRACT_ADDRESS_ABI = [
     name: "userClaimedRegistredToken",
     outputs: [],
     stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "address", name: "", type: "address" },
+      { internalType: "uint256", name: "", type: "uint256" },
+    ],
+    name: "userDownline",
+    outputs: [{ internalType: "address", name: "", type: "address" }],
+    stateMutability: "view",
     type: "function",
   },
   {

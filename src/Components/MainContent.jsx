@@ -17,12 +17,27 @@ import DAOModal from "../model/DAOModal";
 
 const MainContent = () => {
   const { address, isConnected, chain, chainId } = useAccount();
+
   const { wallet, userExist, userInfo } = useSelector((state) => state.login);
-  const day7 = userInfo?.firstDepositAt * 1000 + 7 * 24 * 60 * 60 * 1000;
-  const day30 = userInfo?.firstDepositAt * 1000 + 30 * 24 * 60 * 60 * 1000;
+  const walletAddress = wallet.address;
+  const day7 =
+    userInfo?.isHave2x4X > 0
+      ? "Completed"
+      : userInfo?.firstDepositAt * 1000 + 7 * 24 * 60 * 60 * 1000;
+  const day30 =
+    userInfo?.isMagicBooster === true
+      ? "Completed"
+      : userInfo?.firstDepositAt * 1000 + 30 * 24 * 60 * 60 * 1000;
   const day10 = userInfo?.firstDepositAt * 1000 + 10 * 24 * 60 * 60 * 1000;
-  const day50 = userInfo?.firstDepositAt * 1000 + 50 * 24 * 60 * 60 * 1000;
+  const day50 =
+    userInfo?.rankReward > 0
+      ? "Completed"
+      : userInfo?.firstDepositAt * 1000 + 50 * 24 * 60 * 60 * 1000;
   const [con, setCon] = useState(false);
+  const [income2XB, setIncome2XB] = useState(0);
+  // useEffect(() => {
+  //   setIncome2XB(userInfo.isHave2x4X);
+  // });
   useEffect(() => {
     AOS.init({
       duration: 1000,
@@ -90,10 +105,12 @@ const MainContent = () => {
       console.log(error);
     }
   };
+  // console.log(userInfo?.isHave2x4X, "::::DX");
   const timers = [
     {
       label: "2X B (C — 50) TIME",
       id: "f50timer",
+      // date: day7,
       date: day7,
     },
     {
@@ -143,12 +160,15 @@ const MainContent = () => {
             (distance % (1000 * 60 * 60)) / (1000 * 60)
           );
           const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
+          const setTimeC =
+            timer.date === "Completed"
+              ? "Completed"
+              : `${days || 0}d ${hours || 0}h ${minutes || 0}m ${
+                  seconds || 0
+                }s`;
           setTimeRemaining((prev) => ({
             ...prev,
-            [timer.id]: `${days || 0}d ${hours || 0}h ${minutes || 0}m ${
-              seconds || 0
-            }s`,
+            [timer.id]: setTimeC,
           }));
         }
       }, 1000);

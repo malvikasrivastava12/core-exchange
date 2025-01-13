@@ -139,9 +139,104 @@ export async function getRoiOfUserfn(address, depositLenght) {
         depositLenght: depositLenght,
       },
     });
-    console.log("getRoiOfUserfn", response.data);
+    // console.log("getRoiOfUserfn", response.data);
     return response.data;
   } catch (error) {
     console.log("Error getUserInfo Admin:", error);
+  }
+}
+
+export async function getWithdrawHistoryfn(address) {
+  try {
+    const response = await axios.get(`${URLApi}/withdrawHistory`, {
+      params: {
+        user: address,
+        page: 1,
+        limit: 10,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.log("Error getWithdrawHistoryfn Admin:", error);
+  }
+}
+
+export async function getInvestmentHistoryfn(address) {
+  try {
+    const response = await axios.get(`${URLApi}/getInvestmentHistory`, {
+      params: {
+        user: address,
+        page: 1,
+        limit: 10,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.log("Error getWithdrawHistoryfn Admin:", error);
+  }
+}
+
+export async function gettotalEarnedHistoryfn(address) {
+  try {
+    const response = await axios.get(`${URLApi}/totalEarnedHistory`, {
+      params: {
+        user: address,
+        page: 1,
+        limit: 10,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.log("Error getWithdrawHistoryfn Admin:", error);
+  }
+}
+
+export async function getOfferIncomeHistoryfn(address) {
+  try {
+    const response = await axios.get(`${URLApi}/offerIncomeHistory`, {
+      params: {
+        user: address,
+        page: 1,
+        limit: 10,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.log("Error getWithdrawHistoryfn Admin:", error);
+  }
+}
+
+export async function getOfferHistoryfn(address) {
+  try {
+    const response = await axios.get(`${URLApi}/offerHistory`, {
+      params: {
+        user: address,
+        page: 1,
+        limit: 10,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.log("Error getWithdrawHistoryfn Admin:", error);
+  }
+}
+export async function getMagicIncomeHistory(address) {
+  try {
+    const response = await axios.get(`${URLApi}/magicIncomeHistory`, {
+      params: {
+        user: address,
+        page: 1,
+        limit: 10,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.log("Error getWithdrawHistoryfn Admin:", error);
   }
 }

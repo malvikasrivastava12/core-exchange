@@ -25,8 +25,10 @@ import classNames from "classnames";
 const Navbar = () => {
   const dispatch = useDispatch();
   const { address, isConnected, chainId, chain } = useAccount();
+  // const address = "0xe6804548674be4253aaab4f9eeb780e04885efd8";
   const { wallet, userExist, userInfo } = useSelector((state) => state.login);
   const walletAddress = wallet.address;
+
   const [showWalletStatisticsModal, setShowWalletStatisticsModal] =
     useState(false);
   const [showWithDrawalModal, setShowWithDrawalModal] = useState(false);

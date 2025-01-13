@@ -1,15 +1,24 @@
 import React, { useEffect, useState } from "react";
 import DAOIcon from "../assets/Images/Core_Exchange_Logo_favicon.png";
 import { useSelector } from "react-redux";
-import { getUserDepositList } from "../Helper/Api_function";
+import {
+  getUserDepositList,
+  getWithdrawHistoryfn,
+  getInvestmentHistoryfn,
+} from "../Helper/Api_function";
 import {
   Depositfn,
   getReturnVirtualTokenAmountCanBeUsed,
+  returnAvailableSplitWalletFundfn,
+  TotalClaimableIncomefn,
+  TotalIncomefn,
   UserDetailsfn,
+  withdrawBalancefn,
 } from "../Helper/Web3";
 import { IoCaretForwardOutline } from "react-icons/io5";
 import { IoCaretBackOutline } from "react-icons/io5";
 import toast from "react-hot-toast";
+import moment from "moment/moment";
 export default function DepositModel(props) {
   const { userInfo } = useSelector((state) => state.login);
   const {
@@ -37,8 +46,6 @@ export default function DepositModel(props) {
     const data = await getUserDepositList(walletAddress);
     console.log(data, "::::::::::in getUserDepositList");
     setDepositHistory(Array.isArray(data.data) ? data.data : []);
-    console.log(depositHistory, "depositHistory");
-    console.log(walletAddress, "walletAddress-------");
   };
   const [inputDeposit, setInputDeposit] = useState(false);
   const [isWithdraw, setIsWithdraw] = useState(false);
@@ -49,7 +56,18 @@ export default function DepositModel(props) {
   const [splitInput, setSplitInput] = useState(0);
   const [userDetails, setUserDetails] = useState([]);
   const [isDepositFunction, setIsDepositFunction] = useState(false);
-
+  const [myInvestment, setMyInvestment] = useState([]);
+  const [viewMyInvestmentTable, setViewMyInvestmentTable] = useState("");
+  const [myReInvestment, setMyReInvestment] = useState([]);
+  const [viewMyReInvestmentTable, setViewMyReInvestmentTable] = useState("");
+  const [balance, setBalance] = useState(0);
+  const [transferToWallet, setTransferToWallet] = useState(0);
+  const [transferToSplitWallet, setTransferToSplitWallet] = useState(0);
+  const [reinvestwallet, setReinvestwallet] = useState(0);
+  const [totalWithdraw, setTotalWithdraw] = useState([]);
+  const [viewTotalWithdrawTable, setViewTotalWithdrawTable] = useState("");
+  const [splitWallet, setSplitWallet] = useState(0);
+  const [totalWithdrawn, setTotalWithdrawn] = useState(0);
   const handleSecurityPin = () => {
     setSecurityPin((prev) => !prev);
   };
@@ -66,12 +84,58 @@ export default function DepositModel(props) {
 
     setIsDepositMode(false);
   };
+  const [reInvest, setReInvest] = useState(0);
+  const handleMyReInvestment = async () => {
+    const data = await getWithdrawHistoryfn(walletAddress);
+    setReInvest(data.totalReinvestment);
+    setMyReInvestment(data.data);
+    setTotalWithdraw(data.data);
+    setSplitWallet(data.splitWallet);
+  };
+
+  const handleTotalWithdraw = async () => {
+    const TotalIncome = await TotalIncomefn(walletAddress);
+    setTotalWithdrawn(TotalIncome / 1e18);
+    // console.log(TotalIncome / 1e18?.toFixed(2), "TotalIncome");
+  };
+
+  const handleMyInvestment = async () => {
+    const data = await getInvestmentHistoryfn(walletAddress);
+    setMyInvestment(data.data);
+  };
+  const handleBalance = async () => {
+    const TotalClaimableIncome = await TotalClaimableIncomefn(walletAddress);
+    setBalance(Number(TotalClaimableIncome) / 1e18);
+  };
+
+  const inputWithdraws = () => {
+    const walletinput = (balance * 50) / 100;
+    const splitwalletinput = (balance * 25) / 100;
+    const reInvestWalletinput = (balance * 25) / 100;
+    setTransferToWallet(walletinput);
+    setTransferToSplitWallet(splitwalletinput);
+    setReinvestwallet(reInvestWalletinput);
+  };
+  const [leftFreeCore, setLeftFreeCore] = useState(0);
+  const handleLeftFreeCore = async () => {
+    const data = await returnAvailableSplitWalletFundfn();
+    setLeftFreeCore(data / 1e18);
+  };
+
+  useEffect(() => {
+    if (walletAddress) {
+      handleMyReInvestment();
+      handleBalance();
+      handleTotalWithdraw();
+      handleLeftFreeCore();
+    }
+  }, [walletAddress]);
 
   const MakeDepositModalData = [
     {
       id: 0,
       label1: "Split Wallet :",
-      value: userInfo?.splitWallet ?? 0,
+      value: splitWallet,
       label2: "Click to View :",
       buttonText: "View History",
       image: DAOIcon,
@@ -80,13 +144,7 @@ export default function DepositModel(props) {
     {
       id: 1,
       label1: "Left Free Core:",
-      value:
-        Number(userDetails[10]) / 1e18 > 0
-          ? (
-              Number(userDetails[10]) / 1e18 +
-              Number(userDetails[12]) / 1e18
-            ).toFixed(4)
-          : 0,
+      value: leftFreeCore,
       label2: "Click to View :",
       buttonText: "View History",
       image: DAOIcon,
@@ -104,7 +162,7 @@ export default function DepositModel(props) {
     {
       id: 6,
       label1: "My Investment :",
-      value: userInfo?.firstDepositAmount ?? 0,
+      value: userInfo?.depositWallet - reInvest ?? 0,
       label2: "Click to View :",
       buttonText: "View History",
       image: DAOIcon,
@@ -113,8 +171,7 @@ export default function DepositModel(props) {
     {
       id: 7,
       label1: "My Re-investment :",
-      value:
-        (userInfo?.depositWallet ?? 0) - (userInfo?.firstDepositAmount ?? 0),
+      value: reInvest,
       label2: "Click to View :",
       buttonText: "View History",
       image: DAOIcon,
@@ -123,26 +180,29 @@ export default function DepositModel(props) {
     {
       id: 3,
       label1: "Total Investment :",
-      value: Number(userDetails[5]) > 0 ? Number(userDetails[5]) / 1e18 : 0,
+      value:
+        Number(userDetails[5]) / 1e18 > 0
+          ? (Number(userDetails[5]) / 1e18).toFixed(4)
+          : 0,
       label2: "",
       buttonText: "Deposit History",
       image: DAOIcon,
       name: "TI",
     },
-    // {
-    //   id: 4,
-    //   label1: "Total withdrawn :",
-    //   value: 0,
-    //   label2: "",
-    //   buttonText: "Withdraw History",
-    //   image: DAOIcon,
-    //   name: "TW",
-    // },
+    {
+      id: 4,
+      label1: "Total withdrawn :",
+      value: totalWithdrawn,
+      label2: "",
+      buttonText: "Withdraw History",
+      image: DAOIcon,
+      name: "TW",
+    },
 
     {
       id: 5,
       label1: "Balance:",
-      value: userInfo?.walletBalance ?? 0,
+      value: balance.toFixed(2),
       label2: "Request withdraw:",
       buttonText: "Withdraw ",
       image: DAOIcon,
@@ -150,6 +210,7 @@ export default function DepositModel(props) {
       text: "**In the event of an unsuccessful withdrawal resulting in a zero balance display, re-initiate the withdrawal process, disregarding the current balance state. This will re-trigger the pending withdrawal request, facilitating the successful transfer of funds to your designated wallet address*",
     },
   ];
+
   const handleMainandFreeCore = async (walletAddress, inputAmount, rank) => {
     const virtualToken = await getReturnVirtualTokenAmountCanBeUsed(
       walletAddress,
@@ -222,7 +283,7 @@ export default function DepositModel(props) {
           return;
         }
 
-        await Depositfn(0, inputAmount);
+        await Depositfn(0, inputAmount, walletAddress);
         setIsLoader(false);
         setTimeout(() => {
           setIsFetch(!isFetch);
@@ -238,11 +299,13 @@ export default function DepositModel(props) {
     setInputAmount("");
     setInputAddress("");
   };
-
-  useEffect(() => {
-    console.log(userInfo?.securityPin);
-    setInputPin(userInfo?.securityPin);
-  }, [userInfo?.securityPin]);
+  const handleWithdraw = async () => {
+    await withdrawBalancefn();
+  };
+  // useEffect(() => {
+  //   console.log(userInfo?.securityPin);
+  //   setInputPin(userInfo?.securityPin);
+  // }, [userInfo?.securityPin]);
 
   useEffect(() => {
     UserDetailsfn(walletAddress).then((res) => {
@@ -362,9 +425,10 @@ export default function DepositModel(props) {
                         <input
                           type="password"
                           placeholder="Enter Security Pin"
-                          value={
-                            userInfo.securityPin ? userInfo.securityPin : ""
-                          }
+                          value={inputPin}
+                          // value={
+                          //   userInfo.securityPin ? userInfo.securityPin : ""
+                          // }
                           onChange={(e) => setInputPin(e.target.value)}
                           // disabled={!userInfo.securityPin}
                         />
@@ -472,10 +536,18 @@ export default function DepositModel(props) {
                                     } else if (item?.id === 3) {
                                       await handleDepositHistory();
                                       setViewDepositHistoryTable(item.id);
+                                    } else if (item?.id === 4) {
+                                      setViewTotalWithdrawTable(item.id);
+                                    } else if (item?.id === 6) {
+                                      setViewMyInvestmentTable(item.id);
+                                      handleMyInvestment();
+                                    } else if (item?.id === 7) {
+                                      setViewMyReInvestmentTable(item.id);
                                     } else {
                                       setTableview(item.id);
                                     }
                                   }}
+
                                   // onClick={() => {
 
                                   //   if (item.id === 5) {
@@ -516,6 +588,7 @@ export default function DepositModel(props) {
                                               inputPinWithdwaw
                                             ) {
                                               setIsWithdraw(true);
+                                              inputWithdraws();
                                             } else {
                                               toast.error("Pin Not Match!!");
                                             }
@@ -528,21 +601,20 @@ export default function DepositModel(props) {
                                   ) : (
                                     <>
                                       <div className="maincontform authFalse">
-                                        {" "}
                                         <div className="deposit-input-container">
                                           <input
                                             type="text"
-                                            value={`Transfer to wallet (Core) : 0`}
+                                            value={`Transfer to wallet (Core) : ${transferToWallet}`}
                                             readOnly
                                           />
                                           <input
                                             type="text"
-                                            value={`Transfer to Split Wallet(Core) : 0`}
+                                            value={`Transfer to Split Wallet(Core) : ${transferToSplitWallet}`}
                                             readOnly
                                           />
                                           <input
                                             type="text"
-                                            value={`Re-Invest(USD) : 0 `}
+                                            value={`Re-Invest(Core) : ${reinvestwallet} `}
                                             readOnly
                                           />
                                           <div
@@ -563,7 +635,7 @@ export default function DepositModel(props) {
                                             <button
                                               className="maindescbut"
                                               type="button"
-                                              // onClick={handleDeposit}
+                                              onClick={handleWithdraw}
                                             >
                                               Withdraw NOW
                                             </button>
@@ -706,16 +778,23 @@ export default function DepositModel(props) {
                                       data-title="Name"
                                       class="k-header"
                                     >
-                                      User Address
+                                      Credit Amount
                                     </th>
-
+                                    <th
+                                      role="columnheader"
+                                      data-field="SNO"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      Dated
+                                    </th>
                                     <th
                                       role="columnheader"
                                       data-field="Name"
                                       data-title="Name"
                                       class="k-header"
                                     >
-                                      Amount 123
+                                      Description
                                     </th>
                                     {/* <th
                                       role="columnheader"
@@ -727,24 +806,98 @@ export default function DepositModel(props) {
                                     </th> */}
                                   </tr>
                                 </thead>
-                                {/* {depositHistory?.length > 0 &&
-                                  depositHistory?.map((user, index) => (
+                                {totalWithdraw?.length > 0 &&
+                                  totalWithdraw?.map((user, index) => (
                                     <tbody className="table-body" key={index}>
                                       <tr>
                                         <td>{index + 1}</td>
-                                        <td>{user?.user}</td>
-                                        <td>{user?.depositWallet}</td>
+                                        <td>{user?.splitBalance}</td>
+                                        <td>
+                                          {moment(user.createdAt).format(
+                                            "M/D/YYYY h:mm:ss A"
+                                          )}
+                                        </td>
+                                        <td>
+                                          {user?.splitBalance +
+                                            user?.topupBalance +
+                                            user?.wallet}
+                                        </td>
                                       </tr>
                                     </tbody>
-                                  ))} */}
+                                  ))}
                                 <tbody className="table-body">
-                                  <tr>
+                                  {/* <tr>
                                     <th scope="row">1</th>
                                     <td>Mark</td>
                                     <td>Otto</td>
-                                  </tr>
+                                  </tr> */}
                                 </tbody>
                               </table>
+
+                              {totalWithdraw?.length === 0 && (
+                                <div className="p-4 d-flex justify-content-center">
+                                  <div>No Data Found!</div>
+                                </div>
+                              )}
+                            </div>
+                            <div
+                              class="k-pager-wrap k-grid-pager k-widget"
+                              data-role="pager"
+                            >
+                              <a
+                                class="k-link k-pager-nav  k-state-disabled"
+                                aria-controls="DataTables_Table_0"
+                                data-dt-idx="0"
+                                tabindex="0"
+                                id="DataTables_Table_0_previous"
+                              >
+                                <IoCaretBackOutline />
+                              </a>
+                              <a
+                                class="k-link k-pager-nav  k-state-disabled"
+                                aria-controls="DataTables_Table_0"
+                                data-dt-idx="0"
+                                tabindex="0"
+                                id="DataTables_Table_0_previous"
+                              >
+                                <IoCaretBackOutline />
+                              </a>
+                              <ul class="k-pager-numbers k-reset">
+                                <li>
+                                  <a
+                                    class="k-state-selected"
+                                    aria-controls="DataTables_Table_0"
+                                    data-dt-idx="1"
+                                    tabindex="0"
+                                    value="1"
+                                  >
+                                    1
+                                  </a>
+                                </li>
+                              </ul>
+                              <a
+                                class="k-link k-pager-nav k-state-disabled"
+                                aria-controls="DataTables_Table_0"
+                                data-dt-idx="3"
+                                tabindex="0"
+                                id="DataTables_Table_0_next"
+                              >
+                                {/* <i class="k-icon k-i-arrow-e"></i> */}
+                                <IoCaretForwardOutline />
+                              </a>
+                              <a
+                                class="k-link k-pager-nav k-state-disabled"
+                                aria-controls="DataTables_Table_0"
+                                data-dt-idx="3"
+                                tabindex="0"
+                                id="DataTables_Table_0_next"
+                              >
+                                <IoCaretForwardOutline />
+                              </a>
+
+                              <span class="k-pager-info k-label">
+                                Displaying 1 to 7 out of 7 items{" "}
+                              </span>
                             </div>
                           </div>
                         </>
@@ -793,7 +946,7 @@ export default function DepositModel(props) {
                                       data-title="Name"
                                       class="k-header"
                                     >
-                                      User Address
+                                      Address
                                     </th>
 
                                     <th
@@ -810,8 +963,40 @@ export default function DepositModel(props) {
                                       data-title="Name"
                                       class="k-header"
                                     >
-                                      Description
+                                      Required Core
+                                    </th>
+                                    <th
+                                      role="columnheader"
+                                      data-field="Name"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      Main Core
                                     </th> */}
+                                    <th
+                                      role="columnheader"
+                                      data-field="Name"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      Free Core
+                                    </th>
+                                    <th
+                                      role="columnheader"
+                                      data-field="Name"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      Split Core
+                                    </th>
+                                    <th
+                                      role="columnheader"
+                                      data-field="Name"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      InvestOn
+                                    </th>
                                   </tr>
                                 </thead>
                                 {depositHistory?.length > 0 &&
@@ -821,6 +1006,15 @@ export default function DepositModel(props) {
                                         <td>{index + 1}</td>
                                         <td>{user?.user}</td>
                                         <td>{user?.amount}</td>
+                                        {/* <td>{user?.amount}</td>
+                                        <td>{user?.amount}</td> */}
+                                        <td>{user?.level}</td>
+                                        <td>{user?.splitWallet}</td>
+                                        <td>
+                                          {moment(user.createdAt).format(
+                                            "M/D/YYYY h:mm:ss A"
+                                          )}
+                                        </td>
                                       </tr>
                                     </tbody>
                                   ))}
@@ -841,6 +1035,490 @@ export default function DepositModel(props) {
                               )}
                             </div>
 
+                            <div
+                              class="k-pager-wrap k-grid-pager k-widget"
+                              data-role="pager"
+                            >
+                              <a
+                                class="k-link k-pager-nav  k-state-disabled"
+                                aria-controls="DataTables_Table_0"
+                                data-dt-idx="0"
+                                tabindex="0"
+                                id="DataTables_Table_0_previous"
+                              >
+                                <IoCaretBackOutline />
+                              </a>
+                              <a
+                                class="k-link k-pager-nav  k-state-disabled"
+                                aria-controls="DataTables_Table_0"
+                                data-dt-idx="0"
+                                tabindex="0"
+                                id="DataTables_Table_0_previous"
+                              >
+                                <IoCaretBackOutline />
+                              </a>
+                              <ul class="k-pager-numbers k-reset">
+                                <li>
+                                  <a
+                                    class="k-state-selected"
+                                    aria-controls="DataTables_Table_0"
+                                    data-dt-idx="1"
+                                    tabindex="0"
+                                    value="1"
+                                  >
+                                    1
+                                  </a>
+                                </li>
+                              </ul>
+                              <a
+                                class="k-link k-pager-nav k-state-disabled"
+                                aria-controls="DataTables_Table_0"
+                                data-dt-idx="3"
+                                tabindex="0"
+                                id="DataTables_Table_0_next"
+                              >
+                                {/* <i class="k-icon k-i-arrow-e"></i> */}
+                                <IoCaretForwardOutline />
+                              </a>
+                              <a
+                                class="k-link k-pager-nav k-state-disabled"
+                                aria-controls="DataTables_Table_0"
+                                data-dt-idx="3"
+                                tabindex="0"
+                                id="DataTables_Table_0_next"
+                              >
+                                <IoCaretForwardOutline />
+                              </a>
+
+                              <span class="k-pager-info k-label">
+                                Displaying 1 to 7 out of 7 items{" "}
+                              </span>
+                            </div>
+                          </div>
+                        </>
+                      )}
+
+                      {viewMyInvestmentTable === item.id && item.id === 6 && (
+                        <>
+                          <div className="table-container">
+                            <div
+                              className="d-flex align-items-center justify-content-center"
+                              onClick={() => setViewMyInvestmentTable("")}
+                            >
+                              <div class="closee">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <svg viewBox="0 0 36 36" class="circlu">
+                                  <path
+                                    stroke-dasharray="100, 100"
+                                    d="M18 2.0845
+                    a 15.9155 15.9155 0 0 1 0 31.831
+                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                                  ></path>
+                                </svg>
+                              </div>
+                            </div>
+
+                            <div className="table-responsive">
+                              <table class="table table-dark">
+                                <thead
+                                  className="k-grid-header "
+                                  role="rowgroup"
+                                >
+                                  <tr role="row">
+                                    <th
+                                      role="columnheader"
+                                      data-field="SNO"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      SNO
+                                    </th>
+                                    <th
+                                      role="columnheader"
+                                      data-field="SNO"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      Amount
+                                    </th>
+
+                                    <th
+                                      role="columnheader"
+                                      data-field="Name"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      Dated
+                                    </th>
+                                  </tr>
+                                </thead>
+                                {myInvestment?.length > 0 &&
+                                  myInvestment?.map((user, index) => (
+                                    <tbody className="table-body" key={index}>
+                                      <tr>
+                                        <td>{index + 1}</td>
+                                        <td>{user?.amount}</td>
+                                        <td>
+                                          {moment(user.createdAt).format(
+                                            "M/D/YYYY h:mm:ss A"
+                                          )}
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  ))}
+                                {/* <tbody className="table-body">
+                                  <tr>
+                                    <th scope="row">1</th>
+                                    <td>Mark</td>
+                                    <td>Otto</td>
+                                    <td>mdo</td>
+                                  </tr>
+                                </tbody> */}
+                              </table>
+
+                              {myInvestment.length === 0 && (
+                                <div className="p-4 d-flex justify-content-center">
+                                  <div>No Data Found!</div>
+                                </div>
+                              )}
+                            </div>
+
+                            <div
+                              class="k-pager-wrap k-grid-pager k-widget"
+                              data-role="pager"
+                            >
+                              <a
+                                class="k-link k-pager-nav  k-state-disabled"
+                                aria-controls="DataTables_Table_0"
+                                data-dt-idx="0"
+                                tabindex="0"
+                                id="DataTables_Table_0_previous"
+                              >
+                                <IoCaretBackOutline />
+                              </a>
+                              <a
+                                class="k-link k-pager-nav  k-state-disabled"
+                                aria-controls="DataTables_Table_0"
+                                data-dt-idx="0"
+                                tabindex="0"
+                                id="DataTables_Table_0_previous"
+                              >
+                                <IoCaretBackOutline />
+                              </a>
+                              <ul class="k-pager-numbers k-reset">
+                                <li>
+                                  <a
+                                    class="k-state-selected"
+                                    aria-controls="DataTables_Table_0"
+                                    data-dt-idx="1"
+                                    tabindex="0"
+                                    value="1"
+                                  >
+                                    1
+                                  </a>
+                                </li>
+                              </ul>
+                              <a
+                                class="k-link k-pager-nav k-state-disabled"
+                                aria-controls="DataTables_Table_0"
+                                data-dt-idx="3"
+                                tabindex="0"
+                                id="DataTables_Table_0_next"
+                              >
+                                {/* <i class="k-icon k-i-arrow-e"></i> */}
+                                <IoCaretForwardOutline />
+                              </a>
+                              <a
+                                class="k-link k-pager-nav k-state-disabled"
+                                aria-controls="DataTables_Table_0"
+                                data-dt-idx="3"
+                                tabindex="0"
+                                id="DataTables_Table_0_next"
+                              >
+                                <IoCaretForwardOutline />
+                              </a>
+
+                              <span class="k-pager-info k-label">
+                                Displaying 1 to 7 out of 7 items{" "}
+                              </span>
+                            </div>
+                          </div>
+                        </>
+                      )}
+
+                      {viewMyReInvestmentTable === item.id && item.id === 7 && (
+                        <>
+                          <div className="table-container">
+                            <div
+                              className="d-flex align-items-center justify-content-center"
+                              onClick={() => setViewMyReInvestmentTable("")}
+                            >
+                              <div class="closee">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <svg viewBox="0 0 36 36" class="circlu">
+                                  <path
+                                    stroke-dasharray="100, 100"
+                                    d="M18 2.0845
+                    a 15.9155 15.9155 0 0 1 0 31.831
+                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                                  ></path>
+                                </svg>
+                              </div>
+                            </div>
+
+                            <div className="table-responsive">
+                              <table class="table table-dark">
+                                <thead
+                                  className="k-grid-header "
+                                  role="rowgroup"
+                                >
+                                  <tr role="row">
+                                    <th
+                                      role="columnheader"
+                                      data-field="SNO"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      SNO
+                                    </th>
+                                    <th
+                                      role="columnheader"
+                                      data-field="SNO"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      Amount
+                                    </th>
+
+                                    <th
+                                      role="columnheader"
+                                      data-field="Name"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      Dated
+                                    </th>
+                                  </tr>
+                                </thead>
+                                {myReInvestment?.length > 0 &&
+                                  myReInvestment?.map((user, index) => (
+                                    <tbody className="table-body" key={index}>
+                                      <tr>
+                                        <td>{index + 1}</td>
+                                        <td>{user?.topupBalance}</td>
+                                        <td>
+                                          {moment(user.createdAt).format(
+                                            "M/D/YYYY h:mm:ss A"
+                                          )}
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  ))}
+                                {/* <tbody className="table-body">
+                                  <tr>
+                                    <th scope="row">1</th>
+                                    <td>Mark</td>
+                                    <td>Otto</td>
+                                    <td>mdo</td>
+                                  </tr>
+                                </tbody> */}
+                              </table>
+
+                              {myReInvestment.length === 0 && (
+                                <div className="p-4 d-flex justify-content-center">
+                                  <div>No Data Found!</div>
+                                </div>
+                              )}
+                            </div>
+
+                            <div
+                              class="k-pager-wrap k-grid-pager k-widget"
+                              data-role="pager"
+                            >
+                              <a
+                                class="k-link k-pager-nav  k-state-disabled"
+                                aria-controls="DataTables_Table_0"
+                                data-dt-idx="0"
+                                tabindex="0"
+                                id="DataTables_Table_0_previous"
+                              >
+                                <IoCaretBackOutline />
+                              </a>
+                              <a
+                                class="k-link k-pager-nav  k-state-disabled"
+                                aria-controls="DataTables_Table_0"
+                                data-dt-idx="0"
+                                tabindex="0"
+                                id="DataTables_Table_0_previous"
+                              >
+                                <IoCaretBackOutline />
+                              </a>
+                              <ul class="k-pager-numbers k-reset">
+                                <li>
+                                  <a
+                                    class="k-state-selected"
+                                    aria-controls="DataTables_Table_0"
+                                    data-dt-idx="1"
+                                    tabindex="0"
+                                    value="1"
+                                  >
+                                    1
+                                  </a>
+                                </li>
+                              </ul>
+                              <a
+                                class="k-link k-pager-nav k-state-disabled"
+                                aria-controls="DataTables_Table_0"
+                                data-dt-idx="3"
+                                tabindex="0"
+                                id="DataTables_Table_0_next"
+                              >
+                                {/* <i class="k-icon k-i-arrow-e"></i> */}
+                                <IoCaretForwardOutline />
+                              </a>
+                              <a
+                                class="k-link k-pager-nav k-state-disabled"
+                                aria-controls="DataTables_Table_0"
+                                data-dt-idx="3"
+                                tabindex="0"
+                                id="DataTables_Table_0_next"
+                              >
+                                <IoCaretForwardOutline />
+                              </a>
+
+                              <span class="k-pager-info k-label">
+                                Displaying 1 to 7 out of 7 items{" "}
+                              </span>
+                            </div>
+                          </div>
+                        </>
+                      )}
+
+                      {viewTotalWithdrawTable === item.id && item.id === 4 && (
+                        <>
+                          <div className="table-container">
+                            <div
+                              className="d-flex align-items-center justify-content-center"
+                              onClick={() => setViewTotalWithdrawTable("")}
+                            >
+                              <div class="closee">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <svg viewBox="0 0 36 36" class="circlu">
+                                  <path
+                                    stroke-dasharray="100, 100"
+                                    d="M18 2.0845
+                    a 15.9155 15.9155 0 0 1 0 31.831
+                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                                  ></path>
+                                </svg>
+                              </div>
+                            </div>
+
+                            <div className="table-responsive">
+                              <table class="table table-dark">
+                                <thead
+                                  className="k-grid-header "
+                                  role="rowgroup"
+                                >
+                                  <tr role="row">
+                                    <th
+                                      role="columnheader"
+                                      data-field="SNO"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      SNO
+                                    </th>
+                                    <th
+                                      role="columnheader"
+                                      data-field="SNO"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      Amount(CORE)
+                                    </th>
+
+                                    <th
+                                      role="columnheader"
+                                      data-field="SNO"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      Re-Invest(CORE)
+                                    </th>
+                                    <th
+                                      role="columnheader"
+                                      data-field="SNO"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      Wallet(CORE)
+                                    </th>
+                                    <th
+                                      role="columnheader"
+                                      data-field="SNO"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      Split-Wallet(CORE)
+                                    </th>
+
+                                    <th
+                                      role="columnheader"
+                                      data-field="Name"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      Dated
+                                    </th>
+                                  </tr>
+                                </thead>
+                                {totalWithdraw?.length > 0 &&
+                                  totalWithdraw?.map((user, index) => (
+                                    <tbody className="table-body" key={index}>
+                                      <tr>
+                                        <td>{index + 1}</td>
+                                        <td>
+                                          {user?.topupBalance +
+                                            user?.wallet +
+                                            user?.splitBalance}
+                                        </td>
+                                        <td>{user?.topupBalance}</td>
+                                        <td>{user?.wallet}</td>
+                                        <td>{user?.splitBalance}</td>
+                                        <td>
+                                          {moment(user.createdAt).format(
+                                            "M/D/YYYY h:mm:ss A"
+                                          )}
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  ))}
+                                {/* <tbody className="table-body">
+                                  <tr>
+                                    <th scope="row">1</th>
+                                    <td>Mark</td>
+                                    <td>Otto</td>
+                                    <td>mdo</td>
+                                  </tr>
+                                </tbody> */}
+                              </table>
+
+                              {totalWithdraw?.length === 0 && (
+                                <div className="p-4 d-flex justify-content-center">
+                                  <div>No Data Found!</div>
+                                </div>
+                              )}
+                            </div>
                             <div
                               class="k-pager-wrap k-grid-pager k-widget"
                               data-role="pager"
