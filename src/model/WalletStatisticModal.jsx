@@ -17,6 +17,8 @@ import {
   gettotalEarnedHistoryfn,
   getOfferIncomeHistoryfn,
   getOfferHistoryfn,
+  getC50FlushedHistoryfn,
+  getMagicTeamfn,
 } from "../Helper/Api_function";
 import {
   userClaimedRegistrationTokenfn,
@@ -24,6 +26,7 @@ import {
   ReturnUserQualificationLengthfn,
   TotalClaimableIncomefn,
   TotalIncomefn,
+  isRegistrationVirtualTokenClaimed,
 } from "../Helper/Web3";
 import { useSelector } from "react-redux";
 import moment from "moment";
@@ -161,6 +164,22 @@ export default function WalletStatisticModal(props) {
     } else toast.error("Wallet is not connected!!");
   };
 
+  const handleMagicTeam = async () => {
+    if (walletAddress) {
+      const data = await getMagicTeamfn(walletAddress);
+      setTotalBusiness(Array.isArray(data.data) ? data.data : []);
+      // setIsLoading(-1);
+    } else toast.error("Wallet is not connected!!");
+  };
+
+  const handleC50Cappinghistory = async () => {
+    if (walletAddress) {
+      const data = await user(walletAddress);
+      setC50Capping(Array.isArray(data.data) ? data.data : []);
+      // setIsLoading(-1);
+    } else toast.error("Wallet is not connected!!");
+  };
+
   // const handleMagicBooster = async () => {
   //   if (userExist) {
   //     const data = await getMagicBoosterHistoryfn(walletAddress);
@@ -173,7 +192,7 @@ export default function WalletStatisticModal(props) {
     if (walletAddress) {
       const data = await getOfferHistoryfn(walletAddress);
       setMagicBooster(Array.isArray(data.data) ? data.data : []);
-      // setIsLoading(-1);
+      setIsLoading(-1);
       setOfferAmount(data.offerAmount);
     } else toast.error("Wallet is not connected!!");
   };
@@ -182,7 +201,7 @@ export default function WalletStatisticModal(props) {
     if (walletAddress) {
       const data = await getMagicIncomeHistoryfn(walletAddress);
       setMagicIncome(Array.isArray(data.data) ? data.data : []);
-      // setIsLoading(-1);
+      setIsLoading(-1);
     } else toast.error("Wallet is not connected!!");
   };
 
@@ -190,7 +209,7 @@ export default function WalletStatisticModal(props) {
     const data = await getMagicIncomeHistoryfn(walletAddress);
     console.log(data, "::::::::::in getMagicIncomeHistoryfn");
     setMagicIncome(Array.isArray(data.data) ? data.data : []);
-    // setIsLoading(-1);
+    setIsLoading(-1);
   };
 
   const ReturnUserQualificationLength = async () => {
@@ -235,7 +254,7 @@ export default function WalletStatisticModal(props) {
       data: Array.isArray(data.data) ? data.data : [],
       pageinate: data,
     });
-    // setIsLoading(-1);
+    setIsLoading(-1);
 
     console.log(rankReward, "rankReward==========");
   };
@@ -296,10 +315,14 @@ export default function WalletStatisticModal(props) {
   }, [walletAddress]);
 
   useEffect(() => {
-    UserDetailsfn(walletAddress).then((res) => {
+    UserDetailsfn(walletAddress).then(async (res) => {
       console.log("UserDetailsfn response", res);
       setUserDetails(res);
-
+      const r = await isRegistrationVirtualTokenClaimed(walletAddress);
+      if (!r) {
+        setRank("Claim now");
+        return;
+      }
       // if (Number(res[10]) === Number(10 * 1e18)) {
       if (Number(res[9]) == 1) {
         setRank("BRONZE");
@@ -315,6 +338,21 @@ export default function WalletStatisticModal(props) {
     });
   }, [walletAddress, isFetch]);
 
+  const handleC50FlushedHistory = async () => {
+    if (walletAddress) {
+      const data = await getC50FlushedHistoryfn(walletAddress);
+      setC50FlushedHistory(data.data);
+      console.log(data, "Left split wallet");
+    }
+  };
+
+  const handleC50IncomeHistory = async () => {
+    if (walletAddress) {
+      const data = await getC50FlushedHistoryfn(walletAddress);
+      setC50IncomHistory(data.data);
+      console.log(data, "Left split wallet");
+    }
+  };
   const walletStatisticModalData = [
     {
       id: 0,
@@ -345,9 +383,7 @@ export default function WalletStatisticModal(props) {
       id: 1,
       label: "Level Team:",
       heading: "All/Paid",
-      value: `${userInfo?.teamCount ?? 0}/${
-        filteredTeam > 0 ? filteredTeam : 0
-      }`,
+      value: `${userInfo?.teamCount ?? 0}/${userInfo?.directCount}`,
 
       label2: "Click to View:",
       buttonText: "View Team",
@@ -365,7 +401,7 @@ export default function WalletStatisticModal(props) {
     {
       id: 3,
       label: "C50 Capping",
-      value: "0.0000",
+      value: ((userInfo?.depositWallet * 4) / 100).toFixed(2),
       label2: "Click to View:",
       buttonText: "View Team",
     },
@@ -387,8 +423,8 @@ export default function WalletStatisticModal(props) {
     },
     {
       id: 15,
-      label: "Star Reward:",
-      value: userInfo?.organicAmount.toFixed(2) ?? 0,
+      label: "Star Rank:",
+      value: userInfo?.rankReward > 0 ? userInfo?.rankReward + " STAR" : 0,
 
       image: DAOIcon,
       name: "B",
@@ -653,11 +689,13 @@ export default function WalletStatisticModal(props) {
                                       setViewDirectTeamTable(item.id);
                                     } else if (item?.id === 5) {
                                       setViewTotalBusinessesTable(item.id);
+                                      handleMagicTeam();
                                     } else if (item?.id === 6) {
                                       await handleMagicIncome();
                                       setViewMagicIncomeHistoryTable(item.id);
                                     } else if (item?.id === 7) {
                                       setViewC50FlushedTable(item.id);
+                                      handleC50FlushedHistory();
                                     } else if (item?.id === 8) {
                                       setViewC50IncomeTable(item.id);
                                     } else if (item?.id === 9) {
@@ -670,11 +708,12 @@ export default function WalletStatisticModal(props) {
                                       setViewTotalEarnedTable(item.id);
                                       handleTotalEarned();
                                     } else if (item?.id === 14) {
+                                      setIsLoading(item?.id);
                                       await handleRankReward();
                                       setViewRankRewardHistoryTable(item.id);
                                     } else {
-                                      setIsLoading(item?.id);
-                                      setTableview(item.id);
+                                      // setIsLoading(item?.id);
+                                      // setTableview(item.id);
                                     }
                                   }}
                                 >
@@ -1202,8 +1241,10 @@ export default function WalletStatisticModal(props) {
                                   {magicBooster.map((user, index) => (
                                     <tr key={index}>
                                       <td>{index + 1}</td>
-                                      <td>{user?.desciption}</td>
-                                      <td>{user?.distributionAmount}</td>
+                                      <td>{user?.rewardFrom}</td>
+                                      <td>
+                                        {user?.distributionAmount.toFixed(2)}
+                                      </td>
                                       <td>
                                         {user?.magicBoosterTime
                                           ? new Date(
@@ -1694,7 +1735,7 @@ export default function WalletStatisticModal(props) {
                                   </th>
                                 </tr>
                               </thead>
-                              {C50Capping?.length > 0 && (
+                              {/* {C50Capping?.length > 0 && (
                                 <tbody className="table-body">
                                   {C50Capping.map((user, index) => (
                                     <tr key={index}>
@@ -1703,78 +1744,19 @@ export default function WalletStatisticModal(props) {
                                     </tr>
                                   ))}
                                 </tbody>
-                              )}
-                              {/* <tbody className="table-body">
+                              )} */}
+                              <tbody className="table-body">
                                 <tr>
-                                  <td>Mark</td>
-                                  <td>Mark</td>
+                                  <td>{userInfo?.depositWallet.toFixed(2)}</td>
+                                  <td>{userInfo?.directBonus.toFixed(2)}</td>
                                 </tr>
-                              </tbody> */}
+                              </tbody>
                             </table>
-                            {C50Capping.length === 0 && (
+                            {/* {C50Capping.length === 0 && (
                               <div className="p-4 d-flex justify-content-center">
                                 <div>No Data Found!</div>
                               </div>
-                            )}
-                            <div
-                              class="k-pager-wrap k-grid-pager k-widget"
-                              data-role="pager"
-                            >
-                              <a
-                                class="k-link k-pager-nav  k-state-disabled"
-                                aria-controls="DataTables_Table_0"
-                                data-dt-idx="0"
-                                tabindex="0"
-                                id="DataTables_Table_0_previous"
-                              >
-                                <IoPlayBackSharp />
-                              </a>
-                              <a
-                                class="k-link k-pager-nav  k-state-disabled"
-                                aria-controls="DataTables_Table_0"
-                                data-dt-idx="0"
-                                tabindex="0"
-                                id="DataTables_Table_0_previous"
-                              >
-                                <IoCaretBackOutline />
-                              </a>
-                              <ul class="k-pager-numbers k-reset">
-                                <li>
-                                  <a
-                                    class="k-state-selected"
-                                    aria-controls="DataTables_Table_0"
-                                    data-dt-idx="1"
-                                    tabindex="0"
-                                    value="1"
-                                  >
-                                    1
-                                  </a>
-                                </li>
-                              </ul>
-                              <a
-                                class="k-link k-pager-nav k-state-disabled"
-                                aria-controls="DataTables_Table_0"
-                                data-dt-idx="3"
-                                tabindex="0"
-                                id="DataTables_Table_0_next"
-                              >
-                                {/* <i class="k-icon k-i-arrow-e"></i> */}
-                                <IoCaretForwardOutline />
-                              </a>
-                              <a
-                                class="k-link k-pager-nav k-state-disabled"
-                                aria-controls="DataTables_Table_0"
-                                data-dt-idx="3"
-                                tabindex="0"
-                                id="DataTables_Table_0_next"
-                              >
-                                <IoMdFastforward />
-                              </a>
-
-                              <span class="k-pager-info k-label">
-                                Displaying 1 to 7 out of 7 items{" "}
-                              </span>
-                            </div>
+                            )} */}
                           </div>
                         </div>
                       </>
@@ -1839,7 +1821,9 @@ export default function WalletStatisticModal(props) {
                                     <tr key={index}>
                                       <td>{index + 1}</td>
                                       <td>{user?.user}</td>
-                                      <td>{user?.amount}</td>
+                                      <td>
+                                        {user?.weeklyTeamBusiness.toFixed(2)}
+                                      </td>
                                     </tr>
                                   ))}
                                 </tbody>
@@ -2146,9 +2130,9 @@ export default function WalletStatisticModal(props) {
                                       <td>{index + 1}</td>
                                       <td>{user?.amount}</td>
                                       <td>
-                                        {user?.time
+                                        {user?.timestamp
                                           ? new Date(
-                                              Number(user.time) * 1000
+                                              Number(user.timestamp) * 1000
                                             ).toLocaleString()
                                           : "N/A"}
                                       </td>

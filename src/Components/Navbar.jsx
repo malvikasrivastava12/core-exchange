@@ -38,8 +38,11 @@ const Navbar = () => {
 
   const referralLink = `${base_url}/?ref=${walletAddress}`;
   const [showMakeDepositModal, setShowMakeDepositModal] = useState(false);
-  const toggleMakeDepositModal = () =>
+  const toggleMakeDepositModal = () => {
     setShowMakeDepositModal(!showMakeDepositModal);
+    setIsFetch(!isFetch);
+    console.log(isFetch, ":::::::::::::::::");
+  };
   const toggleWalletStatisticsModal = () =>
     setShowWalletStatisticsModal(!showWalletStatisticsModal);
 

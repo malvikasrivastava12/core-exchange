@@ -2,7 +2,7 @@ import axios from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
 export const URLApi = "https://core-exchange.com/api";
-// export const URLApi = "http://192.168.1.104:1414/api";
+// export const URLApi = "http://192.168.1.112:1414/api";
 export async function getUserInfo(address) {
   try {
     const response = await axios.get(`${URLApi}/user-info`, {
@@ -232,6 +232,85 @@ export async function getMagicIncomeHistory(address) {
         user: address,
         page: 1,
         limit: 10,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.log("Error getWithdrawHistoryfn Admin:", error);
+  }
+}
+
+export async function getLeftCoreWalletfn(address) {
+  try {
+    const response = await axios.get(`${URLApi}/leftCoreWallet`, {
+      params: {
+        user: address,
+        page: 1,
+        limit: 10,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.log("Error getWithdrawHistoryfn Admin:", error);
+  }
+}
+
+export async function getLeftSplitWalletfn(address) {
+  try {
+    const response = await axios.get(`${URLApi}/leftSplitWallet`, {
+      params: {
+        user: address,
+        page: 1,
+        limit: 10,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.log("Error getWithdrawHistoryfn Admin:", error);
+  }
+}
+
+export async function getC50FlushedHistoryfn(address) {
+  try {
+    const response = await axios.get(`${URLApi}/m50FlushedHistory`, {
+      params: {
+        user: address,
+        page: 1,
+        limit: 10,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.log("Error getWithdrawHistoryfn Admin:", error);
+  }
+}
+
+export async function getMagicTeamfn(address) {
+  try {
+    const response = await axios.get(`${URLApi}/magicTeam`, {
+      params: {
+        user: address,
+        page: 1,
+        limit: 10,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.log("Error getWithdrawHistoryfn Admin:", error);
+  }
+}
+
+export async function updateDownlinefn(address, downlineUser) {
+  try {
+    const response = await axios.get(`${URLApi}/updateDownline`, {
+      params: {
+        user: address,
+        downlineUser: downlineUser,
       },
     });
 

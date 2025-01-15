@@ -131,6 +131,18 @@ export async function TotalClaimableIncomefn(address) {
 
   return Number(result);
 }
+
+export async function isRegistrationVirtualTokenClaimed(address) {
+  const result = await readContract(config, {
+    abi: CONTRACT_ADDRESS_ABI,
+    address: CONTRACT_ADDRESS,
+    functionName: "isRegistrationVirtualTokenClaimed",
+    args: [address],
+  });
+
+  return result;
+}
+
 export async function TotalIncomefn(address) {
   const result = await readContract(config, {
     abi: CONTRACT_ADDRESS_ABI,

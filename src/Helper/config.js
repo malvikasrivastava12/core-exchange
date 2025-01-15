@@ -1,4 +1,4 @@
-export const CONTRACT_ADDRESS = "0xd1DC0D9e032e66946e332d159092b751F93345EB";
+export const CONTRACT_ADDRESS = "0x1bcd4A91427b0F492946506Fe0Adda6e2B7f7FFD";
 export const CONTRACT_ADDRESS_ABI = [
   {
     inputs: [
@@ -545,6 +545,17 @@ export const CONTRACT_ADDRESS_ABI = [
   },
   {
     inputs: [
+      { internalType: "address", name: "downlineUser", type: "address" },
+      { internalType: "address", name: "addressWhoTopup", type: "address" },
+      { internalType: "bool", name: "status", type: "bool" },
+    ],
+    name: "updateUserDownLine",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
       { internalType: "address", name: "user", type: "address" },
       { internalType: "uint256", name: "amt", type: "uint256" },
       { internalType: "string", name: "incomeType", type: "string" },
@@ -564,10 +575,10 @@ export const CONTRACT_ADDRESS_ABI = [
   {
     inputs: [
       { internalType: "address", name: "", type: "address" },
-      { internalType: "uint256", name: "", type: "uint256" },
+      { internalType: "address", name: "", type: "address" },
     ],
     name: "userDownline",
-    outputs: [{ internalType: "address", name: "", type: "address" }],
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
     stateMutability: "view",
     type: "function",
   },

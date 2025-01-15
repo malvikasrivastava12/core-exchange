@@ -49,7 +49,26 @@ function App() {
         <MainContent />
         <Footer />
         <SocialMediaLinks />
-        <Toaster position="top-center" reverseOrder={false} />
+        <Toaster
+          position="top-center"
+          reverseOrder={false}
+          toastOptions={{
+            success: {
+              style: {
+                fontWeight: "bold",
+                backgroundColor: "#f0f8ff",
+                color: "#333",
+              },
+            },
+            error: {
+              style: {
+                fontWeight: "bold",
+                backgroundColor: "#ffe5e5",
+                color: "#900",
+              },
+            },
+          }}
+        />
 
         {showWarningModal && (
           <WarningModel

@@ -5,6 +5,9 @@ import {
   getUserDepositList,
   getWithdrawHistoryfn,
   getInvestmentHistoryfn,
+  getLeftCoreWalletfn,
+  getLeftSplitWalletfn,
+  updateDownlinefn,
 } from "../Helper/Api_function";
 import {
   Depositfn,
@@ -134,21 +137,23 @@ export default function DepositModel(props) {
     }
   };
 
-  // left ree and split
+  // left free and split
   const handleLeftFreeCoreHistory = async () => {
     if (walletAddress) {
-      const data = await getInvestmentHistoryfn(walletAddress);
+      const data = await getLeftCoreWalletfn(walletAddress);
       setLeftFreeCoreHistory(data.data);
+      console.log(data, "Left Free core");
     }
   };
   const handleSplitFreeWallet = async () => {
     if (walletAddress) {
-      const data = await getInvestmentHistoryfn(walletAddress);
+      const data = await getLeftSplitWalletfn(walletAddress);
       setleftSplitWalletHistory(data.data);
+      console.log(data, "Left split wallet");
     }
   };
 
-  // left ree and split
+  // left free and split
   const inputWithdraws = () => {
     const walletinput = (balance * 50) / 100;
     const splitwalletinput = (balance * 25) / 100;
@@ -179,12 +184,13 @@ export default function DepositModel(props) {
       inputAmount,
       rank
     );
+    console.log(rank, virtualToken, ":::::123456");
 
     const freeCore = Number(virtualToken[0]) / 1e18;
     const split = Number(virtualToken[1]) / 1e18;
     setFreeWallet(freeCore.toFixed(2));
     setSplitInput(split.toFixed(2));
-    setMainInput((split - freeCore).toFixed(2));
+    setMainInput(inputAmount - (split + freeCore).toFixed(2));
     console.log(freeCore, split, mainInput, virtualToken, "virtualToken");
 
     // const reg = Number(virtualToken[0]) / 1e18;
@@ -259,13 +265,22 @@ export default function DepositModel(props) {
           toast.error("Please register Your self");
           return;
         }
+        const responseDownline = await updateDownlinefn(
+          walletAddress,
+          inputAddress
+        );
 
-        await Depositfn(0, inputAmount, walletAddress);
-        setIsLoader(false);
-        setTimeout(() => {
-          setIsFetch(!isFetch);
-        }, 4000);
-        console.log(userExist, "isUserExist");
+        console.log(responseDownline, "Downline:::");
+        if (responseDownline.success == true) {
+          await Depositfn(0, inputAmount, walletAddress);
+          setIsLoader(false);
+          setTimeout(() => {
+            setIsFetch(!isFetch);
+          }, 4000);
+          console.log(userExist, "isUserExist");
+        } else {
+          return toast.error("Invalid Downline User!!");
+        }
       } catch (e) {
         setIsLoader(false);
 
@@ -1081,11 +1096,15 @@ export default function DepositModel(props) {
                                       <tr key={index}>
                                         <td>{index + 1}</td>
                                         <td>{user?.user}</td>
-                                        <td>{user?.amount}</td>
-                                        <td>{user?.amount}</td>
-                                        <td>{user?.amount}</td>
-                                        <td>{user?.level}</td>
-                                        <td>{user?.splitWallet}</td>
+                                        <td>{user?.amount.toFixed(2)}</td>
+                                        <td>{user?.amount.toFixed(2)}</td>
+                                        <td>
+                                          {(
+                                            user?.amount - user?.offAmount
+                                          ).toFixed(2)}
+                                        </td>
+                                        <td>{user?.level.toFixed(2)}</td>
+                                        <td>{user?.splitWallet.toFixed(2)}</td>
                                         <td>
                                           {moment(user.createdAt).format(
                                             "M/D/YYYY h:mm:ss A"
@@ -1246,7 +1265,7 @@ export default function DepositModel(props) {
                                       <tr key={index}>
                                         <td>{index + 1}</td>
                                         <td>{user?.user}</td>
-                                        <td>{user?.amount}</td>
+                                        <td>{user?.level.toFixed(2)}</td>
                                         <td>
                                           {moment(user.createdAt).format(
                                             "M/D/YYYY h:mm:ss A"
@@ -1256,15 +1275,6 @@ export default function DepositModel(props) {
                                     ))}
                                   </tbody>
                                 )}
-
-                                {/* <tbody className="table-body">
-                                  <tr>
-                                    <th scope="row">1</th>
-                                    <td>Mark</td>
-                                    <td>Otto</td>
-                                    <td>mdo</td>
-                                  </tr>
-                                </tbody> */}
                               </table>
 
                               {leftFreeCoreHistory?.length === 0 && (
@@ -1410,7 +1420,9 @@ export default function DepositModel(props) {
                                           <tr key={index}>
                                             <td>{index + 1}</td>
                                             <td>{user?.user}</td>
-                                            <td>{user?.amount}</td>
+                                            <td>
+                                              {user?.splitWallet.toFixed(2)}
+                                            </td>
                                             <td>
                                               {moment(user.createdAt).format(
                                                 "M/D/YYYY h:mm:ss A"

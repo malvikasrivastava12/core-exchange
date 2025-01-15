@@ -33,7 +33,7 @@ export default function WarningModel({ closeModal, showWarningModal }) {
                 onClick={closeModal}
               ></button>
               <h1>Warning: Beware of Fake Websites</h1>
-              <div className="modaldesc" style={{ opacity: "0.7" }}>
+              <div className="modaldesc">
                 <p>
                   "It has come to our attention that a fraudulent website has
                   been created, copying our content and design. Please be aware
