@@ -17,8 +17,10 @@ import {
 } from "../Helper/Web3";
 import { IoCaretForwardOutline } from "react-icons/io5";
 import { IoCaretBackOutline } from "react-icons/io5";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import moment from "moment/moment";
+import { IoMdFastforward } from "react-icons/io";
+import { IoPlayBackSharp } from "react-icons/io5";
 export default function DepositModel(props) {
   const { userInfo } = useSelector((state) => state.login);
   const {
@@ -42,11 +44,7 @@ export default function DepositModel(props) {
 
   const [depositHistory, setDepositHistory] = useState([]);
   const [viewDepositHistoryTable, setViewDepositHistoryTable] = useState("");
-  const handleDepositHistory = async () => {
-    const data = await getUserDepositList(walletAddress);
-    console.log(data, "::::::::::in getUserDepositList");
-    setDepositHistory(Array.isArray(data.data) ? data.data : []);
-  };
+
   const [inputDeposit, setInputDeposit] = useState(false);
   const [isWithdraw, setIsWithdraw] = useState(false);
   const [inputPinWithdwaw, setInputPinWithdwaw] = useState("");
@@ -68,6 +66,17 @@ export default function DepositModel(props) {
   const [viewTotalWithdrawTable, setViewTotalWithdrawTable] = useState("");
   const [splitWallet, setSplitWallet] = useState(0);
   const [totalWithdrawn, setTotalWithdrawn] = useState(0);
+
+  const [reInvest, setReInvest] = useState(0);
+  const [leftSplitWallet, setLeftSplitWallet] = useState(0);
+  const [leftFreeCoreHistory, setLeftFreeCoreHistory] = useState([]);
+  const [viewLeftFreeCoreTable, setViewLeftFreeCoreTable] = useState("");
+
+  const [leftSplitWalletHistory, setleftSplitWalletHistory] = useState([]);
+  const [viewLeftSplitWalletTable, setViewLeftSplitWalletTable] = useState("");
+
+  const [leftFreeCore, setLeftFreeCore] = useState(0);
+
   const handleSecurityPin = () => {
     setSecurityPin((prev) => !prev);
   };
@@ -81,33 +90,65 @@ export default function DepositModel(props) {
     setInputAddress("");
     setInputAmount("");
     setInputPin("");
-
     setIsDepositMode(false);
   };
-  const [reInvest, setReInvest] = useState(0);
   const handleMyReInvestment = async () => {
-    const data = await getWithdrawHistoryfn(walletAddress);
-    setReInvest(data.totalReinvestment);
-    setMyReInvestment(data.data);
-    setTotalWithdraw(data.data);
-    setSplitWallet(data.splitWallet);
+    if (walletAddress) {
+      const data = await getWithdrawHistoryfn(walletAddress);
+      setReInvest(data.totalReinvestment);
+      setMyReInvestment(data.data);
+      setTotalWithdraw(data.data);
+      setSplitWallet(data.splitWallet);
+    }
   };
 
   const handleTotalWithdraw = async () => {
-    const TotalIncome = await TotalIncomefn(walletAddress);
-    setTotalWithdrawn(TotalIncome / 1e18);
-    // console.log(TotalIncome / 1e18?.toFixed(2), "TotalIncome");
+    if (walletAddress) {
+      const TotalClaimableIncome = await TotalClaimableIncomefn(walletAddress);
+      const TotalIncome = await TotalIncomefn(walletAddress);
+      setTotalWithdrawn((TotalIncome - TotalClaimableIncome) / 1e18);
+      // setTotalWithdrawn(TotalIncome / 1e18);
+      // console.log(TotalIncome / 1e18?.toFixed(2), "TotalIncome");
+    }
+  };
+
+  const handleBalance = async () => {
+    if (walletAddress) {
+      const TotalClaimableIncome = await TotalClaimableIncomefn(walletAddress);
+      setBalance(Number(TotalClaimableIncome) / 1e18);
+    }
+  };
+
+  const handleDepositHistory = async () => {
+    if (walletAddress) {
+      const data = await getUserDepositList(walletAddress);
+      // console.log(data, "::::::::::in getUserDepositList");
+      setDepositHistory(Array.isArray(data.data) ? data.data : []);
+    }
   };
 
   const handleMyInvestment = async () => {
-    const data = await getInvestmentHistoryfn(walletAddress);
-    setMyInvestment(data.data);
-  };
-  const handleBalance = async () => {
-    const TotalClaimableIncome = await TotalClaimableIncomefn(walletAddress);
-    setBalance(Number(TotalClaimableIncome) / 1e18);
+    if (walletAddress) {
+      const data = await getInvestmentHistoryfn(walletAddress);
+      setMyInvestment(data.data);
+    }
   };
 
+  // left ree and split
+  const handleLeftFreeCoreHistory = async () => {
+    if (walletAddress) {
+      const data = await getInvestmentHistoryfn(walletAddress);
+      setLeftFreeCoreHistory(data.data);
+    }
+  };
+  const handleSplitFreeWallet = async () => {
+    if (walletAddress) {
+      const data = await getInvestmentHistoryfn(walletAddress);
+      setleftSplitWalletHistory(data.data);
+    }
+  };
+
+  // left ree and split
   const inputWithdraws = () => {
     const walletinput = (balance * 50) / 100;
     const splitwalletinput = (balance * 25) / 100;
@@ -116,10 +157,11 @@ export default function DepositModel(props) {
     setTransferToSplitWallet(splitwalletinput);
     setReinvestwallet(reInvestWalletinput);
   };
-  const [leftFreeCore, setLeftFreeCore] = useState(0);
-  const handleLeftFreeCore = async () => {
-    const data = await returnAvailableSplitWalletFundfn();
-    setLeftFreeCore(data / 1e18);
+
+  const handleLeftSplitWallet = async () => {
+    const data = await returnAvailableSplitWalletFundfn(walletAddress);
+    setLeftSplitWallet(data / 1e18);
+    console.log(data, "Left Split Wallet :::::::::::::::::");
   };
 
   useEffect(() => {
@@ -127,89 +169,9 @@ export default function DepositModel(props) {
       handleMyReInvestment();
       handleBalance();
       handleTotalWithdraw();
-      handleLeftFreeCore();
+      handleLeftSplitWallet();
     }
   }, [walletAddress]);
-
-  const MakeDepositModalData = [
-    {
-      id: 0,
-      label1: "Split Wallet :",
-      value: splitWallet,
-      label2: "Click to View :",
-      buttonText: "View History",
-      image: DAOIcon,
-      name: "SW",
-    },
-    {
-      id: 1,
-      label1: "Left Free Core:",
-      value: leftFreeCore,
-      label2: "Click to View :",
-      buttonText: "View History",
-      image: DAOIcon,
-      name: "LFPOP",
-    },
-    {
-      id: 2,
-      label1: "Left Split Wallet :",
-      value: 0,
-      label2: "Click to View :",
-      buttonText: "View History",
-      image: DAOIcon,
-      name: "LSW",
-    },
-    {
-      id: 6,
-      label1: "My Investment :",
-      value: userInfo?.depositWallet - reInvest ?? 0,
-      label2: "Click to View :",
-      buttonText: "View History",
-      image: DAOIcon,
-      name: "MI",
-    },
-    {
-      id: 7,
-      label1: "My Re-investment :",
-      value: reInvest,
-      label2: "Click to View :",
-      buttonText: "View History",
-      image: DAOIcon,
-      name: "MRI",
-    },
-    {
-      id: 3,
-      label1: "Total Investment :",
-      value:
-        Number(userDetails[5]) / 1e18 > 0
-          ? (Number(userDetails[5]) / 1e18).toFixed(4)
-          : 0,
-      label2: "",
-      buttonText: "Deposit History",
-      image: DAOIcon,
-      name: "TI",
-    },
-    {
-      id: 4,
-      label1: "Total withdrawn :",
-      value: totalWithdrawn,
-      label2: "",
-      buttonText: "Withdraw History",
-      image: DAOIcon,
-      name: "TW",
-    },
-
-    {
-      id: 5,
-      label1: "Balance:",
-      value: balance.toFixed(2),
-      label2: "Request withdraw:",
-      buttonText: "Withdraw ",
-      image: DAOIcon,
-      name: "B",
-      text: "**In the event of an unsuccessful withdrawal resulting in a zero balance display, re-initiate the withdrawal process, disregarding the current balance state. This will re-trigger the pending withdrawal request, facilitating the successful transfer of funds to your designated wallet address*",
-    },
-  ];
 
   const handleMainandFreeCore = async (walletAddress, inputAmount, rank) => {
     const virtualToken = await getReturnVirtualTokenAmountCanBeUsed(
@@ -217,13 +179,21 @@ export default function DepositModel(props) {
       inputAmount,
       rank
     );
-    const reg = Number(virtualToken[0]) / 1e18;
-    const level = Number(virtualToken[1]) / 1e18;
-    const split = Number(virtualToken[2]);
-    setFreeWallet(reg + level);
-    setSplitInput(split);
-    setMainInput(inputAmount - (reg + level + split));
-    console.log(reg, level, split, "virtualToken");
+
+    const freeCore = Number(virtualToken[0]) / 1e18;
+    const split = Number(virtualToken[1]) / 1e18;
+    setFreeWallet(freeCore.toFixed(2));
+    setSplitInput(split.toFixed(2));
+    setMainInput((split - freeCore).toFixed(2));
+    console.log(freeCore, split, mainInput, virtualToken, "virtualToken");
+
+    // const reg = Number(virtualToken[0]) / 1e18;
+    // const level = Number(virtualToken[1]) / 1e18;
+    // const split = Number(virtualToken[2]);
+    // setFreeWallet(reg + level);
+    // setSplitInput(split);
+    // setMainInput(inputAmount - (reg + level + split));
+    // console.log(reg, level, split, "virtualToken");
   };
 
   const handleIsDeposit = () => {
@@ -248,7 +218,14 @@ export default function DepositModel(props) {
       }, 3000);
       return;
     }
-    setIsDepositMode(true);
+
+    console.log(userInfo?.securityPin, "userInfo?.securityPin", inputPin);
+    if (inputPin == userInfo?.securityPin) {
+      setIsDepositMode(true);
+    } else {
+      toast.error("Security Pin is Incorrect");
+    }
+    // setIsDepositMode(true);
     handleMainandFreeCore(walletAddress, inputAmount, 1);
   };
 
@@ -315,6 +292,86 @@ export default function DepositModel(props) {
       }, 4000);
     });
   }, [walletAddress, isDepositFunction]);
+
+  const MakeDepositModalData = [
+    {
+      id: 0,
+      label1: "Split Wallet :",
+      value: splitWallet.toFixed(2),
+      label2: "Click to View :",
+      buttonText: "View History",
+      image: DAOIcon,
+      name: "SW",
+    },
+    {
+      id: 1,
+      label1: "Left Free Core:",
+      value: Number(userDetails[11]) / (1e18).toFixed(2),
+      label2: "Click to View :",
+      buttonText: "View History",
+      image: DAOIcon,
+      name: "LFPOP",
+    },
+    {
+      id: 2,
+      label1: "Left Split Wallet :",
+      value: leftSplitWallet.toFixed(2),
+      label2: "Click to View :",
+      buttonText: "View History",
+      image: DAOIcon,
+      name: "LSW",
+    },
+    {
+      id: 6,
+      label1: "My Investment :",
+      value: userInfo?.depositWallet - reInvest ?? 0,
+      label2: "Click to View :",
+      buttonText: "View History",
+      image: DAOIcon,
+      name: "MI",
+    },
+    {
+      id: 7,
+      label1: "My Re-investment :",
+      value: reInvest.toFixed(2),
+      label2: "Click to View :",
+      buttonText: "View History",
+      image: DAOIcon,
+      name: "MRI",
+    },
+    {
+      id: 3,
+      label1: "Total Investment :",
+      value:
+        Number(userDetails[5]) / 1e18 > 0
+          ? (Number(userDetails[5]) / 1e18).toFixed(2)
+          : 0,
+      label2: "",
+      buttonText: "Deposit History",
+      image: DAOIcon,
+      name: "TI",
+    },
+    {
+      id: 4,
+      label1: "Total withdrawn :",
+      value: totalWithdrawn.toFixed(2),
+      label2: "",
+      buttonText: "Withdraw History",
+      image: DAOIcon,
+      name: "TW",
+    },
+
+    {
+      id: 5,
+      label1: "Balance:",
+      value: balance.toFixed(2),
+      label2: "Request withdraw:",
+      buttonText: "Withdraw ",
+      image: DAOIcon,
+      name: "B",
+      text: "**In the event of an unsuccessful withdrawal resulting in a zero balance display, re-initiate the withdrawal process, disregarding the current balance state. This will re-trigger the pending withdrawal request, facilitating the successful transfer of funds to your designated wallet address*",
+    },
+  ];
 
   return (
     <>
@@ -509,12 +566,11 @@ export default function DepositModel(props) {
                             <div class="modallinewrap">
                               <b>{item.label1}</b>
                               <div class="modallinewrapvalue">
-                                <img src={item.image} alt="" />{" "}
+                                <img src={item.image} alt="" />
                                 <span
                                   class="userTotalDeposits"
                                   id="freeCoinPer"
                                 >
-                                  {" "}
                                   {item.value}
                                 </span>
                               </div>
@@ -533,6 +589,12 @@ export default function DepositModel(props) {
                                       setInputDeposit(true);
                                     } else if (item?.id === 0) {
                                       setViewSplitwalletTable(item.id);
+                                    } else if (item?.id === 1) {
+                                      setViewLeftFreeCoreTable(item.id);
+                                      handleLeftFreeCoreHistory();
+                                    } else if (item?.id === 2) {
+                                      setViewLeftSplitWalletTable(item.id);
+                                      handleSplitFreeWallet();
                                     } else if (item?.id === 3) {
                                       await handleDepositHistory();
                                       setViewDepositHistoryTable(item.id);
@@ -578,11 +640,6 @@ export default function DepositModel(props) {
                                         <button
                                           className="maindescbut"
                                           onClick={() => {
-                                            console.log(
-                                              inputPinWithdwaw,
-                                              userInfo?.securityPin,
-                                              "inputPinWithdwaw"
-                                            );
                                             if (
                                               userInfo?.securityPin ==
                                               inputPinWithdwaw
@@ -654,7 +711,6 @@ export default function DepositModel(props) {
                           </div>
                         </div>
                       </div>
-
                       {tableview === item.name && (
                         <>
                           <div className="table-container">
@@ -806,32 +862,52 @@ export default function DepositModel(props) {
                                     </th> */}
                                   </tr>
                                 </thead>
-                                {totalWithdraw?.length > 0 &&
-                                  totalWithdraw?.map((user, index) => (
-                                    <tbody className="table-body" key={index}>
-                                      <tr>
+                                {totalWithdraw?.length > 0 && (
+                                  <tbody className="table-body">
+                                    {totalWithdraw.map((user, index) => (
+                                      <tr className="" key={index}>
                                         <td>{index + 1}</td>
-                                        <td>{user?.splitBalance}</td>
+                                        <td>{user?.splitBalance.toFixed(2)}</td>
                                         <td>
                                           {moment(user.createdAt).format(
                                             "M/D/YYYY h:mm:ss A"
                                           )}
                                         </td>
                                         <td>
-                                          {user?.splitBalance +
+                                          {`Withdrawal Request Of ${(
+                                            user?.splitBalance +
                                             user?.topupBalance +
-                                            user?.wallet}
+                                            user?.wallet
+                                          ).toFixed(2)}`}
                                         </td>
                                       </tr>
-                                    </tbody>
-                                  ))}
-                                <tbody className="table-body">
-                                  {/* <tr>
-                                    <th scope="row">1</th>
-                                    <td>Mark</td>
-                                    <td>Otto</td>
-                                  </tr> */}
-                                </tbody>
+                                    ))}
+                                  </tbody>
+                                )}
+
+                                {/* <tbody className="table-body">
+                                  <tr
+                                    className="Modalopacity"
+                                    style={{ fontWeight: "normal" }}
+                                  >
+                                    <td scope="row">1</td>
+                                    <td>500</td>
+                                    <td>14/1/25</td>
+                                    <td> withdrawal Request of</td>
+                                  </tr>
+                                  <tr className="Modalopacity">
+                                    <td scope="row">2</td>
+                                    <td>500</td>
+                                    <td>14/1/25</td>
+                                    <td> withdrawal Request of</td>
+                                  </tr>
+                                  <tr className="Modalopacity">
+                                    <td scope="row">2</td>
+                                    <td>500</td>
+                                    <td>14/1/25</td>
+                                    <td> withdrawal Request of</td>
+                                  </tr>
+                                </tbody> */}
                               </table>
 
                               {totalWithdraw?.length === 0 && (
@@ -851,7 +927,7 @@ export default function DepositModel(props) {
                                 tabindex="0"
                                 id="DataTables_Table_0_previous"
                               >
-                                <IoCaretBackOutline />
+                                <IoPlayBackSharp />
                               </a>
                               <a
                                 class="k-link k-pager-nav  k-state-disabled"
@@ -892,12 +968,12 @@ export default function DepositModel(props) {
                                 tabindex="0"
                                 id="DataTables_Table_0_next"
                               >
-                                <IoCaretForwardOutline />
+                                <IoMdFastforward />
                               </a>
 
-                              <span class="k-pager-info k-label">
+                              <div class="k-pager-info k-label d-block">
                                 Displaying 1 to 7 out of 7 items{" "}
-                              </span>
+                              </div>
                             </div>
                           </div>
                         </>
@@ -957,7 +1033,7 @@ export default function DepositModel(props) {
                                     >
                                       Amount
                                     </th>
-                                    {/* <th
+                                    <th
                                       role="columnheader"
                                       data-field="Name"
                                       data-title="Name"
@@ -972,7 +1048,7 @@ export default function DepositModel(props) {
                                       class="k-header"
                                     >
                                       Main Core
-                                    </th> */}
+                                    </th>
                                     <th
                                       role="columnheader"
                                       data-field="Name"
@@ -999,15 +1075,15 @@ export default function DepositModel(props) {
                                     </th>
                                   </tr>
                                 </thead>
-                                {depositHistory?.length > 0 &&
-                                  depositHistory?.map((user, index) => (
-                                    <tbody className="table-body" key={index}>
-                                      <tr>
+                                {depositHistory?.length > 0 && (
+                                  <tbody className="table-body">
+                                    {depositHistory.map((user, index) => (
+                                      <tr key={index}>
                                         <td>{index + 1}</td>
                                         <td>{user?.user}</td>
                                         <td>{user?.amount}</td>
-                                        {/* <td>{user?.amount}</td>
-                                        <td>{user?.amount}</td> */}
+                                        <td>{user?.amount}</td>
+                                        <td>{user?.amount}</td>
                                         <td>{user?.level}</td>
                                         <td>{user?.splitWallet}</td>
                                         <td>
@@ -1016,8 +1092,10 @@ export default function DepositModel(props) {
                                           )}
                                         </td>
                                       </tr>
-                                    </tbody>
-                                  ))}
+                                    ))}
+                                  </tbody>
+                                )}
+
                                 {/* <tbody className="table-body">
                                   <tr>
                                     <th scope="row">1</th>
@@ -1046,7 +1124,7 @@ export default function DepositModel(props) {
                                 tabindex="0"
                                 id="DataTables_Table_0_previous"
                               >
-                                <IoCaretBackOutline />
+                                <IoPlayBackSharp />
                               </a>
                               <a
                                 class="k-link k-pager-nav  k-state-disabled"
@@ -1087,7 +1165,7 @@ export default function DepositModel(props) {
                                 tabindex="0"
                                 id="DataTables_Table_0_next"
                               >
-                                <IoCaretForwardOutline />
+                                <IoMdFastforward />
                               </a>
 
                               <span class="k-pager-info k-label">
@@ -1097,6 +1175,332 @@ export default function DepositModel(props) {
                           </div>
                         </>
                       )}
+
+                      {viewLeftFreeCoreTable === item.id && item.id === 1 && (
+                        <>
+                          <div className="table-container">
+                            <div
+                              className="d-flex align-items-center justify-content-center"
+                              onClick={() => setViewLeftFreeCoreTable("")}
+                            >
+                              <div class="closee">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <svg viewBox="0 0 36 36" class="circlu">
+                                  <path
+                                    stroke-dasharray="100, 100"
+                                    d="M18 2.0845
+                    a 15.9155 15.9155 0 0 1 0 31.831
+                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                                  ></path>
+                                </svg>
+                              </div>
+                            </div>
+
+                            <div className="table-responsive">
+                              <table class="table table-dark">
+                                <thead
+                                  className="k-grid-header "
+                                  role="rowgroup"
+                                >
+                                  <tr role="row">
+                                    <th
+                                      role="columnheader"
+                                      data-field="SNO"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      SNO
+                                    </th>
+                                    <th
+                                      role="columnheader"
+                                      data-field="SNO"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      Used For
+                                    </th>
+                                    <th
+                                      role="columnheader"
+                                      data-field="SNO"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      Debit Amount
+                                    </th>
+                                    <th
+                                      role="columnheader"
+                                      data-field="Name"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      Dated
+                                    </th>
+                                  </tr>
+                                </thead>
+                                {leftFreeCoreHistory?.length > 0 && (
+                                  <tbody className="table-body">
+                                    {leftFreeCoreHistory.map((user, index) => (
+                                      <tr key={index}>
+                                        <td>{index + 1}</td>
+                                        <td>{user?.user}</td>
+                                        <td>{user?.amount}</td>
+                                        <td>
+                                          {moment(user.createdAt).format(
+                                            "M/D/YYYY h:mm:ss A"
+                                          )}
+                                        </td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                )}
+
+                                {/* <tbody className="table-body">
+                                  <tr>
+                                    <th scope="row">1</th>
+                                    <td>Mark</td>
+                                    <td>Otto</td>
+                                    <td>mdo</td>
+                                  </tr>
+                                </tbody> */}
+                              </table>
+
+                              {leftFreeCoreHistory?.length === 0 && (
+                                <div className="p-4 d-flex justify-content-center">
+                                  <div>No Data Found!</div>
+                                </div>
+                              )}
+                            </div>
+
+                            <div
+                              class="k-pager-wrap k-grid-pager k-widget"
+                              data-role="pager"
+                            >
+                              <a
+                                class="k-link k-pager-nav  k-state-disabled"
+                                aria-controls="DataTables_Table_0"
+                                data-dt-idx="0"
+                                tabindex="0"
+                                id="DataTables_Table_0_previous"
+                              >
+                                <IoPlayBackSharp />
+                              </a>
+                              <a
+                                class="k-link k-pager-nav  k-state-disabled"
+                                aria-controls="DataTables_Table_0"
+                                data-dt-idx="0"
+                                tabindex="0"
+                                id="DataTables_Table_0_previous"
+                              >
+                                <IoCaretBackOutline />
+                              </a>
+                              <ul class="k-pager-numbers k-reset">
+                                <li>
+                                  <a
+                                    class="k-state-selected"
+                                    aria-controls="DataTables_Table_0"
+                                    data-dt-idx="1"
+                                    tabindex="0"
+                                    value="1"
+                                  >
+                                    1
+                                  </a>
+                                </li>
+                              </ul>
+                              <a
+                                class="k-link k-pager-nav k-state-disabled"
+                                aria-controls="DataTables_Table_0"
+                                data-dt-idx="3"
+                                tabindex="0"
+                                id="DataTables_Table_0_next"
+                              >
+                                {/* <i class="k-icon k-i-arrow-e"></i> */}
+                                <IoCaretForwardOutline />
+                              </a>
+                              <a
+                                class="k-link k-pager-nav k-state-disabled"
+                                aria-controls="DataTables_Table_0"
+                                data-dt-idx="3"
+                                tabindex="0"
+                                id="DataTables_Table_0_next"
+                              >
+                                <IoMdFastforward />
+                              </a>
+
+                              <span class="k-pager-info k-label">
+                                Displaying 1 to 7 out of 7 items{" "}
+                              </span>
+                            </div>
+                          </div>
+                        </>
+                      )}
+
+                      {viewLeftSplitWalletTable === item.id &&
+                        item.id === 2 && (
+                          <>
+                            <div className="table-container">
+                              <div
+                                className="d-flex align-items-center justify-content-center"
+                                onClick={() => setViewLeftSplitWalletTable("")}
+                              >
+                                <div class="closee">
+                                  <span></span>
+                                  <span></span>
+                                  <span></span>
+                                  <span></span>
+                                  <svg viewBox="0 0 36 36" class="circlu">
+                                    <path
+                                      stroke-dasharray="100, 100"
+                                      d="M18 2.0845
+                    a 15.9155 15.9155 0 0 1 0 31.831
+                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                                    ></path>
+                                  </svg>
+                                </div>
+                              </div>
+
+                              <div className="table-responsive">
+                                <table class="table table-dark">
+                                  <thead
+                                    className="k-grid-header "
+                                    role="rowgroup"
+                                  >
+                                    <tr role="row">
+                                      <th
+                                        role="columnheader"
+                                        data-field="SNO"
+                                        data-title="Name"
+                                        class="k-header"
+                                      >
+                                        SNO
+                                      </th>
+                                      <th
+                                        role="columnheader"
+                                        data-field="SNO"
+                                        data-title="Name"
+                                        class="k-header"
+                                      >
+                                        Used For
+                                      </th>
+                                      <th
+                                        role="columnheader"
+                                        data-field="SNO"
+                                        data-title="Name"
+                                        class="k-header"
+                                      >
+                                        Debit Amount
+                                      </th>
+
+                                      <th
+                                        role="columnheader"
+                                        data-field="Name"
+                                        data-title="Name"
+                                        class="k-header"
+                                      >
+                                        Dated
+                                      </th>
+                                    </tr>
+                                  </thead>
+                                  {leftSplitWalletHistory?.length > 0 && (
+                                    <tbody className="table-body">
+                                      {leftSplitWalletHistory.map(
+                                        (user, index) => (
+                                          <tr key={index}>
+                                            <td>{index + 1}</td>
+                                            <td>{user?.user}</td>
+                                            <td>{user?.amount}</td>
+                                            <td>
+                                              {moment(user.createdAt).format(
+                                                "M/D/YYYY h:mm:ss A"
+                                              )}
+                                            </td>
+                                          </tr>
+                                        )
+                                      )}
+                                    </tbody>
+                                  )}
+
+                                  {/* <tbody className="table-body">
+                                  <tr>
+                                    <th scope="row">1</th>
+                                    <td>Mark</td>
+                                    <td>Otto</td>
+                                    <td>mdo</td>
+                                  </tr>
+                                </tbody> */}
+                                </table>
+
+                                {leftSplitWalletHistory?.length === 0 && (
+                                  <div className="p-4 d-flex justify-content-center">
+                                    <div>No Data Found!</div>
+                                  </div>
+                                )}
+                              </div>
+
+                              <div
+                                class="k-pager-wrap k-grid-pager k-widget"
+                                data-role="pager"
+                              >
+                                <a
+                                  class="k-link k-pager-nav  k-state-disabled"
+                                  aria-controls="DataTables_Table_0"
+                                  data-dt-idx="0"
+                                  tabindex="0"
+                                  id="DataTables_Table_0_previous"
+                                >
+                                  <IoPlayBackSharp />
+                                </a>
+                                <a
+                                  class="k-link k-pager-nav  k-state-disabled"
+                                  aria-controls="DataTables_Table_0"
+                                  data-dt-idx="0"
+                                  tabindex="0"
+                                  id="DataTables_Table_0_previous"
+                                >
+                                  <IoCaretBackOutline />
+                                </a>
+                                <ul class="k-pager-numbers k-reset">
+                                  <li>
+                                    <a
+                                      class="k-state-selected"
+                                      aria-controls="DataTables_Table_0"
+                                      data-dt-idx="1"
+                                      tabindex="0"
+                                      value="1"
+                                    >
+                                      1
+                                    </a>
+                                  </li>
+                                </ul>
+                                <a
+                                  class="k-link k-pager-nav k-state-disabled"
+                                  aria-controls="DataTables_Table_0"
+                                  data-dt-idx="3"
+                                  tabindex="0"
+                                  id="DataTables_Table_0_next"
+                                >
+                                  {/* <i class="k-icon k-i-arrow-e"></i> */}
+                                  <IoCaretForwardOutline />
+                                </a>
+                                <a
+                                  class="k-link k-pager-nav k-state-disabled"
+                                  aria-controls="DataTables_Table_0"
+                                  data-dt-idx="3"
+                                  tabindex="0"
+                                  id="DataTables_Table_0_next"
+                                >
+                                  <IoMdFastforward />
+                                </a>
+
+                                <span class="k-pager-info k-label">
+                                  Displaying 1 to 7 out of 7 items{" "}
+                                </span>
+                              </div>
+                            </div>
+                          </>
+                        )}
 
                       {viewMyInvestmentTable === item.id && item.id === 6 && (
                         <>
@@ -1155,10 +1559,10 @@ export default function DepositModel(props) {
                                     </th>
                                   </tr>
                                 </thead>
-                                {myInvestment?.length > 0 &&
-                                  myInvestment?.map((user, index) => (
-                                    <tbody className="table-body" key={index}>
-                                      <tr>
+                                {myInvestment?.length > 0 && (
+                                  <tbody className="table-body">
+                                    {myInvestment.map((user, index) => (
+                                      <tr key={index}>
                                         <td>{index + 1}</td>
                                         <td>{user?.amount}</td>
                                         <td>
@@ -1167,8 +1571,10 @@ export default function DepositModel(props) {
                                           )}
                                         </td>
                                       </tr>
-                                    </tbody>
-                                  ))}
+                                    ))}
+                                  </tbody>
+                                )}
+
                                 {/* <tbody className="table-body">
                                   <tr>
                                     <th scope="row">1</th>
@@ -1197,7 +1603,7 @@ export default function DepositModel(props) {
                                 tabindex="0"
                                 id="DataTables_Table_0_previous"
                               >
-                                <IoCaretBackOutline />
+                                <IoPlayBackSharp />
                               </a>
                               <a
                                 class="k-link k-pager-nav  k-state-disabled"
@@ -1238,7 +1644,7 @@ export default function DepositModel(props) {
                                 tabindex="0"
                                 id="DataTables_Table_0_next"
                               >
-                                <IoCaretForwardOutline />
+                                <IoMdFastforward />
                               </a>
 
                               <span class="k-pager-info k-label">
@@ -1248,7 +1654,6 @@ export default function DepositModel(props) {
                           </div>
                         </>
                       )}
-
                       {viewMyReInvestmentTable === item.id && item.id === 7 && (
                         <>
                           <div className="table-container">
@@ -1306,20 +1711,22 @@ export default function DepositModel(props) {
                                     </th>
                                   </tr>
                                 </thead>
-                                {myReInvestment?.length > 0 &&
-                                  myReInvestment?.map((user, index) => (
-                                    <tbody className="table-body" key={index}>
-                                      <tr>
+                                {myReInvestment?.length > 0 && (
+                                  <tbody className="table-body">
+                                    {myReInvestment.map((user, index) => (
+                                      <tr key={index}>
                                         <td>{index + 1}</td>
-                                        <td>{user?.topupBalance}</td>
+                                        <td>{user?.topupBalance.toFixed(2)}</td>
                                         <td>
                                           {moment(user.createdAt).format(
                                             "M/D/YYYY h:mm:ss A"
                                           )}
                                         </td>
                                       </tr>
-                                    </tbody>
-                                  ))}
+                                    ))}
+                                  </tbody>
+                                )}
+
                                 {/* <tbody className="table-body">
                                   <tr>
                                     <th scope="row">1</th>
@@ -1348,7 +1755,7 @@ export default function DepositModel(props) {
                                 tabindex="0"
                                 id="DataTables_Table_0_previous"
                               >
-                                <IoCaretBackOutline />
+                                <IoPlayBackSharp />
                               </a>
                               <a
                                 class="k-link k-pager-nav  k-state-disabled"
@@ -1389,7 +1796,7 @@ export default function DepositModel(props) {
                                 tabindex="0"
                                 id="DataTables_Table_0_next"
                               >
-                                <IoCaretForwardOutline />
+                                <IoMdFastforward />
                               </a>
 
                               <span class="k-pager-info k-label">
@@ -1399,7 +1806,6 @@ export default function DepositModel(props) {
                           </div>
                         </>
                       )}
-
                       {viewTotalWithdrawTable === item.id && item.id === 4 && (
                         <>
                           <div className="table-container">
@@ -1478,31 +1884,35 @@ export default function DepositModel(props) {
                                       data-title="Name"
                                       class="k-header"
                                     >
-                                      Dated
+                                      Date
                                     </th>
                                   </tr>
                                 </thead>
-                                {totalWithdraw?.length > 0 &&
-                                  totalWithdraw?.map((user, index) => (
-                                    <tbody className="table-body" key={index}>
-                                      <tr>
+                                {totalWithdraw?.length > 0 && (
+                                  <tbody className="table-body">
+                                    {totalWithdraw.map((user, index) => (
+                                      <tr key={index}>
                                         <td>{index + 1}</td>
                                         <td>
-                                          {user?.topupBalance +
+                                          {(
+                                            user?.topupBalance +
                                             user?.wallet +
-                                            user?.splitBalance}
+                                            user?.splitBalance
+                                          ).toFixed(2)}
                                         </td>
-                                        <td>{user?.topupBalance}</td>
-                                        <td>{user?.wallet}</td>
-                                        <td>{user?.splitBalance}</td>
+                                        <td>{user?.topupBalance.toFixed(2)}</td>
+                                        <td>{user?.wallet.toFixed(2)}</td>
+                                        <td>{user?.splitBalance.toFixed(2)}</td>
                                         <td>
                                           {moment(user.createdAt).format(
                                             "M/D/YYYY h:mm:ss A"
                                           )}
                                         </td>
                                       </tr>
-                                    </tbody>
-                                  ))}
+                                    ))}
+                                  </tbody>
+                                )}
+
                                 {/* <tbody className="table-body">
                                   <tr>
                                     <th scope="row">1</th>
@@ -1530,7 +1940,7 @@ export default function DepositModel(props) {
                                 tabindex="0"
                                 id="DataTables_Table_0_previous"
                               >
-                                <IoCaretBackOutline />
+                                <IoPlayBackSharp />
                               </a>
                               <a
                                 class="k-link k-pager-nav  k-state-disabled"
@@ -1571,7 +1981,7 @@ export default function DepositModel(props) {
                                 tabindex="0"
                                 id="DataTables_Table_0_next"
                               >
-                                <IoCaretForwardOutline />
+                                <IoMdFastforward />
                               </a>
 
                               <span class="k-pager-info k-label">

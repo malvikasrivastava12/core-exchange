@@ -14,12 +14,19 @@ import { getUserInfo } from "../Helper/Api_function";
 import { useSelector } from "react-redux";
 import Countdown from "react-countdown";
 import DAOModal from "../model/DAOModal";
-
+import WalletStatisticModal from "../model/WalletStatisticModal";
+import { base_url } from "../Helper/config";
 const MainContent = () => {
   const { address, isConnected, chain, chainId } = useAccount();
+  const [showWalletStatisticsModal, setShowWalletStatisticsModal] =
+    useState(false);
+  const toggleWalletStatisticsModal = () =>
+    setShowWalletStatisticsModal(!showWalletStatisticsModal);
 
+  const [isFetch, setIsFetch] = useState(false);
   const { wallet, userExist, userInfo } = useSelector((state) => state.login);
   const walletAddress = wallet.address;
+  const referralLink = `${base_url}/?ref=${walletAddress}`;
   const day7 =
     userInfo?.isHave2x4X > 0
       ? "Completed"
@@ -65,6 +72,16 @@ const MainContent = () => {
   const [userExit, setUserExit] = useState(false);
   const data = new URLSearchParams(window.location.search);
   const ref = data.get("ref");
+  const handleCopy = () => {
+    navigator.clipboard
+      .writeText(referralLink)
+      .then(() => {
+        toast.success("Referral link copied to clipboard!");
+      })
+      .catch(() => {
+        toast.error("Failed to copy the referral link.");
+      });
+  };
   useEffect(() => {
     if (address) {
       isUserExist(address)
@@ -498,6 +515,7 @@ const MainContent = () => {
                     href="#"
                     data-remodal-target="wallet"
                     className="maindescbut"
+                    onClick={toggleWalletStatisticsModal}
                   >
                     Your wallet statistics
                   </a>
@@ -594,17 +612,64 @@ const MainContent = () => {
                     <img src={DAOIcon} alt="" /> Get your rank and reward
                   </h4>
                   <FaRegCheckCircle />
-                  100% Direct Income: Earn the full value of your direct
-                  referrals' upgraded packages.
+                  1st Star rank requires 250 Core (Self ID), 500 Core (Direct
+                  Business), and 5,000 Core (Team Business).
                   <br />
                   <br />
-                  <FaRegCheckCircle /> Offer valid for 30 days from your TOP-UP
+                  <FaRegCheckCircle />
+                  2nd Star Requires 500 Core (Self ID), 1,000 Core (Direct
+                  Business), and 10,000 Core (Team Business).
+                  <br />
+                  <br />
+                  <FaRegCheckCircle />
+                  3rd Star Requires 1,000 Core (Self ID), 2,000 Core (Direct
+                  Business), and 20,000 Core (Team Business).
+                  <br />
+                  <br />
+                  <FaRegCheckCircle />
+                  4th Star Requires 2,000 Core (Self ID), 4,000 Core (Direct
+                  Business), and 40,000 Core (Team Business).
+                  <br />
+                  <br />
+                  <FaRegCheckCircle />
+                  5th Star Requires 4,000 Core (Self ID), 8,000 Core (Direct
+                  Business), and 80,000 Core (Team Business).
+                  <br />
+                  <br />
+                  <FaRegCheckCircle />
+                  6th Star Requires 8,000 Core (Self ID), 16,000 Core (Direct
+                  Business), and 1,60,000 Core (Team Business).
+                  <br />
+                  <br />
+                  <FaRegCheckCircle />
+                  7th Star Requires 16,000 Core (Self ID), 32,000 Core (Direct
+                  Business), and 3,20,000 Core (Team Business).
+                  <br />
+                  <br />
+                  <FaRegCheckCircle />
+                  8th Star Requires 32,000 Core (Self ID), 64,000 Core (Direct
+                  Business), and 6,40,000 Core (Team Business).
+                  <br />
+                  <br />
+                  <FaRegCheckCircle /> Offer valid for 50 days from your TOP-UP
                   Day.
                   <br />
                   <br />
                 </div>
               </div>
             </div>
+            {showWalletStatisticsModal && (
+              <WalletStatisticModal
+                toggleWalletStatisticsModal={() =>
+                  toggleWalletStatisticsModal()
+                }
+                walletAddress={walletAddress}
+                handleCopy={() => handleCopy()}
+                referralLink={referralLink}
+                isFetch={isFetch}
+                setIsFetch={setIsFetch}
+              />
+            )}
             {/* MODAL */}
             {showAccountModal && (
               <div

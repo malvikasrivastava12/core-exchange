@@ -16,7 +16,7 @@ const SocialMediaLinks = () => {
         />
       </a>
       <a
-        href="https://www.youtube.com/@matic_verious?si=UvZkIMW0MRk06VP7"
+        // href="https://www.youtube.com/@matic_verious?si=UvZkIMW0MRk06VP7"
         target="_blank"
         title="Youtube"
         className="langwrapp langwrap_fa"
@@ -28,7 +28,7 @@ const SocialMediaLinks = () => {
         />
       </a>
       <a
-        href="https://t.me/MaticVeriousOfficial"
+        // href="https://t.me/MaticVeriousOfficial"
         target="_blank"
         title="Telegram"
         className="langwrapp langwrap_ru"

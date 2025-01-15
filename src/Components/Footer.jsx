@@ -45,7 +45,7 @@ const Footer = () => {
               <br />
               Blockchain investment platform
               <br />
-              2024 © All Rights Reserved
+              2025 © All Rights Reserved
             </p>
           </div>
 
@@ -58,9 +58,7 @@ const Footer = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ color: "#fd9500", wordWrap: "break-word" }}
-              >
-                0x8af8bdBD504a9d302e251a9f6AF4fD5bC3C65b4C
-              </a>
+              ></a>
             </p>
             <p>
               Powered by

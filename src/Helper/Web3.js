@@ -129,7 +129,6 @@ export async function TotalClaimableIncomefn(address) {
     args: [address],
   });
 
-  console.log(result, "::::+>>>>>>>>");
   return Number(result);
 }
 export async function TotalIncomefn(address) {
@@ -166,6 +165,6 @@ export async function returnAvailableSplitWalletFundfn(address) {
     functionName: "returnAvailableSplitWalletFund",
     args: [address],
   });
-
+  console.log(result, "returnAvailableSplitWalletFund");
   return Number(result);
 }

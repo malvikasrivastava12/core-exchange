@@ -35531,7 +35531,7 @@ body {
 }
 .cardtext {
   font-size: 12px;
-  color: #aea5a5;
+  /* color: #aea5a5; */
   font-style: italic;
 }
 .cardtext-container {

@@ -5,7 +5,6 @@ const initialState = {
   wallet: {},
   userExist: false,
   userInfo: {},
-  securityPin: "",
 };
 
 const loginSlice = createSlice({
@@ -21,12 +20,8 @@ const loginSlice = createSlice({
     setUserInfo: (state, action) => {
       state.userInfo = action.payload;
     },
-    setSecurityPin: (state, action) => {
-      state.securityPin = action.payload;
-    },
   },
 });
 
-export const { setWallet, setUserExist, setUserInfo, setSecurityPin } =
-  loginSlice.actions;
+export const { setWallet, setUserExist, setUserInfo } = loginSlice.actions;
 export default loginSlice.reducer;
