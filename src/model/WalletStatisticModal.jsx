@@ -300,11 +300,11 @@ export default function WalletStatisticModal(props) {
       const data = await getFetchTeams(walletAddress);
       // console.log(walletAddress, "walletAddress");
       // console.log(data, "::::::::::in getFetchTeams11");
-      const users = Array.isArray(data.data.users) ? data.data.users : [];
+      const users = Array.isArray(data?.data?.users) ? data?.data?.users : [];
       // console.log(users, "directTeam");
       setLevelTeam(users);
 
-      const filteredUsers = users.filter((user) => user.totalDeposit > 0);
+      const filteredUsers = users.filter((user) => user?.totalDeposit > 0);
       // console.log(filteredTeam?.length, ":::::::12231115");
       setFilteredTeam(filteredUsers?.length);
     }
@@ -359,7 +359,7 @@ export default function WalletStatisticModal(props) {
       label: "Total Free Core:",
       value:
         Number(userDetails[10]) / 1e18 > 0
-          ? (Number(userDetails[11]) / 1e18).toFixed(2)
+          ? (Number(userDetails[10]) / 1e18)?.toFixed(2)
           : 0,
       label2: "Request to get :",
       buttonText: rank,
@@ -401,14 +401,17 @@ export default function WalletStatisticModal(props) {
     {
       id: 3,
       label: "C50 Capping",
-      value: ((userInfo?.depositWallet * 4) / 100).toFixed(2),
+      value:
+        userInfo.isHave2x4X > 0
+          ? ((userInfo?.depositWallet * 4) / 100).toFixed(2)
+          : 0,
       label2: "Click to View:",
       buttonText: "View Team",
     },
     {
       id: 4,
       label: "Direct Businesses:",
-      value: userInfo?.directBonus.toFixed(2) ?? 0.0,
+      value: userInfo?.directBonus?.toFixed(2) ?? 0.0,
       label2: "Click to View:",
       buttonText: "View Direct Team",
       image: DAOIcon,
@@ -416,7 +419,7 @@ export default function WalletStatisticModal(props) {
     {
       id: 5,
       label: "Total Businesses:",
-      value: userInfo?.teamBusiness.toFixed(2) ?? 0,
+      value: userInfo?.teamBusiness?.toFixed(2) ?? 0,
       label2: "Click to View:",
       buttonText: "Magic Team",
       image: DAOIcon,
@@ -441,7 +444,7 @@ export default function WalletStatisticModal(props) {
     {
       id: 15,
       label: "Organic Deposit:",
-      value: userInfo?.organicAmount.toFixed(2) ?? 0,
+      value: userInfo?.organicAmount?.toFixed(2) ?? 0,
 
       image: DAOIcon,
       name: "B",
@@ -449,7 +452,7 @@ export default function WalletStatisticModal(props) {
     {
       id: 16,
       label: "Organic Direct Business:",
-      value: userInfo?.organicDirectBusiness.toFixed(2) ?? 0,
+      value: userInfo?.organicDirectBusiness?.toFixed(2) ?? 0,
       label2: "",
       buttonText: "",
       image: DAOIcon,
@@ -458,7 +461,7 @@ export default function WalletStatisticModal(props) {
     {
       id: 17,
       label: "Organic Team Business:",
-      value: userInfo?.organicWeeklyTeamBusiness.toFixed(2) ?? 0,
+      value: userInfo?.organicWeeklyTeamBusiness?.toFixed(2) ?? 0,
       label2: "",
       buttonText: "",
       image: DAOIcon,
@@ -503,7 +506,7 @@ export default function WalletStatisticModal(props) {
     {
       id: 10,
       label: "Offer Income:",
-      value: userInfo?.magicBoosterIncome.toFixed(2) ?? 0,
+      value: userInfo?.magicBoosterIncome?.toFixed(2) ?? 0,
       label2: "Offer Income History:",
       buttonText: "Offer Income History",
       image: DAOIcon,

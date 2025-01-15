@@ -312,7 +312,7 @@ export default function DepositModel(props) {
     {
       id: 0,
       label1: "Split Wallet :",
-      value: splitWallet.toFixed(2),
+      value: splitWallet?.toFixed(2) ?? 0,
       label2: "Click to View :",
       buttonText: "View History",
       image: DAOIcon,
@@ -330,7 +330,7 @@ export default function DepositModel(props) {
     {
       id: 2,
       label1: "Left Split Wallet :",
-      value: leftSplitWallet.toFixed(2),
+      value: leftSplitWallet?.toFixed(2) ?? 0,
       label2: "Click to View :",
       buttonText: "View History",
       image: DAOIcon,
@@ -348,7 +348,7 @@ export default function DepositModel(props) {
     {
       id: 7,
       label1: "My Re-investment :",
-      value: reInvest.toFixed(2),
+      value: reInvest?.toFixed(2) ?? 0,
       label2: "Click to View :",
       buttonText: "View History",
       image: DAOIcon,
@@ -369,7 +369,7 @@ export default function DepositModel(props) {
     {
       id: 4,
       label1: "Total withdrawn :",
-      value: totalWithdrawn.toFixed(2),
+      value: totalWithdrawn?.toFixed(2) ?? 0,
       label2: "",
       buttonText: "Withdraw History",
       image: DAOIcon,
@@ -379,7 +379,7 @@ export default function DepositModel(props) {
     {
       id: 5,
       label1: "Balance:",
-      value: balance.toFixed(2),
+      value: balance?.toFixed(2) ?? 0,
       label2: "Request withdraw:",
       buttonText: "Withdraw ",
       image: DAOIcon,
