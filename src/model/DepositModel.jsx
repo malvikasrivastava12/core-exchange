@@ -303,7 +303,9 @@ export default function DepositModel(props) {
   const handleWithdraw = async () => {
     await withdrawBalancefn();
     setIsWithdraw(false);
-    setIsFetch(!isFetch);
+    setTimeout(() => {
+      setIsFetch(!isFetch);
+    }, 3000);
   };
 
   const handleCancelWithdraw = () => {
