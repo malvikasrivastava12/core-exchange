@@ -19,6 +19,7 @@ import {
   getOfferHistoryfn,
   getC50FlushedHistoryfn,
   getMagicTeamfn,
+  getC50IncomeHistoryfn,
 } from "../Helper/Api_function";
 import {
   userClaimedRegistrationTokenfn,
@@ -53,7 +54,7 @@ export default function WalletStatisticModal(props) {
   const [C50Team, setC50Team] = useState([]);
   const [magicIncome, setMagicIncome] = useState([]);
   const [magicBooster, setMagicBooster] = useState([]);
-  const [rankReward, setRankReward] = useState({ data: [], pageinate: {} });
+  const [dataTable, setDataTable] = useState({ data: [], pageinate: {} });
   const [isloading, setIsLoading] = useState(-1);
   const [viewC50TeamTable, setViewC50TeamTable] = useState("");
   const [viewLevelTeamTable, setViewLevelTeamTable] = useState("");
@@ -67,8 +68,8 @@ export default function WalletStatisticModal(props) {
   const [levelTeam, setLevelTeam] = useState([]);
   const [C50Income, setC50Income] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const totalItems = rankReward?.pageinate?.totalCount || 0;
-  const itemsPerPage = 2; // Or you can use rankReward?.itemsPerPage if available
+  const totalItems = dataTable?.pageinate?.totalCount || 0;
+  const itemsPerPage = 10; // Or you can use rankReward?.itemsPerPage if available
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const [rank, setRank] = useState("Claim Now");
   const [userDetails, setUserDetails] = useState([]);
@@ -94,6 +95,9 @@ export default function WalletStatisticModal(props) {
 
   const [C50IncomHistory, setC50IncomHistory] = useState([]);
   const [viewC50IncomeTable, setViewC50IncomeTable] = useState("");
+  console.log(dataTable, "dataTable");
+  const [C50IncomeData, setC50IncomeData] = useState(0);
+  const [C50FlushedAmount, setC50FlushedAmount] = useState(0);
 
   // const [filteredTeam, setFilteredTeam] = useState([]);
   const handleSecurityPin = () => {
@@ -140,10 +144,14 @@ export default function WalletStatisticModal(props) {
       }
     }
   };
-  const handleDirectTeam = async () => {
+  const handleDirectTeam = async (page) => {
     if (walletAddress) {
-      const data = await getDirectTeam(walletAddress);
-      setDirectTeam(Array.isArray(data.data) ? data.data : []);
+      const data = await getDirectTeam(walletAddress, page, itemsPerPage);
+      // setDirectTeam(Array.isArray(data.data) ? data.data : []);
+      setDataTable({
+        data: Array.isArray(data.data) ? data.data : [],
+        pageinate: data,
+      });
       // setIsLoading(-1);
     } else toast.error("Wallet is not connected!!");
   };
@@ -160,14 +168,6 @@ export default function WalletStatisticModal(props) {
     if (walletAddress) {
       const data = await getOfferIncomeHistoryfn(walletAddress);
       setOfferIncome(Array.isArray(data.data) ? data.data : []);
-      // setIsLoading(-1);
-    } else toast.error("Wallet is not connected!!");
-  };
-
-  const handleMagicTeam = async () => {
-    if (walletAddress) {
-      const data = await getMagicTeamfn(walletAddress);
-      setTotalBusiness(Array.isArray(data.data) ? data.data : []);
       // setIsLoading(-1);
     } else toast.error("Wallet is not connected!!");
   };
@@ -236,6 +236,19 @@ export default function WalletStatisticModal(props) {
     setTotalWithdraw(TotalIncome / 1e18);
     // console.log(TotalIncome / 1e18?.toFixed(2), "TotalIncome");
   };
+
+  const handleMagicTeam = async (page) => {
+    if (walletAddress) {
+      const data = await getMagicTeamfn(walletAddress, page, itemsPerPage);
+      // setTotalBusiness(Array.isArray(data.data) ? data.data : []);
+      setDataTable({
+        data: Array.isArray(data.data) ? data.data : [],
+        pageinate: data,
+      });
+      setIsLoading(-1);
+    } else toast.error("Wallet is not connected!!");
+  };
+
   useEffect(() => {
     ReturnUserQualificationLength(walletAddress);
     handletotalEarned();
@@ -243,63 +256,120 @@ export default function WalletStatisticModal(props) {
     handleOfferHistory();
   }, [walletAddress, isFetch]);
 
-  const handleRankReward = async () => {
+  const handleRankReward = async (newPage) => {
     const data = await getStarIncomeHistoryfn(
       walletAddress,
-      currentPage,
+      newPage,
       itemsPerPage
     );
     console.log(data, "::::::::::in getStarIncomeHistoryfn");
-    setRankReward({
+    setDataTable({
       data: Array.isArray(data.data) ? data.data : [],
       pageinate: data,
     });
     setIsLoading(-1);
-
-    console.log(rankReward, "rankReward==========");
+  };
+  const fetchData = async (page) => {
+    try {
+      const response = await axios.get(`${URLApi}/getLevelAndPaid`, {
+        params: {
+          user: walletAddress,
+          page: page,
+          limit: itemsPerPage,
+        },
+      });
+      // console.log(response.data, "getLevelAndPaid1");
+      setDataTable({
+        data: Array.isArray(response?.data?.data) ? response?.data?.data : [],
+        pageinate: response?.data,
+      });
+      // setC50Team(response?.data?.data);
+      setLevelPaid(response.data);
+    } catch (error) {
+      console.log("Error getLevelAndPaid :", error);
+    }
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${URLApi}/getLevelAndPaid`, {
-          params: {
-            user: walletAddress,
-          },
-        });
-        // console.log(response.data, "getLevelAndPaid1");
-
-        setC50Team(response.data.data);
-        setLevelPaid(response.data);
-      } catch (error) {
-        console.log("Error getLevelAndPaid :", error);
-      }
-    };
-
-    fetchData();
+    fetchData(currentPage);
+    handleC50IncomeHistory();
   }, [walletAddress, isFetch]);
 
-  const handlePrevious = () => {
+  const handlePrevious = async () => {
     if (currentPage > 1) {
       const newPage = currentPage - 1;
       setCurrentPage(newPage);
-      handleRankReward(newPage); // Fetch data for the previous page
+      if (id === 2) {
+        await fetchData(newPage);
+      } else if (item?.id === 1) {
+        await handleLevelTeam(newPage);
+      } else if (item?.id === 4) {
+        await handleDirectTeam(newPage);
+      } else if (item?.id === 5) {
+        await handleMagicTeam(newPage);
+      }
+      //  else if (item?.id === 6) {
+      //   await handleDirectTeam(newPage);
+      // }
+      // else if (item?.id === 7) {
+      //   await handleDirectTeam(newPage);
+      // } else if (item?.id === 8) {
+      //   await handleDirectTeam(newPage);
+      // }
+      // else if (item?.id === 9) {
+      //   await handleDirectTeam(newPage);
+      // }
+      // else if (item?.id === 10) {
+      //   await handleDirectTeam(newPage);
+      // } else if (item?.id === 11) {
+      //   await handleDirectTeam(newPage);
+      // }
+      else if (id === 14) {
+        await handleRankReward(newPage);
+      } // Fetch data for the previous page
     }
   };
 
-  const handleNext = () => {
+  const handleNext = async (id) => {
     if (currentPage < totalPages) {
       const newPage = currentPage + 1;
       setCurrentPage(newPage);
-      handleRankReward(newPage); // Fetch data for the next page
+      if (id === 2) {
+        await fetchData(newPage);
+      } else if (item?.id === 1) {
+        await handleLevelTeam(newPage);
+      } else if (item?.id === 4) {
+        await handleDirectTeam(newPage);
+      } else if (item?.id === 5) {
+        await handleMagicTeam(newPage);
+      }
+      //  else if (item?.id === 6) {
+      //   await handleDirectTeam(newPage);
+      // }
+      // else if (item?.id === 7) {
+      //   await handleDirectTeam(newPage);
+      // } else if (item?.id === 8) {
+      //   await handleDirectTeam(newPage);
+      // }
+      // else if (item?.id === 9) {
+      //   await handleDirectTeam(newPage);
+      // }
+      // else if (item?.id === 10) {
+      //   await handleDirectTeam(newPage);
+      // } else if (item?.id === 11) {
+      //   await handleDirectTeam(newPage);
+      // }
+      else if (id === 14) {
+        await handleRankReward(newPage);
+      }
+      // Fetch data for the next page
     }
   };
 
-  const handleLevelTeam = async () => {
+  const handleLevelTeam = async (page) => {
     if (walletAddress) {
-      const data = await getFetchTeams(walletAddress);
-      // console.log(walletAddress, "walletAddress");
-      // console.log(data, "::::::::::in getFetchTeams11");
+      const data = await getFetchTeams(walletAddress, page, itemsPerPage);
+
       const users = Array.isArray(data?.data?.users) ? data?.data?.users : [];
       // console.log(users, "directTeam");
       // setLevelTeam(users);
@@ -307,11 +377,27 @@ export default function WalletStatisticModal(props) {
       const filteredUsers = users.sort((a, b) => b.level - a.level);
       // console.log(filteredTeam?.length, ":::::::12231115");
       setLevelTeam(filteredUsers);
+
+      setDataTable({
+        data: filteredUsers,
+        pageinate: data?.data,
+      });
+    }
+  };
+
+  const handleC50IncomeHistory = async () => {
+    if (walletAddress) {
+      const data = await getC50IncomeHistoryfn(walletAddress);
+      setC50IncomHistory(data?.data);
+      setC50IncomeData(data?.totalRoi);
+      setC50FlushedAmount(data?.totalFlushed);
+      console.log(data, "C50 Income History");
     }
   };
 
   useEffect(() => {
-    handleLevelTeam();
+    handleC50IncomeHistory();
+    handleLevelTeam(currentPage);
   }, [walletAddress, isFetch]);
 
   useEffect(() => {
@@ -325,13 +411,13 @@ export default function WalletStatisticModal(props) {
       }
       // if (Number(res[10]) === Number(10 * 1e18)) {
       if (Number(res[9]) == 1) {
-        setRank("BRONZE");
+        setRank("BRONZE 10%");
       } else if (Number(res[9]) == 2) {
-        setRank("SILVER");
+        setRank("SILVER 20%");
       } else if (Number(res[9]) == 3) {
-        setRank("GOLD");
+        setRank("GOLD 30%");
       } else if (Number(res[9]) == 4) {
-        setRank("DIAMOND");
+        setRank("DIAMOND 40%");
       } else {
         setRank("Claim now");
       }
@@ -342,17 +428,10 @@ export default function WalletStatisticModal(props) {
     if (walletAddress) {
       const data = await getC50FlushedHistoryfn(walletAddress);
       setC50FlushedHistory(data.data);
-      console.log(data, "Left split wallet");
+      set;
     }
   };
 
-  const handleC50IncomeHistory = async () => {
-    if (walletAddress) {
-      const data = await getC50FlushedHistoryfn(walletAddress);
-      setC50IncomHistory(data.data);
-      console.log(data, "Left split wallet");
-    }
-  };
   const walletStatisticModalData = [
     {
       id: 0,
@@ -401,10 +480,9 @@ export default function WalletStatisticModal(props) {
     {
       id: 3,
       label: "C50 Capping",
-      value:
-        userInfo.isHave2x4X > 0
-          ? ((userInfo?.depositWallet * 4) / 100).toFixed(2)
-          : 0,
+      value: C50Income
+        ? ((Number(C50Income?.totalAmount) * 4) / 100)?.toFixed(2)
+        : 0,
       label2: "Click to View:",
       buttonText: "View Team",
     },
@@ -479,7 +557,7 @@ export default function WalletStatisticModal(props) {
     {
       id: 7,
       label: "C50 Flushed:",
-      value: C50Income?.totalRoi && (C50Income?.totalRoi * 20)?.toFixed(2),
+      value: C50FlushedAmount && C50FlushedAmount?.toFixed(2),
       label2: "C50 Flushed History:",
       buttonText: "C50 Flushed History",
       image: DAOIcon,
@@ -488,7 +566,7 @@ export default function WalletStatisticModal(props) {
     {
       id: 8,
       label: "C50 Income:",
-      value: C50Income?.totalRoi?.toFixed(2),
+      value: C50IncomeData?.toFixed(2),
       label2: "Recent Days Income Total:",
       buttonText: "C50 Income History",
       image: DAOIcon,
@@ -682,23 +760,25 @@ export default function WalletStatisticModal(props) {
                                         setIsFetch(!isFetch);
                                       }, 2000);
                                     } else if (item?.id === 1) {
+                                      await handleLevelTeam(1);
                                       setViewLevelTeamTable(item.id);
                                     } else if (item?.id === 2) {
+                                      await fetchData(1);
                                       setViewC50TeamTable(item.id);
                                     } else if (item?.id === 3) {
                                       setViewC50CappingTable(item.id);
                                     } else if (item?.id === 4) {
-                                      await handleDirectTeam();
+                                      await handleDirectTeam(currentPage);
                                       setViewDirectTeamTable(item.id);
                                     } else if (item?.id === 5) {
                                       setViewTotalBusinessesTable(item.id);
-                                      handleMagicTeam();
+                                      await handleMagicTeam(currentPage);
                                     } else if (item?.id === 6) {
                                       await handleMagicIncome();
                                       setViewMagicIncomeHistoryTable(item.id);
                                     } else if (item?.id === 7) {
-                                      setViewC50FlushedTable(item.id);
                                       handleC50FlushedHistory();
+                                      setViewC50FlushedTable(item.id);
                                     } else if (item?.id === 8) {
                                       setViewC50IncomeTable(item.id);
                                     } else if (item?.id === 9) {
@@ -712,7 +792,7 @@ export default function WalletStatisticModal(props) {
                                       handleTotalEarned();
                                     } else if (item?.id === 14) {
                                       setIsLoading(item?.id);
-                                      await handleRankReward();
+                                      await handleRankReward(currentPage);
                                       setViewRankRewardHistoryTable(item.id);
                                     } else {
                                       // setIsLoading(item?.id);
@@ -777,18 +857,10 @@ export default function WalletStatisticModal(props) {
                                   </th>
                                 </tr>
                               </thead>
-                              {/* {C50Team?.length > 0 &&
-                                C50Team?.map((user, index) => (
-                                  <tbody className="table-body">
-                                    <tr key={index}>
-                                      <td>{user?.level}</td>
-                                      <td>{user?.people}</td>
-                                    </tr>
-                                  </tbody>
-                                ))} */}
-                              {C50Team?.length > 0 && (
+
+                              {dataTable?.data?.length > 0 && (
                                 <tbody className="table-body">
-                                  {C50Team.map((user, index) => (
+                                  {dataTable?.data?.map((user, index) => (
                                     <tr key={index}>
                                       <td>{user?.level}</td>
                                       <td>{user?.people}</td>
@@ -796,23 +868,9 @@ export default function WalletStatisticModal(props) {
                                   ))}
                                 </tbody>
                               )}
-                              {/* <tbody className="table-body">
-                                <tr>
-                                  <td>Mark</td>
-                                  <td>Mark</td>
-                                </tr>
-                                <tr>
-                                  <td>Mark</td>
-                                  <td>Mark</td>
-                                </tr>
-                                <tr>
-                                  <td>Mark</td>
-                                  <td>Mark</td>
-                                </tr>
-                              </tbody> */}
                             </table>
 
-                            {C50Team.length === 0 && (
+                            {dataTable?.data?.length === 0 && (
                               <div className="p-4 d-flex justify-content-center">
                                 <div>No Data Found!</div>
                               </div>
@@ -833,8 +891,15 @@ export default function WalletStatisticModal(props) {
                               <IoPlayBackSharp />
                             </a>
                             <a
-                              class="k-link k-pager-nav  k-state-disabled"
+                              className={`k-link k-pager-nav ${
+                                currentPage === 1 ? "k-state-disabled" : ""
+                              }`}
                               aria-controls="DataTables_Table_0"
+                              onClick={() => handlePrevious(item.id)}
+                              style={{
+                                cursor:
+                                  currentPage === 1 ? "not-allowed" : "pointer",
+                              }}
                               data-dt-idx="0"
                               tabindex="0"
                               id="DataTables_Table_0_previous"
@@ -850,18 +915,28 @@ export default function WalletStatisticModal(props) {
                                   tabindex="0"
                                   value="1"
                                 >
-                                  1
+                                  {currentPage}
                                 </a>
                               </li>
                             </ul>
                             <a
-                              class="k-link k-pager-nav k-state-disabled"
+                              className={`k-link k-pager-nav ${
+                                currentPage === totalPages
+                                  ? "k-state-disabled"
+                                  : ""
+                              }`}
                               aria-controls="DataTables_Table_0"
+                              onClick={() => handleNext(item.id)}
+                              style={{
+                                cursor:
+                                  currentPage === totalPages
+                                    ? "not-allowed"
+                                    : "pointer",
+                              }}
                               data-dt-idx="3"
                               tabindex="0"
                               id="DataTables_Table_0_next"
                             >
-                              {/* <i class="k-icon k-i-arrow-e"></i> */}
                               <IoCaretForwardOutline />
                             </a>
                             <a
@@ -874,13 +949,19 @@ export default function WalletStatisticModal(props) {
                               <IoMdFastforward />
                             </a>
 
-                            <span class="k-pager-info k-label">
-                              Displaying 1 to 7 out of 7 items{" "}
+                            <span className="k-pager-info k-label">
+                              {`Displaying ${
+                                (currentPage - 1) * itemsPerPage + 1
+                              } to ${Math.min(
+                                currentPage * itemsPerPage,
+                                totalItems
+                              )} out of ${totalItems} items`}
                             </span>
                           </div>
                         </div>
                       </>
                     )}
+
                     {viewDirectTeamTable === item.id && item.id === 4 && (
                       <>
                         <div className="table-container">
@@ -942,20 +1023,20 @@ export default function WalletStatisticModal(props) {
                                   </th>
                                 </tr>
                               </thead>
-                              {directTeam?.length > 0 && (
+                              {dataTable?.data?.length > 0 && (
                                 <tbody className="table-body">
-                                  {directTeam.map((user, index) => (
+                                  {dataTable?.data?.map((user, index) => (
                                     <tr key={index}>
                                       <td>{index + 1}</td>
                                       <td>{user?.user}</td>
-                                      <td>{user?.depositWallet}</td>
-                                      <td>{user?.reInvestment}</td>
+                                      <td>{user?.depositWallet.toFixed(2)}</td>
+                                      <td>{user?.reInvestment.toFixed(2)}</td>
                                     </tr>
                                   ))}
                                 </tbody>
                               )}
                             </table>
-                            {directTeam.length === 0 && (
+                            {dataTable?.data?.length === 0 && (
                               <div className="p-4 d-flex justify-content-center">
                                 <div>No Data Found!</div>
                               </div>
@@ -976,8 +1057,15 @@ export default function WalletStatisticModal(props) {
                               <IoPlayBackSharp />
                             </a>
                             <a
-                              class="k-link k-pager-nav  k-state-disabled"
+                              className={`k-link k-pager-nav ${
+                                currentPage === 1 ? "k-state-disabled" : ""
+                              }`}
                               aria-controls="DataTables_Table_0"
+                              onClick={() => handlePrevious(item.id)}
+                              style={{
+                                cursor:
+                                  currentPage === 1 ? "not-allowed" : "pointer",
+                              }}
                               data-dt-idx="0"
                               tabindex="0"
                               id="DataTables_Table_0_previous"
@@ -993,18 +1081,28 @@ export default function WalletStatisticModal(props) {
                                   tabindex="0"
                                   value="1"
                                 >
-                                  1
+                                  {currentPage}
                                 </a>
                               </li>
                             </ul>
                             <a
-                              class="k-link k-pager-nav k-state-disabled"
+                              className={`k-link k-pager-nav ${
+                                currentPage === totalPages
+                                  ? "k-state-disabled"
+                                  : ""
+                              }`}
                               aria-controls="DataTables_Table_0"
+                              onClick={() => handleNext(item.id)}
+                              style={{
+                                cursor:
+                                  currentPage === totalPages
+                                    ? "not-allowed"
+                                    : "pointer",
+                              }}
                               data-dt-idx="3"
                               tabindex="0"
                               id="DataTables_Table_0_next"
                             >
-                              {/* <i class="k-icon k-i-arrow-e"></i> */}
                               <IoCaretForwardOutline />
                             </a>
                             <a
@@ -1016,8 +1114,14 @@ export default function WalletStatisticModal(props) {
                             >
                               <IoMdFastforward />
                             </a>
-                            <span class="k-pager-info k-label">
-                              Displaying 1 to 7 out of 7 items
+
+                            <span className="k-pager-info k-label">
+                              {`Displaying ${
+                                (currentPage - 1) * itemsPerPage + 1
+                              } to ${Math.min(
+                                currentPage * itemsPerPage,
+                                totalItems
+                              )} out of ${totalItems} items`}
                             </span>
                           </div>
                         </div>
@@ -1085,7 +1189,7 @@ export default function WalletStatisticModal(props) {
                                   </th>
                                 </tr>
                               </thead>
-                              {levelTeam?.length > 0 && (
+                              {dataTable?.data?.length > 0 && (
                                 <tbody className="table-body">
                                   <tr>
                                     <td>0</td>
@@ -1093,7 +1197,7 @@ export default function WalletStatisticModal(props) {
                                     <td>0</td>
                                     <td>{userInfo?.directCount}</td>
                                   </tr>
-                                  {levelTeam.map((user, index) => (
+                                  {dataTable?.data?.map((user, index) => (
                                     <tr key={index}>
                                       <td>{index + 1}</td>
                                       <td>{user?.user}</td>
@@ -1103,19 +1207,8 @@ export default function WalletStatisticModal(props) {
                                   ))}
                                 </tbody>
                               )}
-
-                              {/* <tbody className="table-body">
-                                  <tr>
-                                    <td>1</td>
-                                    <td>
-                                      0x9ccf0cd809843c239a6b6332985328a8b65dac7
-                                    </td>
-                                    <td>0</td>
-                                    <td>0</td>
-                                  </tr>
-                                </tbody> */}
                             </table>
-                            {levelTeam.length === 0 && (
+                            {dataTable?.data?.length === 0 && (
                               <div className="p-4 d-flex justify-content-center">
                                 <div>No Data Found!</div>
                               </div>
@@ -1134,8 +1227,17 @@ export default function WalletStatisticModal(props) {
                                 <IoPlayBackSharp />
                               </a>
                               <a
-                                class="k-link k-pager-nav  k-state-disabled"
+                                className={`k-link k-pager-nav ${
+                                  currentPage === 1 ? "k-state-disabled" : ""
+                                }`}
                                 aria-controls="DataTables_Table_0"
+                                onClick={() => handlePrevious(item.id)}
+                                style={{
+                                  cursor:
+                                    currentPage === 1
+                                      ? "not-allowed"
+                                      : "pointer",
+                                }}
                                 data-dt-idx="0"
                                 tabindex="0"
                                 id="DataTables_Table_0_previous"
@@ -1151,18 +1253,28 @@ export default function WalletStatisticModal(props) {
                                     tabindex="0"
                                     value="1"
                                   >
-                                    1
+                                    {currentPage}
                                   </a>
                                 </li>
                               </ul>
                               <a
-                                class="k-link k-pager-nav k-state-disabled"
+                                className={`k-link k-pager-nav ${
+                                  currentPage === totalPages
+                                    ? "k-state-disabled"
+                                    : ""
+                                }`}
                                 aria-controls="DataTables_Table_0"
+                                onClick={() => handleNext(item.id)}
+                                style={{
+                                  cursor:
+                                    currentPage === totalPages
+                                      ? "not-allowed"
+                                      : "pointer",
+                                }}
                                 data-dt-idx="3"
                                 tabindex="0"
                                 id="DataTables_Table_0_next"
                               >
-                                {/* <i class="k-icon k-i-arrow-e"></i> */}
                                 <IoCaretForwardOutline />
                               </a>
                               <a
@@ -1175,14 +1287,20 @@ export default function WalletStatisticModal(props) {
                                 <IoMdFastforward />
                               </a>
 
-                              <span class="k-pager-info k-label">
-                                Displaying 1 to 7 out of 7 items{" "}
+                              <span className="k-pager-info k-label">
+                                {`Displaying ${
+                                  (currentPage - 1) * itemsPerPage + 1
+                                } to ${Math.min(
+                                  currentPage * itemsPerPage,
+                                  totalItems
+                                )} out of ${totalItems} items`}
                               </span>
                             </div>
                           </div>
                         </div>
                       </>
                     )}
+
                     {/* magic booster is offer */}
                     {viewMagicBoosterTable === item.id && item.id === 9 && (
                       <>
@@ -1266,361 +1384,12 @@ export default function WalletStatisticModal(props) {
                                   ))}
                                 </tbody>
                               )}
-                              {/* <tbody className="table-body">
-                                <tr>
-                                  <td>Mark</td>
-                                  <td>Mark</td>
-                                </tr>
-                              </tbody> */}
                             </table>
                             {magicBooster.length === 0 && (
                               <div className="p-4 d-flex justify-content-center">
                                 <div>No Data Found!</div>
                               </div>
                             )}
-                            <div
-                              class="k-pager-wrap k-grid-pager k-widget"
-                              data-role="pager"
-                            >
-                              <a
-                                class="k-link k-pager-nav  k-state-disabled"
-                                aria-controls="DataTables_Table_0"
-                                data-dt-idx="0"
-                                tabindex="0"
-                                id="DataTables_Table_0_previous"
-                              >
-                                <IoPlayBackSharp />
-                              </a>
-                              <a
-                                class="k-link k-pager-nav  k-state-disabled"
-                                aria-controls="DataTables_Table_0"
-                                data-dt-idx="0"
-                                tabindex="0"
-                                id="DataTables_Table_0_previous"
-                              >
-                                <IoCaretBackOutline />
-                              </a>
-                              <ul class="k-pager-numbers k-reset">
-                                <li>
-                                  <a
-                                    class="k-state-selected"
-                                    aria-controls="DataTables_Table_0"
-                                    data-dt-idx="1"
-                                    tabindex="0"
-                                    value="1"
-                                  >
-                                    1
-                                  </a>
-                                </li>
-                              </ul>
-                              <a
-                                class="k-link k-pager-nav k-state-disabled"
-                                aria-controls="DataTables_Table_0"
-                                data-dt-idx="3"
-                                tabindex="0"
-                                id="DataTables_Table_0_next"
-                              >
-                                {/* <i class="k-icon k-i-arrow-e"></i> */}
-                                <IoCaretForwardOutline />
-                              </a>
-                              <a
-                                class="k-link k-pager-nav k-state-disabled"
-                                aria-controls="DataTables_Table_0"
-                                data-dt-idx="3"
-                                tabindex="0"
-                                id="DataTables_Table_0_next"
-                              >
-                                <IoMdFastforward />
-                              </a>
-
-                              <span class="k-pager-info k-label">
-                                Displaying 1 to 7 out of 7 items{" "}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </>
-                    )}
-                    {/* magic booster is offer */}
-
-                    {viewMagicIncomeHistoryTable === item.id &&
-                      item.id === 6 && (
-                        <>
-                          <div className="table-container">
-                            <div
-                              className="d-flex align-items-center justify-content-center"
-                              onClick={() => setViewMagicIncomeHistoryTable("")}
-                            >
-                              <div class="closee">
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                                <svg viewBox="0 0 36 36" class="circlu">
-                                  <path
-                                    stroke-dasharray="100, 100"
-                                    d="M18 2.0845
-                    a 15.9155 15.9155 0 0 1 0 31.831
-                    a 15.9155 15.9155 0 0 1 0 -31.831"
-                                  ></path>
-                                </svg>
-                              </div>
-                            </div>
-
-                            <div className="table-responsive">
-                              <table class="table table-dark">
-                                <thead
-                                  className="k-grid-header "
-                                  role="rowgroup"
-                                >
-                                  <tr role="row">
-                                    <th
-                                      role="columnheader"
-                                      data-field="SNO"
-                                      data-title="Name"
-                                      class="k-header"
-                                    >
-                                      SNO
-                                    </th>
-
-                                    <th
-                                      role="columnheader"
-                                      data-field="SNO"
-                                      data-title="Name"
-                                      class="k-header"
-                                    >
-                                      Amount
-                                    </th>
-                                    <th
-                                      role="columnheader"
-                                      data-field="SNO"
-                                      data-title="Name"
-                                      class="k-header"
-                                    >
-                                      Dated
-                                    </th>
-                                    <th
-                                      role="columnheader"
-                                      data-field="SNO"
-                                      data-title="Name"
-                                      class="k-header"
-                                    >
-                                      Description
-                                    </th>
-                                  </tr>
-                                </thead>
-                                {magicIncome?.length > 0 && (
-                                  <tbody className="table-body">
-                                    {magicIncome.map((user, index) => (
-                                      <tr key={index}>
-                                        <td>{index + 1}</td>
-
-                                        <td>{user?.amount}</td>
-                                        <td>
-                                          {moment(user.createdAt).format(
-                                            "M/D/YYYY h:mm:ss A"
-                                          )}
-                                        </td>
-                                        <td> Magic Bonus</td>
-                                      </tr>
-                                    ))}
-                                  </tbody>
-                                )}
-                                {/* <tbody className="table-body">
-                                <tr>
-                                  <td>Mark</td>
-                                  <td>Mark</td>
-                                </tr>
-                              </tbody> */}
-                              </table>
-                              {magicIncome.length === 0 && (
-                                <div className="p-4 d-flex justify-content-center">
-                                  <div>No Data Found!</div>
-                                </div>
-                              )}
-                              <div
-                                class="k-pager-wrap k-grid-pager k-widget"
-                                data-role="pager"
-                              >
-                                <a
-                                  class="k-link k-pager-nav  k-state-disabled"
-                                  aria-controls="DataTables_Table_0"
-                                  data-dt-idx="0"
-                                  tabindex="0"
-                                  id="DataTables_Table_0_previous"
-                                >
-                                  <IoPlayBackSharp />
-                                </a>
-                                <a
-                                  class="k-link k-pager-nav  k-state-disabled"
-                                  aria-controls="DataTables_Table_0"
-                                  data-dt-idx="0"
-                                  tabindex="0"
-                                  id="DataTables_Table_0_previous"
-                                >
-                                  <IoCaretBackOutline />
-                                </a>
-                                <ul class="k-pager-numbers k-reset">
-                                  <li>
-                                    <a
-                                      class="k-state-selected"
-                                      aria-controls="DataTables_Table_0"
-                                      data-dt-idx="1"
-                                      tabindex="0"
-                                      value="1"
-                                    >
-                                      1
-                                    </a>
-                                  </li>
-                                </ul>
-                                <a
-                                  class="k-link k-pager-nav k-state-disabled"
-                                  aria-controls="DataTables_Table_0"
-                                  data-dt-idx="3"
-                                  tabindex="0"
-                                  id="DataTables_Table_0_next"
-                                >
-                                  {/* <i class="k-icon k-i-arrow-e"></i> */}
-                                  <IoCaretForwardOutline />
-                                </a>
-                                <a
-                                  class="k-link k-pager-nav k-state-disabled"
-                                  aria-controls="DataTables_Table_0"
-                                  data-dt-idx="3"
-                                  tabindex="0"
-                                  id="DataTables_Table_0_next"
-                                >
-                                  <IoMdFastforward />
-                                </a>
-
-                                <span class="k-pager-info k-label">
-                                  Displaying 1 to 7 out of 7 items{" "}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </>
-                      )}
-
-                    {viewRankRewardHistoryTable === item.id &&
-                      item.id === 14 && (
-                        <>
-                          <div className="table-container">
-                            <div
-                              className="d-flex align-items-center justify-content-center"
-                              onClick={() => setViewRankRewardHistoryTable("")}
-                            >
-                              <div class="closee">
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                                <svg viewBox="0 0 36 36" class="circlu">
-                                  <path
-                                    stroke-dasharray="100, 100"
-                                    d="M18 2.0845
-                    a 15.9155 15.9155 0 0 1 0 31.831
-                    a 15.9155 15.9155 0 0 1 0 -31.831"
-                                  ></path>
-                                </svg>
-                              </div>
-                            </div>
-
-                            <div className="table-responsive">
-                              <table class="table table-dark">
-                                <thead
-                                  className="k-grid-header "
-                                  role="rowgroup"
-                                >
-                                  <tr role="row">
-                                    {/* <th
-                                      role="columnheader"
-                                      data-field="SNO"
-                                      data-title="Name"
-                                      class="k-header"
-                                    >
-                                      Organic self Sell
-                                    </th>
-                                    <th
-                                      role="columnheader"
-                                      data-field="SNO"
-                                      data-title="Name"
-                                      class="k-header"
-                                    >
-                                      Organic direct sell
-                                    </th>
-                                    <th
-                                      role="columnheader"
-                                      data-field="SNO"
-                                      data-title="Name"
-                                      class="k-header"
-                                    >
-                                      Total organic TEAM SELL
-                                    </th> */}
-                                    <th
-                                      role="columnheader"
-                                      data-field="SNO"
-                                      data-title="Name"
-                                      class="k-header"
-                                    >
-                                      SNO
-                                    </th>
-                                    <th
-                                      role="columnheader"
-                                      data-field="SNO"
-                                      data-title="Name"
-                                      class="k-header"
-                                    >
-                                      Address
-                                    </th>
-                                    <th
-                                      role="columnheader"
-                                      data-field="SNO"
-                                      data-title="Name"
-                                      class="k-header"
-                                    >
-                                      Reward
-                                    </th>
-                                    <th
-                                      role="columnheader"
-                                      data-field="SNO"
-                                      data-title="Name"
-                                      class="k-header"
-                                    >
-                                      Rank
-                                    </th>
-                                  </tr>
-                                </thead>
-                                {rankReward?.data?.length > 0 && (
-                                  <tbody className="table-body">
-                                    {rankReward.data.map((user, index) => (
-                                      <tr key={index}>
-                                        <td>{index + 1}</td>
-                                        <td>{user?.user}</td>
-                                        <td>{user?.reward}</td>
-                                        <td>{user?.starRank}</td>
-                                      </tr>
-                                    ))}
-                                  </tbody>
-                                )}
-
-                                {/* <tbody className="table-body">
-                                  <tr>
-                                    <th scope="row">1</th>
-                                    <td>Mark</td>
-                                    <td>Otto</td>
-                                    <td>mdo</td>
-                                  </tr>
-                                </tbody> */}
-                              </table>
-
-                              {rankReward?.data?.length === 0 && (
-                                <div className="p-4 d-flex justify-content-center">
-                                  <div>No Data Found!</div>
-                                </div>
-                              )}
-                            </div>
-
                             <div
                               class="k-pager-wrap k-grid-pager k-widget"
                               data-role="pager"
@@ -1705,6 +1474,358 @@ export default function WalletStatisticModal(props) {
                               </span>
                             </div>
                           </div>
+                        </div>
+                      </>
+                    )}
+                    {/* magic booster is offer */}
+
+                    {viewMagicIncomeHistoryTable === item.id &&
+                      item.id === 6 && (
+                        <>
+                          <div className="table-container">
+                            <div
+                              className="d-flex align-items-center justify-content-center"
+                              onClick={() => setViewMagicIncomeHistoryTable("")}
+                            >
+                              <div class="closee">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <svg viewBox="0 0 36 36" class="circlu">
+                                  <path
+                                    stroke-dasharray="100, 100"
+                                    d="M18 2.0845
+                    a 15.9155 15.9155 0 0 1 0 31.831
+                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                                  ></path>
+                                </svg>
+                              </div>
+                            </div>
+
+                            <div className="table-responsive">
+                              <table class="table table-dark">
+                                <thead
+                                  className="k-grid-header "
+                                  role="rowgroup"
+                                >
+                                  <tr role="row">
+                                    <th
+                                      role="columnheader"
+                                      data-field="SNO"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      SNO
+                                    </th>
+
+                                    <th
+                                      role="columnheader"
+                                      data-field="SNO"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      Amount
+                                    </th>
+                                    <th
+                                      role="columnheader"
+                                      data-field="SNO"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      Dated
+                                    </th>
+                                    <th
+                                      role="columnheader"
+                                      data-field="SNO"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      Description
+                                    </th>
+                                  </tr>
+                                </thead>
+                                {magicIncome?.length > 0 && (
+                                  <tbody className="table-body">
+                                    {magicIncome.map((user, index) => (
+                                      <tr key={index}>
+                                        <td>{index + 1}</td>
+
+                                        <td>{user?.amount.toFixed(2)}</td>
+                                        <td>
+                                          {moment(user.createdAt).format(
+                                            "M/D/YYYY h:mm:ss A"
+                                          )}
+                                        </td>
+                                        <td> Magic Bonus</td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                )}
+                              </table>
+                              {magicIncome.length === 0 && (
+                                <div className="p-4 d-flex justify-content-center">
+                                  <div>No Data Found!</div>
+                                </div>
+                              )}
+                              <div
+                                class="k-pager-wrap k-grid-pager k-widget"
+                                data-role="pager"
+                              >
+                                <a
+                                  class="k-link k-pager-nav  k-state-disabled"
+                                  aria-controls="DataTables_Table_0"
+                                  data-dt-idx="0"
+                                  tabindex="0"
+                                  id="DataTables_Table_0_previous"
+                                >
+                                  <IoPlayBackSharp />
+                                </a>
+                                <a
+                                  className={`k-link k-pager-nav ${
+                                    currentPage === 1 ? "k-state-disabled" : ""
+                                  }`}
+                                  aria-controls="DataTables_Table_0"
+                                  onClick={handlePrevious}
+                                  style={{
+                                    cursor:
+                                      currentPage === 1
+                                        ? "not-allowed"
+                                        : "pointer",
+                                  }}
+                                  data-dt-idx="0"
+                                  tabindex="0"
+                                  id="DataTables_Table_0_previous"
+                                >
+                                  <IoCaretBackOutline />
+                                </a>
+                                <ul class="k-pager-numbers k-reset">
+                                  <li>
+                                    <a
+                                      class="k-state-selected"
+                                      aria-controls="DataTables_Table_0"
+                                      data-dt-idx="1"
+                                      tabindex="0"
+                                      value="1"
+                                    >
+                                      {currentPage}
+                                    </a>
+                                  </li>
+                                </ul>
+                                <a
+                                  className={`k-link k-pager-nav ${
+                                    currentPage === totalPages
+                                      ? "k-state-disabled"
+                                      : ""
+                                  }`}
+                                  aria-controls="DataTables_Table_0"
+                                  onClick={handleNext}
+                                  style={{
+                                    cursor:
+                                      currentPage === totalPages
+                                        ? "not-allowed"
+                                        : "pointer",
+                                  }}
+                                  data-dt-idx="3"
+                                  tabindex="0"
+                                  id="DataTables_Table_0_next"
+                                >
+                                  <IoCaretForwardOutline />
+                                </a>
+                                <a
+                                  class="k-link k-pager-nav k-state-disabled"
+                                  aria-controls="DataTables_Table_0"
+                                  data-dt-idx="3"
+                                  tabindex="0"
+                                  id="DataTables_Table_0_next"
+                                >
+                                  <IoMdFastforward />
+                                </a>
+
+                                <span className="k-pager-info k-label">
+                                  {`Displaying ${
+                                    (currentPage - 1) * itemsPerPage + 1
+                                  } to ${Math.min(
+                                    currentPage * itemsPerPage,
+                                    totalItems
+                                  )} out of ${totalItems} items`}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </>
+                      )}
+
+                    {viewRankRewardHistoryTable === item.id &&
+                      item.id === 14 && (
+                        <>
+                          <div className="table-container">
+                            <div
+                              className="d-flex align-items-center justify-content-center"
+                              onClick={() => setViewRankRewardHistoryTable("")}
+                            >
+                              <div class="closee">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <svg viewBox="0 0 36 36" class="circlu">
+                                  <path
+                                    stroke-dasharray="100, 100"
+                                    d="M18 2.0845
+                    a 15.9155 15.9155 0 0 1 0 31.831
+                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                                  ></path>
+                                </svg>
+                              </div>
+                            </div>
+
+                            <div className="table-responsive">
+                              <table class="table table-dark">
+                                <thead
+                                  className="k-grid-header "
+                                  role="rowgroup"
+                                >
+                                  <tr role="row">
+                                    <th
+                                      role="columnheader"
+                                      data-field="SNO"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      SNO
+                                    </th>
+                                    <th
+                                      role="columnheader"
+                                      data-field="SNO"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      Address
+                                    </th>
+                                    <th
+                                      role="columnheader"
+                                      data-field="SNO"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      Reward
+                                    </th>
+                                    <th
+                                      role="columnheader"
+                                      data-field="SNO"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      Rank
+                                    </th>
+                                  </tr>
+                                </thead>
+                                {dataTable?.data?.length > 0 && (
+                                  <tbody className="table-body">
+                                    {dataTable.data.map((user, index) => (
+                                      <tr key={index}>
+                                        <td>{index + 1}</td>
+                                        <td>{user?.user}</td>
+                                        <td>{user?.reward}</td>
+                                        <td>{user?.starRank}</td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                )}
+                              </table>
+
+                              {dataTable?.data?.length === 0 && (
+                                <div className="p-4 d-flex justify-content-center">
+                                  <div>No Data Found!</div>
+                                </div>
+                              )}
+                            </div>
+
+                            <div
+                              class="k-pager-wrap k-grid-pager k-widget"
+                              data-role="pager"
+                            >
+                              <a
+                                class="k-link k-pager-nav  k-state-disabled"
+                                aria-controls="DataTables_Table_0"
+                                data-dt-idx="0"
+                                tabindex="0"
+                                id="DataTables_Table_0_previous"
+                              >
+                                <IoPlayBackSharp />
+                              </a>
+                              <a
+                                className={`k-link k-pager-nav ${
+                                  currentPage === 1 ? "k-state-disabled" : ""
+                                }`}
+                                aria-controls="DataTables_Table_0"
+                                onClick={() => handlePrevious(item.id)}
+                                style={{
+                                  cursor:
+                                    currentPage === 1
+                                      ? "not-allowed"
+                                      : "pointer",
+                                }}
+                                data-dt-idx="0"
+                                tabindex="0"
+                                id="DataTables_Table_0_previous"
+                              >
+                                <IoCaretBackOutline />
+                              </a>
+                              <ul class="k-pager-numbers k-reset">
+                                <li>
+                                  <a
+                                    class="k-state-selected"
+                                    aria-controls="DataTables_Table_0"
+                                    data-dt-idx="1"
+                                    tabindex="0"
+                                    value="1"
+                                  >
+                                    {currentPage}
+                                  </a>
+                                </li>
+                              </ul>
+                              <a
+                                className={`k-link k-pager-nav ${
+                                  currentPage === totalPages
+                                    ? "k-state-disabled"
+                                    : ""
+                                }`}
+                                aria-controls="DataTables_Table_0"
+                                onClick={() => handleNext(item.id)}
+                                style={{
+                                  cursor:
+                                    currentPage === totalPages
+                                      ? "not-allowed"
+                                      : "pointer",
+                                }}
+                                data-dt-idx="3"
+                                tabindex="0"
+                                id="DataTables_Table_0_next"
+                              >
+                                <IoCaretForwardOutline />
+                              </a>
+                              <a
+                                class="k-link k-pager-nav k-state-disabled"
+                                aria-controls="DataTables_Table_0"
+                                data-dt-idx="3"
+                                tabindex="0"
+                                id="DataTables_Table_0_next"
+                              >
+                                <IoMdFastforward />
+                              </a>
+
+                              <span className="k-pager-info k-label">
+                                {`Displaying ${
+                                  (currentPage - 1) * itemsPerPage + 1
+                                } to ${Math.min(
+                                  currentPage * itemsPerPage,
+                                  totalItems
+                                )} out of ${totalItems} items`}
+                              </span>
+                            </div>
+                          </div>
                         </>
                       )}
 
@@ -1753,16 +1874,7 @@ export default function WalletStatisticModal(props) {
                                   </th>
                                 </tr>
                               </thead>
-                              {/* {C50Capping?.length > 0 && (
-                                <tbody className="table-body">
-                                  {C50Capping.map((user, index) => (
-                                    <tr key={index}>
-                                      <td>{user?.user}</td>
-                                      <td>{user?.amount}</td>
-                                    </tr>
-                                  ))}
-                                </tbody>
-                              )} */}
+
                               <tbody className="table-body">
                                 <tr>
                                   <td>{userInfo?.depositWallet.toFixed(2)}</td>
@@ -1770,11 +1882,6 @@ export default function WalletStatisticModal(props) {
                                 </tr>
                               </tbody>
                             </table>
-                            {/* {C50Capping.length === 0 && (
-                              <div className="p-4 d-flex justify-content-center">
-                                <div>No Data Found!</div>
-                              </div>
-                            )} */}
                           </div>
                         </div>
                       </>
@@ -1833,9 +1940,9 @@ export default function WalletStatisticModal(props) {
                                   </th>
                                 </tr>
                               </thead>
-                              {totalBusiness?.length > 0 && (
+                              {dataTable?.data?.length > 0 && (
                                 <tbody className="table-body">
-                                  {totalBusiness.map((user, index) => (
+                                  {dataTable?.data?.map((user, index) => (
                                     <tr key={index}>
                                       <td>{index + 1}</td>
                                       <td>{user?.user}</td>
@@ -1846,14 +1953,21 @@ export default function WalletStatisticModal(props) {
                                   ))}
                                 </tbody>
                               )}
-                              {/* <tbody className="table-body">
-                                <tr>
-                                  <td>Mark</td>
-                                  <td>Mark</td>
-                                </tr>
-                              </tbody> */}
+                              {/* {dataTable?.data?.length > 0 && (
+                                <tbody className="table-body">
+                                  {dataTable?.data?.map((user, index) => (
+                                    <tr key={index}>
+                                      <td>{index + 1}</td>
+                                      <td>{user?.user}</td>
+                                      <td>
+                                        {user?.oraganicTeamBuisiness.toFixed(2)}
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              )} */}
                             </table>
-                            {totalBusiness.length === 0 && (
+                            {dataTable?.data?.length === 0 && (
                               <div className="p-4 d-flex justify-content-center">
                                 <div>No Data Found!</div>
                               </div>
@@ -1872,8 +1986,17 @@ export default function WalletStatisticModal(props) {
                                 <IoPlayBackSharp />
                               </a>
                               <a
-                                class="k-link k-pager-nav  k-state-disabled"
+                                className={`k-link k-pager-nav ${
+                                  currentPage === 1 ? "k-state-disabled" : ""
+                                }`}
                                 aria-controls="DataTables_Table_0"
+                                onClick={() => handlePrevious(item.id)}
+                                style={{
+                                  cursor:
+                                    currentPage === 1
+                                      ? "not-allowed"
+                                      : "pointer",
+                                }}
                                 data-dt-idx="0"
                                 tabindex="0"
                                 id="DataTables_Table_0_previous"
@@ -1889,18 +2012,28 @@ export default function WalletStatisticModal(props) {
                                     tabindex="0"
                                     value="1"
                                   >
-                                    1
+                                    {currentPage}
                                   </a>
                                 </li>
                               </ul>
                               <a
-                                class="k-link k-pager-nav k-state-disabled"
+                                className={`k-link k-pager-nav ${
+                                  currentPage === totalPages
+                                    ? "k-state-disabled"
+                                    : ""
+                                }`}
                                 aria-controls="DataTables_Table_0"
+                                onClick={() => handleNext(item.id)}
+                                style={{
+                                  cursor:
+                                    currentPage === totalPages
+                                      ? "not-allowed"
+                                      : "pointer",
+                                }}
                                 data-dt-idx="3"
                                 tabindex="0"
                                 id="DataTables_Table_0_next"
                               >
-                                {/* <i class="k-icon k-i-arrow-e"></i> */}
                                 <IoCaretForwardOutline />
                               </a>
                               <a
@@ -1913,8 +2046,13 @@ export default function WalletStatisticModal(props) {
                                 <IoMdFastforward />
                               </a>
 
-                              <span class="k-pager-info k-label">
-                                Displaying 1 to 7 out of 7 items{" "}
+                              <span className="k-pager-info k-label">
+                                {`Displaying ${
+                                  (currentPage - 1) * itemsPerPage + 1
+                                } to ${Math.min(
+                                  currentPage * itemsPerPage,
+                                  totalItems
+                                )} out of ${totalItems} items`}
                               </span>
                             </div>
                           </div>
@@ -1988,20 +2126,18 @@ export default function WalletStatisticModal(props) {
                                   {C50IncomHistory.map((user, index) => (
                                     <tr key={index}>
                                       <td>{index + 1}</td>
-                                      <td>{user?.amount}</td>
-                                      <td>{user?.amount}</td>
+                                      <td>{user?.amount.toFixed(2)}</td>
+                                      <td>
+                                        {" "}
+                                        {moment(user.createdAt).format(
+                                          "M/D/YYYY h:mm:ss A"
+                                        )}
+                                      </td>
                                       <td>C50 Bonus</td>
                                     </tr>
                                   ))}
                                 </tbody>
                               )}
-
-                              {/* <tbody className="table-body">
-                                <tr>
-                                  <td>Mark</td>
-                                  <td>Mark</td>
-                                </tr>
-                              </tbody> */}
                             </table>
                             {C50IncomHistory?.length === 0 && (
                               <div className="p-4 d-flex justify-content-center">
@@ -2022,8 +2158,17 @@ export default function WalletStatisticModal(props) {
                                 <IoPlayBackSharp />
                               </a>
                               <a
-                                class="k-link k-pager-nav  k-state-disabled"
+                                className={`k-link k-pager-nav ${
+                                  currentPage === 1 ? "k-state-disabled" : ""
+                                }`}
                                 aria-controls="DataTables_Table_0"
+                                onClick={handlePrevious}
+                                style={{
+                                  cursor:
+                                    currentPage === 1
+                                      ? "not-allowed"
+                                      : "pointer",
+                                }}
                                 data-dt-idx="0"
                                 tabindex="0"
                                 id="DataTables_Table_0_previous"
@@ -2039,18 +2184,28 @@ export default function WalletStatisticModal(props) {
                                     tabindex="0"
                                     value="1"
                                   >
-                                    1
+                                    {currentPage}
                                   </a>
                                 </li>
                               </ul>
                               <a
-                                class="k-link k-pager-nav k-state-disabled"
+                                className={`k-link k-pager-nav ${
+                                  currentPage === totalPages
+                                    ? "k-state-disabled"
+                                    : ""
+                                }`}
                                 aria-controls="DataTables_Table_0"
+                                onClick={handleNext}
+                                style={{
+                                  cursor:
+                                    currentPage === totalPages
+                                      ? "not-allowed"
+                                      : "pointer",
+                                }}
                                 data-dt-idx="3"
                                 tabindex="0"
                                 id="DataTables_Table_0_next"
                               >
-                                {/* <i class="k-icon k-i-arrow-e"></i> */}
                                 <IoCaretForwardOutline />
                               </a>
                               <a
@@ -2063,8 +2218,13 @@ export default function WalletStatisticModal(props) {
                                 <IoMdFastforward />
                               </a>
 
-                              <span class="k-pager-info k-label">
-                                Displaying 1 to 7 out of 7 items{" "}
+                              <span className="k-pager-info k-label">
+                                {`Displaying ${
+                                  (currentPage - 1) * itemsPerPage + 1
+                                } to ${Math.min(
+                                  currentPage * itemsPerPage,
+                                  totalItems
+                                )} out of ${totalItems} items`}
                               </span>
                             </div>
                           </div>
@@ -2131,14 +2291,6 @@ export default function WalletStatisticModal(props) {
                                   >
                                     Description
                                   </th>
-                                  {/* <th
-                                      role="columnheader"
-                                      data-field="SNO"
-                                      data-title="Name"
-                                      class="k-header"
-                                    >
-                                      DESC
-                                    </th> */}
                                 </tr>
                               </thead>
                               {C50FlushedHistory?.length > 0 && (
@@ -2146,7 +2298,7 @@ export default function WalletStatisticModal(props) {
                                   {C50FlushedHistory.map((user, index) => (
                                     <tr key={index}>
                                       <td>{index + 1}</td>
-                                      <td>{user?.amount}</td>
+                                      <td>{(user?.amount * 20).toFixed(2)}</td>
                                       <td>
                                         {user?.timestamp
                                           ? new Date(
@@ -2159,13 +2311,6 @@ export default function WalletStatisticModal(props) {
                                   ))}
                                 </tbody>
                               )}
-
-                              {/* <tbody className="table-body">
-                                <tr>
-                                  <td>Mark</td>
-                                  <td>Mark</td>
-                                </tr>
-                              </tbody> */}
                             </table>
                             {C50FlushedHistory?.length === 0 && (
                               <div className="p-4 d-flex justify-content-center">
@@ -2186,8 +2331,17 @@ export default function WalletStatisticModal(props) {
                                 <IoPlayBackSharp />
                               </a>
                               <a
-                                class="k-link k-pager-nav  k-state-disabled"
+                                className={`k-link k-pager-nav ${
+                                  currentPage === 1 ? "k-state-disabled" : ""
+                                }`}
                                 aria-controls="DataTables_Table_0"
+                                onClick={handlePrevious}
+                                style={{
+                                  cursor:
+                                    currentPage === 1
+                                      ? "not-allowed"
+                                      : "pointer",
+                                }}
                                 data-dt-idx="0"
                                 tabindex="0"
                                 id="DataTables_Table_0_previous"
@@ -2203,18 +2357,28 @@ export default function WalletStatisticModal(props) {
                                     tabindex="0"
                                     value="1"
                                   >
-                                    1
+                                    {currentPage}
                                   </a>
                                 </li>
                               </ul>
                               <a
-                                class="k-link k-pager-nav k-state-disabled"
+                                className={`k-link k-pager-nav ${
+                                  currentPage === totalPages
+                                    ? "k-state-disabled"
+                                    : ""
+                                }`}
                                 aria-controls="DataTables_Table_0"
+                                onClick={handleNext}
+                                style={{
+                                  cursor:
+                                    currentPage === totalPages
+                                      ? "not-allowed"
+                                      : "pointer",
+                                }}
                                 data-dt-idx="3"
                                 tabindex="0"
                                 id="DataTables_Table_0_next"
                               >
-                                {/* <i class="k-icon k-i-arrow-e"></i> */}
                                 <IoCaretForwardOutline />
                               </a>
                               <a
@@ -2227,8 +2391,13 @@ export default function WalletStatisticModal(props) {
                                 <IoMdFastforward />
                               </a>
 
-                              <span class="k-pager-info k-label">
-                                Displaying 1 to 7 out of 7 items{" "}
+                              <span className="k-pager-info k-label">
+                                {`Displaying ${
+                                  (currentPage - 1) * itemsPerPage + 1
+                                } to ${Math.min(
+                                  currentPage * itemsPerPage,
+                                  totalItems
+                                )} out of ${totalItems} items`}
                               </span>
                             </div>
                           </div>
@@ -2295,14 +2464,6 @@ export default function WalletStatisticModal(props) {
                                   >
                                     Dated
                                   </th>
-                                  {/* <th
-                                      role="columnheader"
-                                      data-field="SNO"
-                                      data-title="Name"
-                                      class="k-header"
-                                    >
-                                      DESC
-                                    </th> */}
                                 </tr>
                               </thead>
                               {offerIncome?.length > 0 && (
@@ -2311,7 +2472,7 @@ export default function WalletStatisticModal(props) {
                                     <tr key={index}>
                                       <td>{index + 1}</td>
                                       <td>Offer Income</td>
-                                      <td>{user?.amount}</td>
+                                      <td>{user?.amount.toFixed(2)}</td>
                                       <td>
                                         {user?.time
                                           ? new Date(
@@ -2323,12 +2484,6 @@ export default function WalletStatisticModal(props) {
                                   ))}
                                 </tbody>
                               )}
-                              {/* <tbody className="table-body">
-                                <tr>
-                                  <td>Mark</td>
-                                  <td>Mark</td>
-                                </tr>
-                              </tbody> */}
                             </table>
                             {offerIncome.length === 0 && (
                               <div className="p-4 d-flex justify-content-center">
@@ -2349,8 +2504,17 @@ export default function WalletStatisticModal(props) {
                                 <IoPlayBackSharp />
                               </a>
                               <a
-                                class="k-link k-pager-nav  k-state-disabled"
+                                className={`k-link k-pager-nav ${
+                                  currentPage === 1 ? "k-state-disabled" : ""
+                                }`}
                                 aria-controls="DataTables_Table_0"
+                                onClick={handlePrevious}
+                                style={{
+                                  cursor:
+                                    currentPage === 1
+                                      ? "not-allowed"
+                                      : "pointer",
+                                }}
                                 data-dt-idx="0"
                                 tabindex="0"
                                 id="DataTables_Table_0_previous"
@@ -2366,18 +2530,28 @@ export default function WalletStatisticModal(props) {
                                     tabindex="0"
                                     value="1"
                                   >
-                                    1
+                                    {currentPage}
                                   </a>
                                 </li>
                               </ul>
                               <a
-                                class="k-link k-pager-nav k-state-disabled"
+                                className={`k-link k-pager-nav ${
+                                  currentPage === totalPages
+                                    ? "k-state-disabled"
+                                    : ""
+                                }`}
                                 aria-controls="DataTables_Table_0"
+                                onClick={handleNext}
+                                style={{
+                                  cursor:
+                                    currentPage === totalPages
+                                      ? "not-allowed"
+                                      : "pointer",
+                                }}
                                 data-dt-idx="3"
                                 tabindex="0"
                                 id="DataTables_Table_0_next"
                               >
-                                {/* <i class="k-icon k-i-arrow-e"></i> */}
                                 <IoCaretForwardOutline />
                               </a>
                               <a
@@ -2390,8 +2564,13 @@ export default function WalletStatisticModal(props) {
                                 <IoMdFastforward />
                               </a>
 
-                              <span class="k-pager-info k-label">
-                                Displaying 1 to 7 out of 7 items{" "}
+                              <span className="k-pager-info k-label">
+                                {`Displaying ${
+                                  (currentPage - 1) * itemsPerPage + 1
+                                } to ${Math.min(
+                                  currentPage * itemsPerPage,
+                                  totalItems
+                                )} out of ${totalItems} items`}
                               </span>
                             </div>
                           </div>
@@ -2465,7 +2644,7 @@ export default function WalletStatisticModal(props) {
                                   {totalEarnedTable.map((user, index) => (
                                     <tr key={index}>
                                       <td>{index + 1}</td>
-                                      <td>{user?.amount}</td>
+                                      <td>{user?.amount.toFixed(2)}</td>
                                       <td>
                                         {moment(user.createdAt).format(
                                           "M/D/YYYY h:mm:ss A"
@@ -2476,12 +2655,6 @@ export default function WalletStatisticModal(props) {
                                   ))}
                                 </tbody>
                               )}
-                              {/* <tbody className="table-body">
-                                <tr>
-                                  <td>Mark</td>
-                                  <td>Mark</td>
-                                </tr>
-                              </tbody> */}
                             </table>
                             {totalEarnedTable.length === 0 && (
                               <div className="p-4 d-flex justify-content-center">
@@ -2502,8 +2675,17 @@ export default function WalletStatisticModal(props) {
                                 <IoPlayBackSharp />
                               </a>
                               <a
-                                class="k-link k-pager-nav  k-state-disabled"
+                                className={`k-link k-pager-nav ${
+                                  currentPage === 1 ? "k-state-disabled" : ""
+                                }`}
                                 aria-controls="DataTables_Table_0"
+                                onClick={handlePrevious}
+                                style={{
+                                  cursor:
+                                    currentPage === 1
+                                      ? "not-allowed"
+                                      : "pointer",
+                                }}
                                 data-dt-idx="0"
                                 tabindex="0"
                                 id="DataTables_Table_0_previous"
@@ -2519,18 +2701,28 @@ export default function WalletStatisticModal(props) {
                                     tabindex="0"
                                     value="1"
                                   >
-                                    1
+                                    {currentPage}
                                   </a>
                                 </li>
                               </ul>
                               <a
-                                class="k-link k-pager-nav k-state-disabled"
+                                className={`k-link k-pager-nav ${
+                                  currentPage === totalPages
+                                    ? "k-state-disabled"
+                                    : ""
+                                }`}
                                 aria-controls="DataTables_Table_0"
+                                onClick={handleNext}
+                                style={{
+                                  cursor:
+                                    currentPage === totalPages
+                                      ? "not-allowed"
+                                      : "pointer",
+                                }}
                                 data-dt-idx="3"
                                 tabindex="0"
                                 id="DataTables_Table_0_next"
                               >
-                                {/* <i class="k-icon k-i-arrow-e"></i> */}
                                 <IoCaretForwardOutline />
                               </a>
                               <a
@@ -2543,8 +2735,13 @@ export default function WalletStatisticModal(props) {
                                 <IoMdFastforward />
                               </a>
 
-                              <span class="k-pager-info k-label">
-                                Displaying 1 to 7 out of 7 items{" "}
+                              <span className="k-pager-info k-label">
+                                {`Displaying ${
+                                  (currentPage - 1) * itemsPerPage + 1
+                                } to ${Math.min(
+                                  currentPage * itemsPerPage,
+                                  totalItems
+                                )} out of ${totalItems} items`}
                               </span>
                             </div>
                           </div>

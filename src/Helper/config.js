@@ -1,4 +1,4 @@
-export const CONTRACT_ADDRESS = "0x1bcd4A91427b0F492946506Fe0Adda6e2B7f7FFD";
+export const CONTRACT_ADDRESS = "0x2269BB73313bA7Ad6FB2d1efF440F48770562F3E";
 export const CONTRACT_ADDRESS_ABI = [
   {
     inputs: [
@@ -332,9 +332,13 @@ export const CONTRACT_ADDRESS_ABI = [
     type: "event",
   },
   {
-    inputs: [],
+    inputs: [{ internalType: "address", name: "user", type: "address" }],
     name: "ReturnWithdrawBalance",
-    outputs: [],
+    outputs: [
+      { internalType: "uint256", name: "", type: "uint256" },
+      { internalType: "uint256", name: "", type: "uint256" },
+      { internalType: "uint256", name: "", type: "uint256" },
+    ],
     stateMutability: "view",
     type: "function",
   },

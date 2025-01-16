@@ -150,7 +150,11 @@ const MainContent = () => {
   // console.log(userInfo?.isHave2x4X, "::::DX");
   const timers = [
     {
-      label: "2X B (C — 50) TIME",
+      label: `${
+        Date.now() > userInfo?.firstDepositAt * 1000 + 7 * 24 * 60 * 60 * 1000
+          ? "4x"
+          : "2X"
+      } B (C — 50) TIME`,
       id: "f50timer",
       // date: day7,
       date: day7,

@@ -17,6 +17,7 @@ import {
   TotalIncomefn,
   UserDetailsfn,
   withdrawBalancefn,
+  setReturnWithdrawBalancefn,
 } from "../Helper/Web3";
 import { IoCaretForwardOutline } from "react-icons/io5";
 import { IoCaretBackOutline } from "react-icons/io5";
@@ -79,7 +80,11 @@ export default function DepositModel(props) {
   const [viewLeftSplitWalletTable, setViewLeftSplitWalletTable] = useState("");
 
   const [leftFreeCore, setLeftFreeCore] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
 
+  const totalItems = leftFreeCoreHistory?.pageinate?.totalCount || 0;
+  const itemsPerPage = 2;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
   const handleSecurityPin = () => {
     setSecurityPin((prev) => !prev);
   };
@@ -103,11 +108,13 @@ export default function DepositModel(props) {
     }
   };
 
+  // console.log(splitWallet, "splitWallet");
+
   const handleTotalWithdraw = async () => {
     if (walletAddress) {
       const TotalClaimableIncome = await TotalClaimableIncomefn(walletAddress);
       const TotalIncome = await TotalIncomefn(walletAddress);
-      setTotalWithdrawn((TotalIncome - TotalClaimableIncome) / 1e18);
+      setTotalWithdrawn(TotalIncome / 1e18);
       // setTotalWithdrawn(TotalIncome / 1e18);
       // console.log(TotalIncome / 1e18?.toFixed(2), "TotalIncome");
     }
@@ -147,15 +154,17 @@ export default function DepositModel(props) {
     if (walletAddress) {
       const data = await getLeftSplitWalletfn(walletAddress);
       setleftSplitWalletHistory(data.data);
-      console.log(data, "Left split wallet");
+      // console.log(data, "Left split wallet");
     }
   };
 
   // left free and split
-  const inputWithdraws = () => {
-    const walletinput = (balance * 50) / 100;
-    const splitwalletinput = (balance * 25) / 100;
-    const reInvestWalletinput = (balance * 25) / 100;
+  const inputWithdraws = async () => {
+    const data = await setReturnWithdrawBalancefn(walletAddress);
+    console.log(data, "inputWithdraws");
+    const walletinput = Number(data[0]) / 1e18;
+    const splitwalletinput = Number(data[1]) / 1e18;
+    const reInvestWalletinput = Number(data[2]) / 1e18;
     setTransferToWallet(walletinput);
     setTransferToSplitWallet(splitwalletinput);
     setReinvestwallet(reInvestWalletinput);
@@ -164,7 +173,7 @@ export default function DepositModel(props) {
   const handleLeftSplitWallet = async () => {
     const data = await returnAvailableSplitWalletFundfn(walletAddress);
     setLeftSplitWallet(data / 1e18);
-    console.log(data, "Left Split Wallet :::::::::::::::::");
+    // console.log(data, "Left Split Wallet :::::::::::::::::");
   };
 
   useEffect(() => {
@@ -172,7 +181,9 @@ export default function DepositModel(props) {
       handleMyReInvestment();
       handleBalance();
       handleTotalWithdraw();
+
       handleLeftSplitWallet();
+      console.log(isFetch, "isFetch");
     }
   }, [walletAddress, isFetch]);
 
@@ -249,36 +260,6 @@ export default function DepositModel(props) {
     }
 
     setIsLoader(true);
-    // if (walletAddress) {
-    //   try {
-    //     if (!userExist) {
-    //       toast.error("Please register Your self");
-    //       return;
-    //     }
-    //     const responseDownline = await updateDownlinefn(
-    //       walletAddress,
-    //       inputAddress
-    //     );
-
-    //     console.log(responseDownline, "Downline:::");
-    //     if (responseDownline.success == true) {
-    //       await Depositfn(0, inputAmount, walletAddress);
-    //       setIsLoader(false);
-    //       setTimeout(() => {
-    //         setIsFetch(!isFetch);
-    //       }, 4000);
-    //       console.log(userExist, "isUserExist");
-    //     } else {
-    //       setIsLoader(false);
-    //       toast.error("Invalid Downline User!!");
-    //       return;
-    //     }
-    //   } catch (e) {
-    //     setIsLoader(false);
-
-    //     console.log("error", e);
-    //   }
-    // }
 
     if (walletAddress) {
       try {
@@ -295,7 +276,7 @@ export default function DepositModel(props) {
 
         console.log(responseDownline, "Downline:::");
         if (responseDownline.success === true) {
-          await Depositfn(0, inputAmount, walletAddress);
+          await Depositfn(0, inputAmount, inputAddress);
           setIsLoader(false);
 
           setTimeout(() => {
@@ -338,6 +319,22 @@ export default function DepositModel(props) {
     });
   }, [walletAddress, isDepositFunction, isFetch]);
 
+  const handlePrevious = () => {
+    if (currentPage > 1) {
+      const newPage = currentPage - 1;
+      setCurrentPage(newPage);
+      handleRankReward(newPage); // Fetch data for the previous page
+    }
+  };
+
+  const handleNext = () => {
+    if (currentPage < totalPages) {
+      const newPage = currentPage + 1;
+      setCurrentPage(newPage);
+      handleRankReward(newPage); // Fetch data for the next page
+    }
+  };
+
   const MakeDepositModalData = [
     {
       id: 0,
@@ -360,7 +357,7 @@ export default function DepositModel(props) {
     {
       id: 2,
       label1: "Left Split Wallet :",
-      value: leftSplitWallet?.toFixed(2) ?? 0,
+      value: leftSplitWallet?.toFixed(2) || 0,
       label2: "Click to View :",
       buttonText: "View History",
       image: DAOIcon,
@@ -369,7 +366,7 @@ export default function DepositModel(props) {
     {
       id: 6,
       label1: "My Investment :",
-      value: userInfo?.depositWallet - reInvest.toFixed(2) ?? 0,
+      value: userInfo?.depositWallet - reInvest.toFixed(2) || 0,
       label2: "Click to View :",
       buttonText: "View History",
       image: DAOIcon,
@@ -532,7 +529,6 @@ export default function DepositModel(props) {
                           //   userInfo.securityPin ? userInfo.securityPin : ""
                           // }
                           onChange={(e) => setInputPin(e.target.value)}
-                          // disabled={!userInfo.securityPin}
                         />
 
                         {errors.pin && <p className="error">{errors.pin}</p>}
@@ -706,17 +702,23 @@ export default function DepositModel(props) {
                                         <div className="deposit-input-container">
                                           <input
                                             type="text"
-                                            value={`Transfer to wallet (Core) : ${transferToWallet}`}
+                                            value={`Transfer to wallet (Core) : ${transferToWallet.toFixed(
+                                              2
+                                            )}`}
                                             readOnly
                                           />
                                           <input
                                             type="text"
-                                            value={`Transfer to Split Wallet(Core) : ${transferToSplitWallet}`}
+                                            value={`Transfer to Split Wallet(Core) : ${transferToSplitWallet.toFixed(
+                                              2
+                                            )}`}
                                             readOnly
                                           />
                                           <input
                                             type="text"
-                                            value={`Re-Invest(Core) : ${reinvestwallet} `}
+                                            value={`Re-Invest(Core) : ${reinvestwallet.toFixed(
+                                              2
+                                            )} `}
                                             readOnly
                                           />
                                           <div
@@ -897,14 +899,6 @@ export default function DepositModel(props) {
                                     >
                                       Description
                                     </th>
-                                    {/* <th
-                                      role="columnheader"
-                                      data-field="Name"
-                                      data-title="Name"
-                                      class="k-header"
-                                    >
-                                      Description
-                                    </th> */}
                                   </tr>
                                 </thead>
                                 {totalWithdraw?.length > 0 && (
@@ -929,30 +923,6 @@ export default function DepositModel(props) {
                                     ))}
                                   </tbody>
                                 )}
-
-                                {/* <tbody className="table-body">
-                                  <tr
-                                    className="Modalopacity"
-                                    style={{ fontWeight: "normal" }}
-                                  >
-                                    <td scope="row">1</td>
-                                    <td>500</td>
-                                    <td>14/1/25</td>
-                                    <td> withdrawal Request of</td>
-                                  </tr>
-                                  <tr className="Modalopacity">
-                                    <td scope="row">2</td>
-                                    <td>500</td>
-                                    <td>14/1/25</td>
-                                    <td> withdrawal Request of</td>
-                                  </tr>
-                                  <tr className="Modalopacity">
-                                    <td scope="row">2</td>
-                                    <td>500</td>
-                                    <td>14/1/25</td>
-                                    <td> withdrawal Request of</td>
-                                  </tr>
-                                </tbody> */}
                               </table>
 
                               {totalWithdraw?.length === 0 && (
@@ -975,8 +945,17 @@ export default function DepositModel(props) {
                                 <IoPlayBackSharp />
                               </a>
                               <a
-                                class="k-link k-pager-nav  k-state-disabled"
+                                className={`k-link k-pager-nav ${
+                                  currentPage === 1 ? "k-state-disabled" : ""
+                                }`}
                                 aria-controls="DataTables_Table_0"
+                                onClick={handlePrevious}
+                                style={{
+                                  cursor:
+                                    currentPage === 1
+                                      ? "not-allowed"
+                                      : "pointer",
+                                }}
                                 data-dt-idx="0"
                                 tabindex="0"
                                 id="DataTables_Table_0_previous"
@@ -992,18 +971,28 @@ export default function DepositModel(props) {
                                     tabindex="0"
                                     value="1"
                                   >
-                                    1
+                                    {currentPage}
                                   </a>
                                 </li>
                               </ul>
                               <a
-                                class="k-link k-pager-nav k-state-disabled"
+                                className={`k-link k-pager-nav ${
+                                  currentPage === totalPages
+                                    ? "k-state-disabled"
+                                    : ""
+                                }`}
                                 aria-controls="DataTables_Table_0"
+                                onClick={handleNext}
+                                style={{
+                                  cursor:
+                                    currentPage === totalPages
+                                      ? "not-allowed"
+                                      : "pointer",
+                                }}
                                 data-dt-idx="3"
                                 tabindex="0"
                                 id="DataTables_Table_0_next"
                               >
-                                {/* <i class="k-icon k-i-arrow-e"></i> */}
                                 <IoCaretForwardOutline />
                               </a>
                               <a
@@ -1016,9 +1005,14 @@ export default function DepositModel(props) {
                                 <IoMdFastforward />
                               </a>
 
-                              <div class="k-pager-info k-label d-block">
-                                Displaying 1 to 7 out of 7 items{" "}
-                              </div>
+                              <span className="k-pager-info k-label">
+                                {`Displaying ${
+                                  (currentPage - 1) * itemsPerPage + 1
+                                } to ${Math.min(
+                                  currentPage * itemsPerPage,
+                                  totalItems
+                                )} out of ${totalItems} items`}
+                              </span>
                             </div>
                           </div>
                         </>
@@ -1176,8 +1170,17 @@ export default function DepositModel(props) {
                                 <IoPlayBackSharp />
                               </a>
                               <a
-                                class="k-link k-pager-nav  k-state-disabled"
+                                className={`k-link k-pager-nav ${
+                                  currentPage === 1 ? "k-state-disabled" : ""
+                                }`}
                                 aria-controls="DataTables_Table_0"
+                                onClick={handlePrevious}
+                                style={{
+                                  cursor:
+                                    currentPage === 1
+                                      ? "not-allowed"
+                                      : "pointer",
+                                }}
                                 data-dt-idx="0"
                                 tabindex="0"
                                 id="DataTables_Table_0_previous"
@@ -1193,18 +1196,28 @@ export default function DepositModel(props) {
                                     tabindex="0"
                                     value="1"
                                   >
-                                    1
+                                    {currentPage}
                                   </a>
                                 </li>
                               </ul>
                               <a
-                                class="k-link k-pager-nav k-state-disabled"
+                                className={`k-link k-pager-nav ${
+                                  currentPage === totalPages
+                                    ? "k-state-disabled"
+                                    : ""
+                                }`}
                                 aria-controls="DataTables_Table_0"
+                                onClick={handleNext}
+                                style={{
+                                  cursor:
+                                    currentPage === totalPages
+                                      ? "not-allowed"
+                                      : "pointer",
+                                }}
                                 data-dt-idx="3"
                                 tabindex="0"
                                 id="DataTables_Table_0_next"
                               >
-                                {/* <i class="k-icon k-i-arrow-e"></i> */}
                                 <IoCaretForwardOutline />
                               </a>
                               <a
@@ -1217,8 +1230,13 @@ export default function DepositModel(props) {
                                 <IoMdFastforward />
                               </a>
 
-                              <span class="k-pager-info k-label">
-                                Displaying 1 to 7 out of 7 items{" "}
+                              <span className="k-pager-info k-label">
+                                {`Displaying ${
+                                  (currentPage - 1) * itemsPerPage + 1
+                                } to ${Math.min(
+                                  currentPage * itemsPerPage,
+                                  totalItems
+                                )} out of ${totalItems} items`}
                               </span>
                             </div>
                           </div>
@@ -1328,8 +1346,17 @@ export default function DepositModel(props) {
                                 <IoPlayBackSharp />
                               </a>
                               <a
-                                class="k-link k-pager-nav  k-state-disabled"
+                                className={`k-link k-pager-nav ${
+                                  currentPage === 1 ? "k-state-disabled" : ""
+                                }`}
                                 aria-controls="DataTables_Table_0"
+                                onClick={handlePrevious}
+                                style={{
+                                  cursor:
+                                    currentPage === 1
+                                      ? "not-allowed"
+                                      : "pointer",
+                                }}
                                 data-dt-idx="0"
                                 tabindex="0"
                                 id="DataTables_Table_0_previous"
@@ -1345,18 +1372,28 @@ export default function DepositModel(props) {
                                     tabindex="0"
                                     value="1"
                                   >
-                                    1
+                                    {currentPage}
                                   </a>
                                 </li>
                               </ul>
                               <a
-                                class="k-link k-pager-nav k-state-disabled"
+                                className={`k-link k-pager-nav ${
+                                  currentPage === totalPages
+                                    ? "k-state-disabled"
+                                    : ""
+                                }`}
                                 aria-controls="DataTables_Table_0"
+                                onClick={handleNext}
+                                style={{
+                                  cursor:
+                                    currentPage === totalPages
+                                      ? "not-allowed"
+                                      : "pointer",
+                                }}
                                 data-dt-idx="3"
                                 tabindex="0"
                                 id="DataTables_Table_0_next"
                               >
-                                {/* <i class="k-icon k-i-arrow-e"></i> */}
                                 <IoCaretForwardOutline />
                               </a>
                               <a
@@ -1369,8 +1406,13 @@ export default function DepositModel(props) {
                                 <IoMdFastforward />
                               </a>
 
-                              <span class="k-pager-info k-label">
-                                Displaying 1 to 7 out of 7 items{" "}
+                              <span className="k-pager-info k-label">
+                                {`Displaying ${
+                                  (currentPage - 1) * itemsPerPage + 1
+                                } to ${Math.min(
+                                  currentPage * itemsPerPage,
+                                  totalItems
+                                )} out of ${totalItems} items`}
                               </span>
                             </div>
                           </div>
@@ -1463,15 +1505,6 @@ export default function DepositModel(props) {
                                       )}
                                     </tbody>
                                   )}
-
-                                  {/* <tbody className="table-body">
-                                  <tr>
-                                    <th scope="row">1</th>
-                                    <td>Mark</td>
-                                    <td>Otto</td>
-                                    <td>mdo</td>
-                                  </tr>
-                                </tbody> */}
                                 </table>
 
                                 {leftSplitWalletHistory?.length === 0 && (
@@ -1495,8 +1528,17 @@ export default function DepositModel(props) {
                                   <IoPlayBackSharp />
                                 </a>
                                 <a
-                                  class="k-link k-pager-nav  k-state-disabled"
+                                  className={`k-link k-pager-nav ${
+                                    currentPage === 1 ? "k-state-disabled" : ""
+                                  }`}
                                   aria-controls="DataTables_Table_0"
+                                  onClick={handlePrevious}
+                                  style={{
+                                    cursor:
+                                      currentPage === 1
+                                        ? "not-allowed"
+                                        : "pointer",
+                                  }}
                                   data-dt-idx="0"
                                   tabindex="0"
                                   id="DataTables_Table_0_previous"
@@ -1512,18 +1554,28 @@ export default function DepositModel(props) {
                                       tabindex="0"
                                       value="1"
                                     >
-                                      1
+                                      {currentPage}
                                     </a>
                                   </li>
                                 </ul>
                                 <a
-                                  class="k-link k-pager-nav k-state-disabled"
+                                  className={`k-link k-pager-nav ${
+                                    currentPage === totalPages
+                                      ? "k-state-disabled"
+                                      : ""
+                                  }`}
                                   aria-controls="DataTables_Table_0"
+                                  onClick={handleNext}
+                                  style={{
+                                    cursor:
+                                      currentPage === totalPages
+                                        ? "not-allowed"
+                                        : "pointer",
+                                  }}
                                   data-dt-idx="3"
                                   tabindex="0"
                                   id="DataTables_Table_0_next"
                                 >
-                                  {/* <i class="k-icon k-i-arrow-e"></i> */}
                                   <IoCaretForwardOutline />
                                 </a>
                                 <a
@@ -1536,8 +1588,13 @@ export default function DepositModel(props) {
                                   <IoMdFastforward />
                                 </a>
 
-                                <span class="k-pager-info k-label">
-                                  Displaying 1 to 7 out of 7 items{" "}
+                                <span className="k-pager-info k-label">
+                                  {`Displaying ${
+                                    (currentPage - 1) * itemsPerPage + 1
+                                  } to ${Math.min(
+                                    currentPage * itemsPerPage,
+                                    totalItems
+                                  )} out of ${totalItems} items`}
                                 </span>
                               </div>
                             </div>
@@ -1606,7 +1663,7 @@ export default function DepositModel(props) {
                                     {myInvestment.map((user, index) => (
                                       <tr key={index}>
                                         <td>{index + 1}</td>
-                                        <td>{user?.amount}</td>
+                                        <td>{user?.amount.toFixed(2)}</td>
                                         <td>
                                           {moment(user.createdAt).format(
                                             "M/D/YYYY h:mm:ss A"
@@ -1616,15 +1673,6 @@ export default function DepositModel(props) {
                                     ))}
                                   </tbody>
                                 )}
-
-                                {/* <tbody className="table-body">
-                                  <tr>
-                                    <th scope="row">1</th>
-                                    <td>Mark</td>
-                                    <td>Otto</td>
-                                    <td>mdo</td>
-                                  </tr>
-                                </tbody> */}
                               </table>
 
                               {myInvestment.length === 0 && (
@@ -1648,8 +1696,17 @@ export default function DepositModel(props) {
                                 <IoPlayBackSharp />
                               </a>
                               <a
-                                class="k-link k-pager-nav  k-state-disabled"
+                                className={`k-link k-pager-nav ${
+                                  currentPage === 1 ? "k-state-disabled" : ""
+                                }`}
                                 aria-controls="DataTables_Table_0"
+                                onClick={handlePrevious}
+                                style={{
+                                  cursor:
+                                    currentPage === 1
+                                      ? "not-allowed"
+                                      : "pointer",
+                                }}
                                 data-dt-idx="0"
                                 tabindex="0"
                                 id="DataTables_Table_0_previous"
@@ -1665,18 +1722,28 @@ export default function DepositModel(props) {
                                     tabindex="0"
                                     value="1"
                                   >
-                                    1
+                                    {currentPage}
                                   </a>
                                 </li>
                               </ul>
                               <a
-                                class="k-link k-pager-nav k-state-disabled"
+                                className={`k-link k-pager-nav ${
+                                  currentPage === totalPages
+                                    ? "k-state-disabled"
+                                    : ""
+                                }`}
                                 aria-controls="DataTables_Table_0"
+                                onClick={handleNext}
+                                style={{
+                                  cursor:
+                                    currentPage === totalPages
+                                      ? "not-allowed"
+                                      : "pointer",
+                                }}
                                 data-dt-idx="3"
                                 tabindex="0"
                                 id="DataTables_Table_0_next"
                               >
-                                {/* <i class="k-icon k-i-arrow-e"></i> */}
                                 <IoCaretForwardOutline />
                               </a>
                               <a
@@ -1689,8 +1756,13 @@ export default function DepositModel(props) {
                                 <IoMdFastforward />
                               </a>
 
-                              <span class="k-pager-info k-label">
-                                Displaying 1 to 7 out of 7 items{" "}
+                              <span className="k-pager-info k-label">
+                                {`Displaying ${
+                                  (currentPage - 1) * itemsPerPage + 1
+                                } to ${Math.min(
+                                  currentPage * itemsPerPage,
+                                  totalItems
+                                )} out of ${totalItems} items`}
                               </span>
                             </div>
                           </div>
@@ -1768,15 +1840,6 @@ export default function DepositModel(props) {
                                     ))}
                                   </tbody>
                                 )}
-
-                                {/* <tbody className="table-body">
-                                  <tr>
-                                    <th scope="row">1</th>
-                                    <td>Mark</td>
-                                    <td>Otto</td>
-                                    <td>mdo</td>
-                                  </tr>
-                                </tbody> */}
                               </table>
 
                               {myReInvestment.length === 0 && (
@@ -1800,8 +1863,17 @@ export default function DepositModel(props) {
                                 <IoPlayBackSharp />
                               </a>
                               <a
-                                class="k-link k-pager-nav  k-state-disabled"
+                                className={`k-link k-pager-nav ${
+                                  currentPage === 1 ? "k-state-disabled" : ""
+                                }`}
                                 aria-controls="DataTables_Table_0"
+                                onClick={handlePrevious}
+                                style={{
+                                  cursor:
+                                    currentPage === 1
+                                      ? "not-allowed"
+                                      : "pointer",
+                                }}
                                 data-dt-idx="0"
                                 tabindex="0"
                                 id="DataTables_Table_0_previous"
@@ -1817,18 +1889,28 @@ export default function DepositModel(props) {
                                     tabindex="0"
                                     value="1"
                                   >
-                                    1
+                                    {currentPage}
                                   </a>
                                 </li>
                               </ul>
                               <a
-                                class="k-link k-pager-nav k-state-disabled"
+                                className={`k-link k-pager-nav ${
+                                  currentPage === totalPages
+                                    ? "k-state-disabled"
+                                    : ""
+                                }`}
                                 aria-controls="DataTables_Table_0"
+                                onClick={handleNext}
+                                style={{
+                                  cursor:
+                                    currentPage === totalPages
+                                      ? "not-allowed"
+                                      : "pointer",
+                                }}
                                 data-dt-idx="3"
                                 tabindex="0"
                                 id="DataTables_Table_0_next"
                               >
-                                {/* <i class="k-icon k-i-arrow-e"></i> */}
                                 <IoCaretForwardOutline />
                               </a>
                               <a
@@ -1841,8 +1923,13 @@ export default function DepositModel(props) {
                                 <IoMdFastforward />
                               </a>
 
-                              <span class="k-pager-info k-label">
-                                Displaying 1 to 7 out of 7 items{" "}
+                              <span className="k-pager-info k-label">
+                                {`Displaying ${
+                                  (currentPage - 1) * itemsPerPage + 1
+                                } to ${Math.min(
+                                  currentPage * itemsPerPage,
+                                  totalItems
+                                )} out of ${totalItems} items`}
                               </span>
                             </div>
                           </div>
@@ -1954,15 +2041,6 @@ export default function DepositModel(props) {
                                     ))}
                                   </tbody>
                                 )}
-
-                                {/* <tbody className="table-body">
-                                  <tr>
-                                    <th scope="row">1</th>
-                                    <td>Mark</td>
-                                    <td>Otto</td>
-                                    <td>mdo</td>
-                                  </tr>
-                                </tbody> */}
                               </table>
 
                               {totalWithdraw?.length === 0 && (
@@ -1985,8 +2063,17 @@ export default function DepositModel(props) {
                                 <IoPlayBackSharp />
                               </a>
                               <a
-                                class="k-link k-pager-nav  k-state-disabled"
+                                className={`k-link k-pager-nav ${
+                                  currentPage === 1 ? "k-state-disabled" : ""
+                                }`}
                                 aria-controls="DataTables_Table_0"
+                                onClick={handlePrevious}
+                                style={{
+                                  cursor:
+                                    currentPage === 1
+                                      ? "not-allowed"
+                                      : "pointer",
+                                }}
                                 data-dt-idx="0"
                                 tabindex="0"
                                 id="DataTables_Table_0_previous"
@@ -2002,18 +2089,28 @@ export default function DepositModel(props) {
                                     tabindex="0"
                                     value="1"
                                   >
-                                    1
+                                    {currentPage}
                                   </a>
                                 </li>
                               </ul>
                               <a
-                                class="k-link k-pager-nav k-state-disabled"
+                                className={`k-link k-pager-nav ${
+                                  currentPage === totalPages
+                                    ? "k-state-disabled"
+                                    : ""
+                                }`}
                                 aria-controls="DataTables_Table_0"
+                                onClick={handleNext}
+                                style={{
+                                  cursor:
+                                    currentPage === totalPages
+                                      ? "not-allowed"
+                                      : "pointer",
+                                }}
                                 data-dt-idx="3"
                                 tabindex="0"
                                 id="DataTables_Table_0_next"
                               >
-                                {/* <i class="k-icon k-i-arrow-e"></i> */}
                                 <IoCaretForwardOutline />
                               </a>
                               <a
@@ -2026,8 +2123,13 @@ export default function DepositModel(props) {
                                 <IoMdFastforward />
                               </a>
 
-                              <span class="k-pager-info k-label">
-                                Displaying 1 to 7 out of 7 items{" "}
+                              <span className="k-pager-info k-label">
+                                {`Displaying ${
+                                  (currentPage - 1) * itemsPerPage + 1
+                                } to ${Math.min(
+                                  currentPage * itemsPerPage,
+                                  totalItems
+                                )} out of ${totalItems} items`}
                               </span>
                             </div>
                           </div>

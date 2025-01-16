@@ -2,7 +2,7 @@ import axios from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
 export const URLApi = "https://core-exchange.com/api";
-// export const URLApi = "http://192.168.1.112:1414/api";
+// export const URLApi = "http://192.168.1.96:1414/api";
 export async function getUserInfo(address) {
   try {
     const response = await axios.get(`${URLApi}/user-info`, {
@@ -17,13 +17,13 @@ export async function getUserInfo(address) {
   }
 }
 
-export async function getDirectTeam(address) {
+export async function getDirectTeam(address, page, limit) {
   try {
     const response = await axios.get(`${URLApi}/directTeam`, {
       params: {
         user: address,
-        page: 1,
-        limit: 10,
+        page: page,
+        limit: limit,
       },
     });
 
@@ -33,13 +33,13 @@ export async function getDirectTeam(address) {
   }
 }
 
-export async function getFetchTeams(address) {
+export async function getFetchTeams(address, page, limit) {
   try {
     const response = await axios.get(`${URLApi}/fetch-teams`, {
       params: {
         user: address,
-        page: 1,
-        limit: 10,
+        page: page,
+        limit: limit,
       },
     });
 
@@ -289,13 +289,13 @@ export async function getC50FlushedHistoryfn(address) {
   }
 }
 
-export async function getMagicTeamfn(address) {
+export async function getMagicTeamfn(address, page, limit) {
   try {
     const response = await axios.get(`${URLApi}/magicTeam`, {
       params: {
         user: address,
-        page: 1,
-        limit: 10,
+        page: page,
+        limit: limit,
       },
     });
 
@@ -311,6 +311,22 @@ export async function updateDownlinefn(address, downlineUser) {
       params: {
         user: address,
         downlineUser: downlineUser,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.log("Error getWithdrawHistoryfn Admin:", error);
+  }
+}
+
+export async function getC50IncomeHistoryfn(address) {
+  try {
+    const response = await axios.get(`${URLApi}/c50IncomeHistory`, {
+      params: {
+        user: address,
+        page: 1,
+        limit: 10,
       },
     });
 

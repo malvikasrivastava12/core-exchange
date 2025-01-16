@@ -8,7 +8,6 @@ import { CONTRACT_ADDRESS_ABI, CONTRACT_ADDRESS } from "../Helper/config";
 import { config } from "../main";
 
 export async function isUserExist(address) {
-  console.log(config, "config");
   const result = await readContract(config, {
     abi: CONTRACT_ADDRESS_ABI,
     address: CONTRACT_ADDRESS,
@@ -177,6 +176,17 @@ export async function returnAvailableSplitWalletFundfn(address) {
     functionName: "returnAvailableSplitWalletFund",
     args: [address],
   });
-  console.log(result, "returnAvailableSplitWalletFund");
+
   return Number(result);
+}
+
+export async function setReturnWithdrawBalancefn(address) {
+  const result = await readContract(config, {
+    abi: CONTRACT_ADDRESS_ABI,
+    address: CONTRACT_ADDRESS,
+    functionName: "ReturnWithdrawBalance",
+    args: [address],
+  });
+
+  return result;
 }
