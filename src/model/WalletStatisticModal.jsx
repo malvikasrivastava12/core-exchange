@@ -241,7 +241,7 @@ export default function WalletStatisticModal(props) {
     handletotalEarned();
     handleTotalWithdraw();
     handleOfferHistory();
-  }, [walletAddress]);
+  }, [walletAddress, isFetch]);
 
   const handleRankReward = async () => {
     const data = await getStarIncomeHistoryfn(
@@ -277,7 +277,7 @@ export default function WalletStatisticModal(props) {
     };
 
     fetchData();
-  }, [walletAddress]);
+  }, [walletAddress, isFetch]);
 
   const handlePrevious = () => {
     if (currentPage > 1) {
@@ -302,17 +302,17 @@ export default function WalletStatisticModal(props) {
       // console.log(data, "::::::::::in getFetchTeams11");
       const users = Array.isArray(data?.data?.users) ? data?.data?.users : [];
       // console.log(users, "directTeam");
-      setLevelTeam(users);
+      // setLevelTeam(users);
 
-      const filteredUsers = users.filter((user) => user?.totalDeposit > 0);
+      const filteredUsers = users.sort((a, b) => b.level - a.level);
       // console.log(filteredTeam?.length, ":::::::12231115");
-      setFilteredTeam(filteredUsers?.length);
+      setLevelTeam(filteredUsers);
     }
   };
 
   useEffect(() => {
     handleLevelTeam();
-  }, [walletAddress]);
+  }, [walletAddress, isFetch]);
 
   useEffect(() => {
     UserDetailsfn(walletAddress).then(async (res) => {
@@ -1087,6 +1087,12 @@ export default function WalletStatisticModal(props) {
                               </thead>
                               {levelTeam?.length > 0 && (
                                 <tbody className="table-body">
+                                  <tr>
+                                    <td>0</td>
+                                    <td>{userInfo?.user}</td>
+                                    <td>0</td>
+                                    <td>{userInfo?.directCount}</td>
+                                  </tr>
                                   {levelTeam.map((user, index) => (
                                     <tr key={index}>
                                       <td>{index + 1}</td>
@@ -1527,7 +1533,7 @@ export default function WalletStatisticModal(props) {
                                   role="rowgroup"
                                 >
                                   <tr role="row">
-                                    <th
+                                    {/* <th
                                       role="columnheader"
                                       data-field="SNO"
                                       data-title="Name"
@@ -1550,15 +1556,23 @@ export default function WalletStatisticModal(props) {
                                       class="k-header"
                                     >
                                       Total organic TEAM SELL
+                                    </th> */}
+                                    <th
+                                      role="columnheader"
+                                      data-field="SNO"
+                                      data-title="Name"
+                                      class="k-header"
+                                    >
+                                      SNO
                                     </th>
-                                    {/* <th
+                                    <th
                                       role="columnheader"
                                       data-field="SNO"
                                       data-title="Name"
                                       class="k-header"
                                     >
                                       Address
-                                    </th> */}
+                                    </th>
                                     <th
                                       role="columnheader"
                                       data-field="SNO"
@@ -1581,6 +1595,7 @@ export default function WalletStatisticModal(props) {
                                   <tbody className="table-body">
                                     {rankReward.data.map((user, index) => (
                                       <tr key={index}>
+                                        <td>{index + 1}</td>
                                         <td>{user?.user}</td>
                                         <td>{user?.reward}</td>
                                         <td>{user?.starRank}</td>
@@ -1825,7 +1840,7 @@ export default function WalletStatisticModal(props) {
                                       <td>{index + 1}</td>
                                       <td>{user?.user}</td>
                                       <td>
-                                        {user?.weeklyTeamBusiness.toFixed(2)}
+                                        {user?.oraganicTeamBuisiness.toFixed(2)}
                                       </td>
                                     </tr>
                                   ))}

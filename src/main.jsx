@@ -90,7 +90,7 @@ import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 
 export const config = getDefaultConfig({
   appName: "My RainbowKit App",
-  projectId: "YOUR_PROJECT_ID",
+  projectId: "0f5eb76626c44bb9cfe4f2c7c6bb7c47",
   chains: [opBNBTestnet],
   ssr: true,
 });

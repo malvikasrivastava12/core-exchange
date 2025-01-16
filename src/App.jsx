@@ -67,6 +67,14 @@ function App() {
                 color: "#900",
               },
             },
+            loading: {
+              style: {
+                fontWeight: "bold",
+                backgroundColor: "#fffbe5",
+                color: "#555",
+                border: "1px solid #ffd700",
+              },
+            },
           }}
         />
 

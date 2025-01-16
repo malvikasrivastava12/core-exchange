@@ -83,9 +83,7 @@ export default function DepositModel(props) {
   const handleSecurityPin = () => {
     setSecurityPin((prev) => !prev);
   };
-  const handleCancelWithdraw = () => {
-    setIsWithdraw("");
-  };
+
   const handleAmountInputChange = (event) => {
     setInputAmount(event.target.value);
   };
@@ -176,7 +174,7 @@ export default function DepositModel(props) {
       handleTotalWithdraw();
       handleLeftSplitWallet();
     }
-  }, [walletAddress]);
+  }, [walletAddress, isFetch]);
 
   const handleMainandFreeCore = async (walletAddress, inputAmount, rank) => {
     const virtualToken = await getReturnVirtualTokenAmountCanBeUsed(
@@ -190,16 +188,8 @@ export default function DepositModel(props) {
     const split = Number(virtualToken[1]) / 1e18;
     setFreeWallet(freeCore.toFixed(2));
     setSplitInput(split.toFixed(2));
-    setMainInput(inputAmount - (split + freeCore).toFixed(2));
+    setMainInput((inputAmount - (split + freeCore)).toFixed(2));
     console.log(freeCore, split, mainInput, virtualToken, "virtualToken");
-
-    // const reg = Number(virtualToken[0]) / 1e18;
-    // const level = Number(virtualToken[1]) / 1e18;
-    // const split = Number(virtualToken[2]);
-    // setFreeWallet(reg + level);
-    // setSplitInput(split);
-    // setMainInput(inputAmount - (reg + level + split));
-    // console.log(reg, level, split, "virtualToken");
   };
 
   const handleIsDeposit = () => {
@@ -259,45 +249,85 @@ export default function DepositModel(props) {
     }
 
     setIsLoader(true);
+    // if (walletAddress) {
+    //   try {
+    //     if (!userExist) {
+    //       toast.error("Please register Your self");
+    //       return;
+    //     }
+    //     const responseDownline = await updateDownlinefn(
+    //       walletAddress,
+    //       inputAddress
+    //     );
+
+    //     console.log(responseDownline, "Downline:::");
+    //     if (responseDownline.success == true) {
+    //       await Depositfn(0, inputAmount, walletAddress);
+    //       setIsLoader(false);
+    //       setTimeout(() => {
+    //         setIsFetch(!isFetch);
+    //       }, 4000);
+    //       console.log(userExist, "isUserExist");
+    //     } else {
+    //       setIsLoader(false);
+    //       toast.error("Invalid Downline User!!");
+    //       return;
+    //     }
+    //   } catch (e) {
+    //     setIsLoader(false);
+
+    //     console.log("error", e);
+    //   }
+    // }
+
     if (walletAddress) {
       try {
         if (!userExist) {
-          toast.error("Please register Your self");
+          toast.error("Please register yourself");
+          setIsLoader(false); // Ensure loader is stopped
           return;
         }
+
         const responseDownline = await updateDownlinefn(
           walletAddress,
           inputAddress
         );
 
         console.log(responseDownline, "Downline:::");
-        if (responseDownline.success == true) {
+        if (responseDownline.success === true) {
           await Depositfn(0, inputAmount, walletAddress);
           setIsLoader(false);
+
           setTimeout(() => {
             setIsFetch(!isFetch);
           }, 4000);
+
           console.log(userExist, "isUserExist");
         } else {
-          return toast.error("Invalid Downline User!!");
+          toast.error("Invalid Downline User!!");
+          setIsLoader(false);
+          return;
         }
-      } catch (e) {
+      } catch (error) {
+        console.error("Error occurred:", error);
+        toast.error("An unexpected error occurred");
         setIsLoader(false);
-
-        console.log("error", e);
       }
     }
+
     setIsDepositMode(false);
     setInputAmount("");
     setInputAddress("");
   };
   const handleWithdraw = async () => {
     await withdrawBalancefn();
+    setIsWithdraw(false);
+    setIsFetch(!isFetch);
   };
-  // useEffect(() => {
-  //   console.log(userInfo?.securityPin);
-  //   setInputPin(userInfo?.securityPin);
-  // }, [userInfo?.securityPin]);
+
+  const handleCancelWithdraw = () => {
+    setIsWithdraw(false);
+  };
 
   useEffect(() => {
     UserDetailsfn(walletAddress).then((res) => {
@@ -306,7 +336,7 @@ export default function DepositModel(props) {
         setIsDepositFunction(!isDepositFunction);
       }, 4000);
     });
-  }, [walletAddress, isDepositFunction]);
+  }, [walletAddress, isDepositFunction, isFetch]);
 
   const MakeDepositModalData = [
     {
@@ -321,7 +351,7 @@ export default function DepositModel(props) {
     {
       id: 1,
       label1: "Left Free Core:",
-      value: Number(userDetails[11]) / (1e18).toFixed(2),
+      value: (Number(userDetails[11]) / 1e18).toFixed(2),
       label2: "Click to View :",
       buttonText: "View History",
       image: DAOIcon,
@@ -339,7 +369,7 @@ export default function DepositModel(props) {
     {
       id: 6,
       label1: "My Investment :",
-      value: userInfo?.depositWallet - reInvest ?? 0,
+      value: userInfo?.depositWallet - reInvest.toFixed(2) ?? 0,
       label2: "Click to View :",
       buttonText: "View History",
       image: DAOIcon,

@@ -30,11 +30,36 @@ const MainContent = () => {
   const day7 =
     userInfo?.isHave2x4X > 0
       ? "Completed"
+      : Date.now() > userInfo?.firstDepositAt * 1000 + 7 * 24 * 60 * 60 * 1000
+      ? userInfo?.firstDepositAt * 1000 + 100 * 24 * 60 * 60 * 1000
       : userInfo?.firstDepositAt * 1000 + 7 * 24 * 60 * 60 * 1000;
-  const day30 =
-    userInfo?.isMagicBooster === true
-      ? "Completed"
-      : userInfo?.firstDepositAt * 1000 + 30 * 24 * 60 * 60 * 1000;
+
+  const currentTime = Date.now();
+  const firstDepositTime = userInfo?.firstDepositAt * 1000 || 0;
+
+  let offerPercentage = "0%";
+  let day30 = "Completed";
+
+  if (userInfo?.isMagicBooster === true) {
+    offerPercentage = "Completed";
+  } else if (currentTime < firstDepositTime + 30 * 24 * 60 * 60 * 1000) {
+    offerPercentage = "100%";
+    day30 = firstDepositTime + 30 * 24 * 60 * 60 * 1000;
+  } else if (currentTime < firstDepositTime + 60 * 24 * 60 * 60 * 1000) {
+    offerPercentage = "40%";
+    day30 = firstDepositTime + 60 * 24 * 60 * 60 * 1000;
+  } else if (currentTime < firstDepositTime + 90 * 24 * 60 * 60 * 1000) {
+    offerPercentage = "30%";
+    day30 = firstDepositTime + 90 * 24 * 60 * 60 * 1000;
+  } else if (currentTime < firstDepositTime + 120 * 24 * 60 * 60 * 1000) {
+    offerPercentage = "20%";
+    day30 = firstDepositTime + 120 * 24 * 60 * 60 * 1000;
+  }
+
+  // const day30 =
+  //   userInfo?.isMagicBooster === true
+  //     ? "Completed"
+  //     : userInfo?.firstDepositAt * 1000 + 30 * 24 * 60 * 60 * 1000;
   const day10 = userInfo?.firstDepositAt * 1000 + 10 * 24 * 60 * 60 * 1000;
   const day50 =
     userInfo?.rankReward > 0
@@ -136,7 +161,7 @@ const MainContent = () => {
       date: day10,
     },
     {
-      label: "100% D B OFFER TIME",
+      label: `${offerPercentage} D B OFFER TIME`,
       id: "displaydbtimer",
       date: day30,
     },
