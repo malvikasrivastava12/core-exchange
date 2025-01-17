@@ -48,13 +48,13 @@ export async function getFetchTeams(address, page, limit) {
     console.log("Error getUserInfo Admin:", error);
   }
 }
-export async function getUserDepositList(address) {
+export async function getUserDepositList(address, page, limit) {
   try {
     const response = await axios.get(`${URLApi}/user-deposit-list`, {
       params: {
         userAddress: address,
-        page: 1,
-        limit: 10,
+        page: page,
+        limit: limit,
       },
     });
     console.log(response.data, "user-deposit-list");
@@ -99,13 +99,13 @@ export async function getMagicBoosterHistoryfn(address) {
   }
 }
 
-export async function getMagicIncomeHistoryfn(address) {
+export async function getMagicIncomeHistoryfn(address, page, limit) {
   try {
     const response = await axios.get(`${URLApi}/getMagicIncomeHistory`, {
       params: {
         user: address,
-        page: 1,
-        limit: 10,
+        page: page,
+        limit: limit,
       },
     });
 
@@ -146,13 +146,13 @@ export async function getRoiOfUserfn(address, depositLenght) {
   }
 }
 
-export async function getWithdrawHistoryfn(address) {
+export async function getWithdrawHistoryfn(address, page, limit) {
   try {
     const response = await axios.get(`${URLApi}/withdrawHistory`, {
       params: {
         user: address,
-        page: 1,
-        limit: 10,
+        page: page,
+        limit: limit,
       },
     });
 
@@ -162,13 +162,13 @@ export async function getWithdrawHistoryfn(address) {
   }
 }
 
-export async function getInvestmentHistoryfn(address) {
+export async function getInvestmentHistoryfn(address, page, limit) {
   try {
     const response = await axios.get(`${URLApi}/getInvestmentHistory`, {
       params: {
         user: address,
-        page: 1,
-        limit: 10,
+        page: page,
+        limit: limit,
       },
     });
 
@@ -178,13 +178,13 @@ export async function getInvestmentHistoryfn(address) {
   }
 }
 
-export async function gettotalEarnedHistoryfn(address) {
+export async function gettotalEarnedHistoryfn(address, page, limit) {
   try {
     const response = await axios.get(`${URLApi}/totalEarnedHistory`, {
       params: {
         user: address,
-        page: 1,
-        limit: 10,
+        page: page,
+        limit: limit,
       },
     });
 
@@ -194,13 +194,13 @@ export async function gettotalEarnedHistoryfn(address) {
   }
 }
 
-export async function getOfferIncomeHistoryfn(address) {
+export async function getOfferIncomeHistoryfn(address, page, limit) {
   try {
     const response = await axios.get(`${URLApi}/offerIncomeHistory`, {
       params: {
         user: address,
-        page: 1,
-        limit: 10,
+        page: page,
+        limit: limit,
       },
     });
 
@@ -210,13 +210,13 @@ export async function getOfferIncomeHistoryfn(address) {
   }
 }
 
-export async function getOfferHistoryfn(address) {
+export async function getOfferHistoryfn(address, page, limit) {
   try {
     const response = await axios.get(`${URLApi}/offerHistory`, {
       params: {
         user: address,
-        page: 1,
-        limit: 10,
+        page: page,
+        limit: limit,
       },
     });
 
@@ -241,13 +241,13 @@ export async function getMagicIncomeHistory(address) {
   }
 }
 
-export async function getLeftCoreWalletfn(address) {
+export async function getLeftCoreWalletfn(address, page, limit) {
   try {
     const response = await axios.get(`${URLApi}/leftCoreWallet`, {
       params: {
         user: address,
-        page: 1,
-        limit: 10,
+        page: page,
+        limit: limit,
       },
     });
 
@@ -257,13 +257,13 @@ export async function getLeftCoreWalletfn(address) {
   }
 }
 
-export async function getLeftSplitWalletfn(address) {
+export async function getLeftSplitWalletfn(address, page, limit) {
   try {
     const response = await axios.get(`${URLApi}/leftSplitWallet`, {
       params: {
         user: address,
-        page: 1,
-        limit: 10,
+        page: page,
+        limit: limit,
       },
     });
 
@@ -273,13 +273,13 @@ export async function getLeftSplitWalletfn(address) {
   }
 }
 
-export async function getC50FlushedHistoryfn(address) {
+export async function getC50FlushedHistoryfn(address, page, limit) {
   try {
     const response = await axios.get(`${URLApi}/m50FlushedHistory`, {
       params: {
         user: address,
-        page: 1,
-        limit: 10,
+        page: page,
+        limit: limit,
       },
     });
 
@@ -320,13 +320,13 @@ export async function updateDownlinefn(address, downlineUser) {
   }
 }
 
-export async function getC50IncomeHistoryfn(address) {
+export async function getC50IncomeHistoryfn(address, page, limit) {
   try {
     const response = await axios.get(`${URLApi}/c50IncomeHistory`, {
       params: {
         user: address,
-        page: 1,
-        limit: 10,
+        page: page,
+        limit: limit,
       },
     });
 

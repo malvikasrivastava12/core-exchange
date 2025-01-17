@@ -16,7 +16,7 @@ const SocialMediaLinks = () => {
         />
       </a>
       <a
-        // href="https://www.youtube.com/@matic_verious?si=UvZkIMW0MRk06VP7"
+        href="https://youtube.com/@coreexhangeofficial?si=AXhAUNu6Mcz9ctwM"
         target="_blank"
         title="Youtube"
         className="langwrapp langwrap_fa"
@@ -28,7 +28,7 @@ const SocialMediaLinks = () => {
         />
       </a>
       <a
-        // href="https://t.me/MaticVeriousOfficial"
+        href="https://t.me/coreexchangeoffcial"
         target="_blank"
         title="Telegram"
         className="langwrapp langwrap_ru"
@@ -85,7 +85,7 @@ const SocialMediaLinks = () => {
         />
       </a>
       <a
-        href="#"
+        href="https://www.instagram.com/coreexhangeofficial/?igsh=MWdqNDcwcmkzdzVrcA%3D%3D#"
         target="_blank"
         title="Instagram"
         className="langwrapp langwrap_tr"

@@ -570,7 +570,7 @@ const MainContent = () => {
                   <br />
                   <br />
                   <FaRegCheckCircle /> You will Receive again and again Earnings
-                  from the Team up to 3.33% Daily of your investment
+                  from the Team up to 4% Daily of your investment
                 </div>
               </div>
             </div>
@@ -621,7 +621,7 @@ const MainContent = () => {
                     <img src={DAOIcon} alt="" /> Pre Launching Program
                   </h4>
                   <FaRegCheckCircle /> Get 100% Direct income from your Active
-                  Direct's Upgraded Package.
+                  Direct's Only first deposit Package.
                   <br />
                   <br />
                   <FaRegCheckCircle /> Offer valid for 30 days from your TOP-UP
@@ -641,43 +641,51 @@ const MainContent = () => {
                     <img src={DAOIcon} alt="" /> Get your rank and reward
                   </h4>
                   <FaRegCheckCircle />
-                  1st Star rank requires 250 Core (Self ID), 500 Core (Direct
-                  Business), and 5,000 Core (Team Business).
+                  1st Star Requires 250 Core (Self ID), 500 Core (Direct
+                  Business), and 5,000 Core (Team Business), offering 5 Core
+                  daily for 50 days.
                   <br />
                   <br />
                   <FaRegCheckCircle />
                   2nd Star Requires 500 Core (Self ID), 1,000 Core (Direct
-                  Business), and 10,000 Core (Team Business).
+                  Business), and 10,000 Core (Team Business), offering 10 Core
+                  daily for 50 days.
                   <br />
                   <br />
                   <FaRegCheckCircle />
                   3rd Star Requires 1,000 Core (Self ID), 2,000 Core (Direct
-                  Business), and 20,000 Core (Team Business).
+                  Business), and 20,000 Core (Team Business), offering 20 Core
+                  daily for 50 days.
                   <br />
                   <br />
                   <FaRegCheckCircle />
                   4th Star Requires 2,000 Core (Self ID), 4,000 Core (Direct
-                  Business), and 40,000 Core (Team Business).
+                  Business), and 40,000 Core (Team Business), offering 40 Core
+                  daily for 50 days.
                   <br />
                   <br />
                   <FaRegCheckCircle />
                   5th Star Requires 4,000 Core (Self ID), 8,000 Core (Direct
-                  Business), and 80,000 Core (Team Business).
+                  Business), and 80,000 Core (Team Business), offering 80 Core
+                  daily for 50 days.
                   <br />
                   <br />
                   <FaRegCheckCircle />
                   6th Star Requires 8,000 Core (Self ID), 16,000 Core (Direct
-                  Business), and 1,60,000 Core (Team Business).
+                  Business), and 1,60,000 Core (Team Business), offering 160
+                  Core daily for 50 days.
                   <br />
                   <br />
                   <FaRegCheckCircle />
                   7th Star Requires 16,000 Core (Self ID), 32,000 Core (Direct
-                  Business), and 3,20,000 Core (Team Business).
+                  Business), and 3,20,000 Core (Team Business), offering 320
+                  Core daily for 50 days.
                   <br />
                   <br />
                   <FaRegCheckCircle />
                   8th Star Requires 32,000 Core (Self ID), 64,000 Core (Direct
-                  Business), and 6,40,000 Core (Team Business).
+                  Business), and 6,40,000 Core (Team Business), offering 640
+                  Core daily for 50 days.
                   <br />
                   <br />
                   <FaRegCheckCircle /> Offer valid for 50 days from your TOP-UP

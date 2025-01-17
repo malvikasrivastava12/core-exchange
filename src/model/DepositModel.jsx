@@ -81,9 +81,9 @@ export default function DepositModel(props) {
 
   const [leftFreeCore, setLeftFreeCore] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-
-  const totalItems = leftFreeCoreHistory?.pageinate?.totalCount || 0;
-  const itemsPerPage = 2;
+  const [dataTable, setDataTable] = useState({ data: [], pageinate: {} });
+  const totalItems = dataTable?.pageinate?.totalCount || 0;
+  const itemsPerPage = 15;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const handleSecurityPin = () => {
     setSecurityPin((prev) => !prev);
@@ -98,12 +98,20 @@ export default function DepositModel(props) {
     setInputPin("");
     setIsDepositMode(false);
   };
-  const handleMyReInvestment = async () => {
+  const handleMyReInvestment = async (page) => {
     if (walletAddress) {
-      const data = await getWithdrawHistoryfn(walletAddress);
+      const data = await getWithdrawHistoryfn(
+        walletAddress,
+        page,
+        itemsPerPage
+      );
       setReInvest(data.totalReinvestment);
-      setMyReInvestment(data.data);
-      setTotalWithdraw(data.data);
+      setDataTable({
+        data: Array.isArray(data?.data) ? data?.data : [],
+        pageinate: data,
+      });
+      // setMyReInvestment(data.data);
+      // setTotalWithdraw(data.data);
       setSplitWallet(data.splitWallet);
     }
   };
@@ -127,33 +135,65 @@ export default function DepositModel(props) {
     }
   };
 
-  const handleDepositHistory = async () => {
+  const handleDepositHistory = async (page) => {
     if (walletAddress) {
-      const data = await getUserDepositList(walletAddress);
+      const data = await getUserDepositList(walletAddress, page, itemsPerPage);
       // console.log(data, "::::::::::in getUserDepositList");
-      setDepositHistory(Array.isArray(data.data) ? data.data : []);
+      setDataTable({
+        data: Array.isArray(data?.data) ? data?.data : [],
+        pageinate: data,
+      });
+      // setDepositHistory(Array.isArray(data.data) ? data.data : []);
     }
   };
 
-  const handleMyInvestment = async () => {
+  const handleMyInvestment = async (page) => {
     if (walletAddress) {
-      const data = await getInvestmentHistoryfn(walletAddress);
-      setMyInvestment(data.data);
+      const data = await getInvestmentHistoryfn(
+        walletAddress,
+        page,
+        itemsPerPage
+      );
+      setDataTable({
+        data: Array.isArray(data?.data) ? data?.data : [],
+        pageinate: data,
+      });
+      // setMyInvestment(data.data);
     }
   };
 
   // left free and split
-  const handleLeftFreeCoreHistory = async () => {
+  const handleLeftFreeCoreHistory = async (page) => {
     if (walletAddress) {
-      const data = await getLeftCoreWalletfn(walletAddress);
-      setLeftFreeCoreHistory(data.data);
+      const data = await getLeftCoreWalletfn(walletAddress, page, itemsPerPage);
+      setDataTable({
+        data: Array.isArray(data?.data) ? data?.data : [],
+        pageinate: data,
+      });
+      // setLeftFreeCoreHistory(data.data);
       console.log(data, "Left Free core");
     }
   };
-  const handleSplitFreeWallet = async () => {
+  // const handleLeftFreeCoreHistory = async () => {
+  //   if (walletAddress) {
+  //     const data = await getLeftCoreWalletfn(walletAddress);
+  //     setLeftFreeCoreHistory(data.data);
+  //     console.log(data, "Left Free core");
+  //   }
+  // };
+
+  const handleSplitFreeWallet = async (page) => {
     if (walletAddress) {
-      const data = await getLeftSplitWalletfn(walletAddress);
-      setleftSplitWalletHistory(data.data);
+      const data = await getLeftSplitWalletfn(
+        walletAddress,
+        page,
+        itemsPerPage
+      );
+      setDataTable({
+        data: Array.isArray(data?.data) ? data?.data : [],
+        pageinate: data,
+      });
+      // setleftSplitWalletHistory(data.data);
       // console.log(data, "Left split wallet");
     }
   };
@@ -178,7 +218,7 @@ export default function DepositModel(props) {
 
   useEffect(() => {
     if (walletAddress) {
-      handleMyReInvestment();
+      handleMyReInvestment(currentPage);
       handleBalance();
       handleTotalWithdraw();
 
@@ -197,9 +237,9 @@ export default function DepositModel(props) {
 
     const freeCore = Number(virtualToken[0]) / 1e18;
     const split = Number(virtualToken[1]) / 1e18;
-    setFreeWallet(freeCore.toFixed(2));
-    setSplitInput(split.toFixed(2));
-    setMainInput((inputAmount - (split + freeCore)).toFixed(2));
+    setFreeWallet(freeCore?.toFixed(2));
+    setSplitInput(split?.toFixed(2));
+    setMainInput((inputAmount - (split + freeCore))?.toFixed(2));
     console.log(freeCore, split, mainInput, virtualToken, "virtualToken");
   };
 
@@ -321,21 +361,65 @@ export default function DepositModel(props) {
     });
   }, [walletAddress, isDepositFunction, isFetch]);
 
-  const handlePrevious = () => {
+  // const handlePrevious = () => {
+  //   if (currentPage > 1) {
+  //     const newPage = currentPage - 1;
+  //     setCurrentPage(newPage);
+  //     handleRankReward(newPage); // Fetch data for the previous page
+  //   }
+  // };
+
+  const handlePrevious = async (id) => {
     if (currentPage > 1) {
       const newPage = currentPage - 1;
       setCurrentPage(newPage);
-      handleRankReward(newPage); // Fetch data for the previous page
+      if (id === 0) {
+        await handleMyReInvestment(newPage);
+      } else if (id === 1) {
+        await handleLeftFreeCoreHistory(newPage);
+      } else if (id === 2) {
+        await handleSplitFreeWallet(newPage);
+      } else if (id === 3) {
+        await handleDepositHistory(newPage);
+      } else if (id === 4) {
+        await handleMyReInvestment(newPage);
+      } else if (id === 6) {
+        await handleMyInvestment(newPage);
+      } else if (id === 7) {
+        await handleMyReInvestment(newPage);
+      }
     }
   };
 
-  const handleNext = () => {
+  const handleNext = async (id) => {
     if (currentPage < totalPages) {
       const newPage = currentPage + 1;
       setCurrentPage(newPage);
-      handleRankReward(newPage); // Fetch data for the next page
+      if (id === 0) {
+        await handleMyReInvestment(newPage);
+      } else if (id === 1) {
+        await handleLeftFreeCoreHistory(newPage);
+      } else if (id === 2) {
+        await handleSplitFreeWallet(newPage);
+      } else if (id === 3) {
+        await handleDepositHistory(newPage);
+      } else if (id === 4) {
+        await handleMyReInvestment(newPage);
+      } else if (id === 6) {
+        await handleMyInvestment(newPage);
+      } else if (id === 7) {
+        await handleMyReInvestment(newPage);
+      }
     }
   };
+
+  // const handleNext = () => {
+  //   if (currentPage < totalPages) {
+  //     const newPage = currentPage + 1;
+  //     setCurrentPage(newPage);
+  //     handleRankReward(newPage); // Fetch data for the next page
+  //   }
+  // };
 
   const MakeDepositModalData = [
     {
@@ -349,8 +433,10 @@ export default function DepositModel(props) {
     },
     {
       id: 1,
-      label1: "Left Free Core:",
-      value: (Number(userDetails[11]) / 1e18).toFixed(2),
+      label1: "Left Free Core :",
+      value: userDetails?.[11]
+        ? (Number(userDetails[11]) / 1e18)?.toFixed(2)
+        : 0.0,
       label2: "Click to View :",
       buttonText: "View History",
       image: DAOIcon,
@@ -368,7 +454,10 @@ export default function DepositModel(props) {
     {
       id: 6,
       label1: "My Investment :",
-      value: userInfo?.depositWallet - reInvest.toFixed(2) || 0,
+      value:
+        (Number(userInfo?.depositWallet ?? 0) - Number(reInvest ?? 0)).toFixed(
+          2
+        ) ?? 0,
       label2: "Click to View :",
       buttonText: "View History",
       image: DAOIcon,
@@ -388,7 +477,7 @@ export default function DepositModel(props) {
       label1: "Total Investment :",
       value:
         Number(userDetails[5]) / 1e18 > 0
-          ? (Number(userDetails[5]) / 1e18).toFixed(2)
+          ? (Number(userDetails[5]) / 1e18)?.toFixed(2)
           : 0,
       label2: "",
       buttonText: "Deposit History",
@@ -407,7 +496,7 @@ export default function DepositModel(props) {
 
     {
       id: 5,
-      label1: "Balance:",
+      label1: "Balance :",
       value: balance?.toFixed(2) ?? 0,
       label2: "Request withdraw:",
       buttonText: "Withdraw ",
@@ -632,25 +721,29 @@ export default function DepositModel(props) {
                                       setInputDeposit(true);
                                     } else if (item?.id === 0) {
                                       setViewSplitwalletTable(item.id);
+                                      handleMyReInvestment(currentPage);
                                     } else if (item?.id === 1) {
                                       setViewLeftFreeCoreTable(item.id);
-                                      handleLeftFreeCoreHistory();
+                                      handleLeftFreeCoreHistory(currentPage);
                                     } else if (item?.id === 2) {
                                       setViewLeftSplitWalletTable(item.id);
-                                      handleSplitFreeWallet();
+                                      handleSplitFreeWallet(currentPage);
                                     } else if (item?.id === 3) {
-                                      await handleDepositHistory();
+                                      await handleDepositHistory(currentPage);
                                       setViewDepositHistoryTable(item.id);
                                     } else if (item?.id === 4) {
                                       setViewTotalWithdrawTable(item.id);
+                                      handleMyReInvestment(currentPage);
                                     } else if (item?.id === 6) {
                                       setViewMyInvestmentTable(item.id);
-                                      handleMyInvestment();
+                                      handleMyInvestment(currentPage);
                                     } else if (item?.id === 7) {
                                       setViewMyReInvestmentTable(item.id);
-                                    } else {
-                                      setTableview(item.id);
+                                      handleMyReInvestment(currentPage);
                                     }
+                                    // else {
+                                    //   setTableview(item.id);
+                                    // }
                                   }}
 
                                   // onClick={() => {
@@ -704,21 +797,21 @@ export default function DepositModel(props) {
                                         <div className="deposit-input-container">
                                           <input
                                             type="text"
-                                            value={`Transfer to wallet (Core) : ${transferToWallet.toFixed(
+                                            value={`Transfer to wallet (Core) : ${transferToWallet?.toFixed(
                                               2
                                             )}`}
                                             readOnly
                                           />
                                           <input
                                             type="text"
-                                            value={`Transfer to Split Wallet(Core) : ${transferToSplitWallet.toFixed(
+                                            value={`Transfer to Split Wallet(Core) : ${transferToSplitWallet?.toFixed(
                                               2
                                             )}`}
                                             readOnly
                                           />
                                           <input
                                             type="text"
-                                            value={`Re-Invest(Core) : ${reinvestwallet.toFixed(
+                                            value={`Re-Invest(Core) : ${reinvestwallet?.toFixed(
                                               2
                                             )} `}
                                             readOnly
@@ -839,7 +932,7 @@ export default function DepositModel(props) {
                           </div>
                         </>
                       )}
-                      {viewSplitwalletTable === item.id && (
+                      {viewSplitwalletTable === item.id && item.id === 0 && (
                         <>
                           <div className="table-container">
                             <div
@@ -903,12 +996,18 @@ export default function DepositModel(props) {
                                     </th>
                                   </tr>
                                 </thead>
-                                {totalWithdraw?.length > 0 && (
+                                {dataTable?.data?.length > 0 && (
                                   <tbody className="table-body">
-                                    {totalWithdraw.map((user, index) => (
+                                    {dataTable?.data?.map((user, index) => (
                                       <tr className="" key={index}>
-                                        <td>{index + 1}</td>
-                                        <td>{user?.splitBalance.toFixed(2)}</td>
+                                        <td>
+                                          {(currentPage - 1) * itemsPerPage +
+                                            index +
+                                            1}
+                                        </td>
+                                        <td>
+                                          {user?.splitBalance?.toFixed(2)}
+                                        </td>
                                         <td>
                                           {moment(user.createdAt).format(
                                             "M/D/YYYY h:mm:ss A"
@@ -927,7 +1026,7 @@ export default function DepositModel(props) {
                                 )}
                               </table>
 
-                              {totalWithdraw?.length === 0 && (
+                              {dataTable?.data?.length === 0 && (
                                 <div className="p-4 d-flex justify-content-center">
                                   <div>No Data Found!</div>
                                 </div>
@@ -951,7 +1050,7 @@ export default function DepositModel(props) {
                                   currentPage === 1 ? "k-state-disabled" : ""
                                 }`}
                                 aria-controls="DataTables_Table_0"
-                                onClick={handlePrevious}
+                                onClick={() => handlePrevious(item.id)}
                                 style={{
                                   cursor:
                                     currentPage === 1
@@ -984,7 +1083,7 @@ export default function DepositModel(props) {
                                     : ""
                                 }`}
                                 aria-controls="DataTables_Table_0"
-                                onClick={handleNext}
+                                onClick={() => handleNext(item.id)}
                                 style={{
                                   cursor:
                                     currentPage === totalPages
@@ -1019,7 +1118,7 @@ export default function DepositModel(props) {
                           </div>
                         </>
                       )}
-                      {viewDepositHistoryTable === item.id && (
+                      {viewDepositHistoryTable === item.id && item.id === 3 && (
                         <>
                           <div className="table-container">
                             <div
@@ -1116,21 +1215,25 @@ export default function DepositModel(props) {
                                     </th>
                                   </tr>
                                 </thead>
-                                {depositHistory?.length > 0 && (
+                                {dataTable?.data?.length > 0 && (
                                   <tbody className="table-body">
-                                    {depositHistory.map((user, index) => (
+                                    {dataTable?.data?.map((user, index) => (
                                       <tr key={index}>
-                                        <td>{index + 1}</td>
+                                        <td>
+                                          {(currentPage - 1) * itemsPerPage +
+                                            index +
+                                            1}
+                                        </td>
                                         <td>{user?.user}</td>
-                                        <td>{user?.amount.toFixed(2)}</td>
-                                        <td>{user?.amount.toFixed(2)}</td>
+                                        <td>{user?.amount?.toFixed(2)}</td>
+                                        <td>{user?.amount?.toFixed(2)}</td>
                                         <td>
                                           {(
                                             user?.amount - user?.offAmount
                                           ).toFixed(2)}
                                         </td>
-                                        <td>{user?.level.toFixed(2)}</td>
-                                        <td>{user?.splitWallet.toFixed(2)}</td>
+                                        <td>{user?.level?.toFixed(2)}</td>
+                                        <td>{user?.splitWallet?.toFixed(2)}</td>
                                         <td>
                                           {moment(user.createdAt).format(
                                             "M/D/YYYY h:mm:ss A"
@@ -1151,7 +1254,7 @@ export default function DepositModel(props) {
                                 </tbody> */}
                               </table>
 
-                              {depositHistory.length === 0 && (
+                              {dataTable?.data?.length === 0 && (
                                 <div className="p-4 d-flex justify-content-center">
                                   <div>No Data Found!</div>
                                 </div>
@@ -1176,7 +1279,7 @@ export default function DepositModel(props) {
                                   currentPage === 1 ? "k-state-disabled" : ""
                                 }`}
                                 aria-controls="DataTables_Table_0"
-                                onClick={handlePrevious}
+                                onClick={() => handlePrevious(item.id)}
                                 style={{
                                   cursor:
                                     currentPage === 1
@@ -1209,7 +1312,7 @@ export default function DepositModel(props) {
                                     : ""
                                 }`}
                                 aria-controls="DataTables_Table_0"
-                                onClick={handleNext}
+                                onClick={() => handleNext(item.id)}
                                 style={{
                                   cursor:
                                     currentPage === totalPages
@@ -1309,13 +1412,17 @@ export default function DepositModel(props) {
                                     </th>
                                   </tr>
                                 </thead>
-                                {leftFreeCoreHistory?.length > 0 && (
+                                {dataTable?.data?.length > 0 && (
                                   <tbody className="table-body">
-                                    {leftFreeCoreHistory.map((user, index) => (
+                                    {dataTable?.data?.map((user, index) => (
                                       <tr key={index}>
-                                        <td>{index + 1}</td>
+                                        <td>
+                                          {(currentPage - 1) * itemsPerPage +
+                                            index +
+                                            1}
+                                        </td>
                                         <td>{user?.user}</td>
-                                        <td>{user?.level.toFixed(2)}</td>
+                                        <td>{user?.level?.toFixed(2)}</td>
                                         <td>
                                           {moment(user.createdAt).format(
                                             "M/D/YYYY h:mm:ss A"
@@ -1327,7 +1434,7 @@ export default function DepositModel(props) {
                                 )}
                               </table>
 
-                              {leftFreeCoreHistory?.length === 0 && (
+                              {dataTable?.data?.length === 0 && (
                                 <div className="p-4 d-flex justify-content-center">
                                   <div>No Data Found!</div>
                                 </div>
@@ -1352,7 +1459,7 @@ export default function DepositModel(props) {
                                   currentPage === 1 ? "k-state-disabled" : ""
                                 }`}
                                 aria-controls="DataTables_Table_0"
-                                onClick={handlePrevious}
+                                onClick={() => handlePrevious(item.id)}
                                 style={{
                                   cursor:
                                     currentPage === 1
@@ -1385,7 +1492,7 @@ export default function DepositModel(props) {
                                     : ""
                                 }`}
                                 aria-controls="DataTables_Table_0"
-                                onClick={handleNext}
+                                onClick={() => handleNext(item.id)}
                                 style={{
                                   cursor:
                                     currentPage === totalPages
@@ -1487,29 +1594,31 @@ export default function DepositModel(props) {
                                       </th>
                                     </tr>
                                   </thead>
-                                  {leftSplitWalletHistory?.length > 0 && (
+                                  {dataTable?.data?.length > 0 && (
                                     <tbody className="table-body">
-                                      {leftSplitWalletHistory.map(
-                                        (user, index) => (
-                                          <tr key={index}>
-                                            <td>{index + 1}</td>
-                                            <td>{user?.user}</td>
-                                            <td>
-                                              {user?.splitWallet.toFixed(2)}
-                                            </td>
-                                            <td>
-                                              {moment(user.createdAt).format(
-                                                "M/D/YYYY h:mm:ss A"
-                                              )}
-                                            </td>
-                                          </tr>
-                                        )
-                                      )}
+                                      {dataTable?.data?.map((user, index) => (
+                                        <tr key={index}>
+                                          <td>
+                                            {(currentPage - 1) * itemsPerPage +
+                                              index +
+                                              1}
+                                          </td>
+                                          <td>{user?.user}</td>
+                                          <td>
+                                            {user?.splitWallet?.toFixed(2)}
+                                          </td>
+                                          <td>
+                                            {moment(user.createdAt).format(
+                                              "M/D/YYYY h:mm:ss A"
+                                            )}
+                                          </td>
+                                        </tr>
+                                      ))}
                                     </tbody>
                                   )}
                                 </table>
 
-                                {leftSplitWalletHistory?.length === 0 && (
+                                {dataTable?.data?.length === 0 && (
                                   <div className="p-4 d-flex justify-content-center">
                                     <div>No Data Found!</div>
                                   </div>
@@ -1534,7 +1643,7 @@ export default function DepositModel(props) {
                                     currentPage === 1 ? "k-state-disabled" : ""
                                   }`}
                                   aria-controls="DataTables_Table_0"
-                                  onClick={handlePrevious}
+                                  onClick={() => handlePrevious(item.id)}
                                   style={{
                                     cursor:
                                       currentPage === 1
@@ -1567,7 +1676,7 @@ export default function DepositModel(props) {
                                       : ""
                                   }`}
                                   aria-controls="DataTables_Table_0"
-                                  onClick={handleNext}
+                                  onClick={() => handleNext(item.id)}
                                   style={{
                                     cursor:
                                       currentPage === totalPages
@@ -1660,12 +1769,16 @@ export default function DepositModel(props) {
                                     </th>
                                   </tr>
                                 </thead>
-                                {myInvestment?.length > 0 && (
+                                {dataTable?.data?.length > 0 && (
                                   <tbody className="table-body">
-                                    {myInvestment.map((user, index) => (
+                                    {dataTable?.data?.map((user, index) => (
                                       <tr key={index}>
-                                        <td>{index + 1}</td>
-                                        <td>{user?.amount.toFixed(2)}</td>
+                                        <td>
+                                          {(currentPage - 1) * itemsPerPage +
+                                            index +
+                                            1}
+                                        </td>
+                                        <td>{user?.amount?.toFixed(2)}</td>
                                         <td>
                                           {moment(user.createdAt).format(
                                             "M/D/YYYY h:mm:ss A"
@@ -1677,7 +1790,7 @@ export default function DepositModel(props) {
                                 )}
                               </table>
 
-                              {myInvestment.length === 0 && (
+                              {dataTable?.data?.length === 0 && (
                                 <div className="p-4 d-flex justify-content-center">
                                   <div>No Data Found!</div>
                                 </div>
@@ -1702,7 +1815,7 @@ export default function DepositModel(props) {
                                   currentPage === 1 ? "k-state-disabled" : ""
                                 }`}
                                 aria-controls="DataTables_Table_0"
-                                onClick={handlePrevious}
+                                onClick={() => handlePrevious(item.id)}
                                 style={{
                                   cursor:
                                     currentPage === 1
@@ -1735,7 +1848,7 @@ export default function DepositModel(props) {
                                     : ""
                                 }`}
                                 aria-controls="DataTables_Table_0"
-                                onClick={handleNext}
+                                onClick={() => handleNext(item.id)}
                                 style={{
                                   cursor:
                                     currentPage === totalPages
@@ -1827,12 +1940,18 @@ export default function DepositModel(props) {
                                     </th>
                                   </tr>
                                 </thead>
-                                {myReInvestment?.length > 0 && (
+                                {dataTable?.data?.length > 0 && (
                                   <tbody className="table-body">
-                                    {myReInvestment.map((user, index) => (
+                                    {dataTable?.data?.map((user, index) => (
                                       <tr key={index}>
-                                        <td>{index + 1}</td>
-                                        <td>{user?.topupBalance.toFixed(2)}</td>
+                                        <td>
+                                          {(currentPage - 1) * itemsPerPage +
+                                            index +
+                                            1}
+                                        </td>
+                                        <td>
+                                          {user?.topupBalance?.toFixed(2)}
+                                        </td>
                                         <td>
                                           {moment(user.createdAt).format(
                                             "M/D/YYYY h:mm:ss A"
@@ -1844,7 +1963,7 @@ export default function DepositModel(props) {
                                 )}
                               </table>
 
-                              {myReInvestment.length === 0 && (
+                              {dataTable?.data?.length === 0 && (
                                 <div className="p-4 d-flex justify-content-center">
                                   <div>No Data Found!</div>
                                 </div>
@@ -1869,7 +1988,7 @@ export default function DepositModel(props) {
                                   currentPage === 1 ? "k-state-disabled" : ""
                                 }`}
                                 aria-controls="DataTables_Table_0"
-                                onClick={handlePrevious}
+                                onClick={() => handlePrevious(item.id)}
                                 style={{
                                   cursor:
                                     currentPage === 1
@@ -1902,7 +2021,7 @@ export default function DepositModel(props) {
                                     : ""
                                 }`}
                                 aria-controls="DataTables_Table_0"
-                                onClick={handleNext}
+                                onClick={() => handleNext(item.id)}
                                 style={{
                                   cursor:
                                     currentPage === totalPages
@@ -2019,11 +2138,15 @@ export default function DepositModel(props) {
                                     </th>
                                   </tr>
                                 </thead>
-                                {totalWithdraw?.length > 0 && (
+                                {dataTable?.data?.length > 0 && (
                                   <tbody className="table-body">
-                                    {totalWithdraw.map((user, index) => (
+                                    {dataTable?.data?.map((user, index) => (
                                       <tr key={index}>
-                                        <td>{index + 1}</td>
+                                        <td>
+                                          {(currentPage - 1) * itemsPerPage +
+                                            index +
+                                            1}
+                                        </td>
                                         <td>
                                           {(
                                             user?.topupBalance +
@@ -2031,9 +2154,13 @@ export default function DepositModel(props) {
                                             user?.splitBalance
                                           ).toFixed(2)}
                                         </td>
-                                        <td>{user?.topupBalance.toFixed(2)}</td>
-                                        <td>{user?.wallet.toFixed(2)}</td>
-                                        <td>{user?.splitBalance.toFixed(2)}</td>
+                                        <td>
+                                          {user?.topupBalance?.toFixed(2)}
+                                        </td>
+                                        <td>{user?.wallet?.toFixed(2)}</td>
+                                        <td>
+                                          {user?.splitBalance?.toFixed(2)}
+                                        </td>
                                         <td>
                                           {moment(user.createdAt).format(
                                             "M/D/YYYY h:mm:ss A"
@@ -2045,7 +2172,7 @@ export default function DepositModel(props) {
                                 )}
                               </table>
 
-                              {totalWithdraw?.length === 0 && (
+                              {dataTable?.data?.length === 0 && (
                                 <div className="p-4 d-flex justify-content-center">
                                   <div>No Data Found!</div>
                                 </div>
@@ -2069,7 +2196,7 @@ export default function DepositModel(props) {
                                   currentPage === 1 ? "k-state-disabled" : ""
                                 }`}
                                 aria-controls="DataTables_Table_0"
-                                onClick={handlePrevious}
+                                onClick={() => handlePrevious(item.id)}
                                 style={{
                                   cursor:
                                     currentPage === 1
@@ -2102,7 +2229,7 @@ export default function DepositModel(props) {
                                     : ""
                                 }`}
                                 aria-controls="DataTables_Table_0"
-                                onClick={handleNext}
+                                onClick={() => handleNext(item.id)}
                                 style={{
                                   cursor:
                                     currentPage === totalPages

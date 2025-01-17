@@ -1,4 +1,4 @@
-export const CONTRACT_ADDRESS = "0x2269BB73313bA7Ad6FB2d1efF440F48770562F3E";
+export const CONTRACT_ADDRESS = "0x68Ed8a8ad872A3b74Ee46188b2b80335AB17cF74";
 export const CONTRACT_ADDRESS_ABI = [
   {
     inputs: [
@@ -560,11 +560,11 @@ export const CONTRACT_ADDRESS_ABI = [
   },
   {
     inputs: [
-      { internalType: "address", name: "user", type: "address" },
-      { internalType: "uint256", name: "amt", type: "uint256" },
-      { internalType: "string", name: "incomeType", type: "string" },
+      { internalType: "address[]", name: "users", type: "address[]" },
+      { internalType: "uint256[]", name: "amounts", type: "uint256[]" },
+      { internalType: "string[]", name: "incomeTypes", type: "string[]" },
     ],
-    name: "updateUserIcome",
+    name: "updateUserIncome",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
