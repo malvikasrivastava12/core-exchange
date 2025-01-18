@@ -367,7 +367,7 @@ const MainContent = () => {
       <div className="content">
         <div className="mainabout" id="about">
           <div className="wrap">
-            <h2 data-aos="fade-up">
+            <h2 data-aos="fade-up" className="we-will-multipy-div">
               We will <span className="gt">multiply</span> your funds{" "}
               <span className="gt">unlimited</span>
               <small>without any risks</small>

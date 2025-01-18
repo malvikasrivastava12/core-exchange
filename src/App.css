@@ -328,7 +328,7 @@ cbp-af-header.cbp-af-header-shrink {
     margin: -20px 0 0 -544px !important;
   }
   .mainaboutitem {
-    width: 200px;
+    width: 200px !important;
     font-size: 13px !important;
     padding: 20px !important;
     vertical-align: top !important;
@@ -1726,4 +1726,19 @@ html .km-pane-wrapper .k-header {
 .k-pager-wrap {
   background-color: #1d1d1d;
   color: #fff;
+}
+
+@media screen and (max-width: 768px) and (min-width: 768px) {
+  .wrap {
+    width: 550px !important;
+  }
+  .we-will-multipy-div {
+    padding: 30px;
+  }
+}
+
+@media screen and (max-width: 375px) {
+  .we-will-multipy-div {
+    padding-top: 30px;
+  }
 }

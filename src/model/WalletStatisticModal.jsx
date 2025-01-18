@@ -69,7 +69,7 @@ export default function WalletStatisticModal(props) {
   const [C50Income, setC50Income] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const totalItems = dataTable?.pageinate?.totalCount || 0;
-  const itemsPerPage = 1; // Or you can use rankReward?.itemsPerPage if available
+  const itemsPerPage = 15; // Or you can use rankReward?.itemsPerPage if available
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const [rank, setRank] = useState("Claim Now");
   const [userDetails, setUserDetails] = useState([]);
@@ -168,14 +168,6 @@ export default function WalletStatisticModal(props) {
         pageinate: data,
       });
       // setOfferIncome(Array.isArray(data.data) ? data.data : []);
-      // setIsLoading(-1);
-    } else toast.error("Wallet is not connected!!");
-  };
-
-  const handleC50Cappinghistory = async () => {
-    if (walletAddress) {
-      const data = await user(walletAddress);
-      setC50Capping(Array.isArray(data.data) ? data.data : []);
       // setIsLoading(-1);
     } else toast.error("Wallet is not connected!!");
   };
@@ -413,17 +405,11 @@ export default function WalletStatisticModal(props) {
     }
   };
 
-  useEffect(() => {
-    fetchData(currentPage);
-    handleC50IncomeHistory(currentPage);
-    handleLevelTeam(currentPage);
-  }, [walletAddress, isFetch]);
-
   const handleLevelTeam = async (page) => {
     if (walletAddress) {
       const data = await getFetchTeams(walletAddress, page, itemsPerPage);
 
-      const users = Array.isArray(data?.data?.users) ? data?.data?.users : [];
+      const users = Array.isArray(data?.users) ? data?.users : [];
       // console.log(users, "directTeam");
       // setLevelTeam(users);
 
@@ -432,11 +418,17 @@ export default function WalletStatisticModal(props) {
       setLevelTeam(filteredUsers);
 
       setDataTable({
-        data: filteredUsers,
-        pageinate: data?.data,
+        data: users,
+        pageinate: data,
       });
     }
   };
+
+  useEffect(() => {
+    fetchData(currentPage);
+    handleC50IncomeHistory(currentPage);
+    handleLevelTeam(currentPage);
+  }, [walletAddress, isFetch]);
 
   useEffect(() => {
     UserDetailsfn(walletAddress).then(async (res) => {
@@ -605,7 +597,7 @@ export default function WalletStatisticModal(props) {
 
     {
       id: 9,
-      label: "Offer:",
+      label: "Offer :",
       value: offerAmount?.toFixed(2),
       label2: "Offer  History:",
       buttonText: "Offer  History",
@@ -614,7 +606,7 @@ export default function WalletStatisticModal(props) {
 
     {
       id: 10,
-      label: "Offer Income:",
+      label: "Offer Income :",
       value: userInfo?.magicBoosterIncome?.toFixed(2) ?? 0,
       label2: "Offer Income History:",
       buttonText: "Offer Income History",
@@ -623,7 +615,7 @@ export default function WalletStatisticModal(props) {
 
     {
       id: 11,
-      label: "Total earned:",
+      label: "Total earned :",
       value: totalEarned?.toFixed(2),
       label2: "All Earning History:",
       buttonText: "All Earning History",
@@ -639,6 +631,9 @@ export default function WalletStatisticModal(props) {
     //   image: DAOIcon,
     // },
   ];
+  function resetpage() {
+    setCurrentPage(1);
+  }
   return (
     <div
       className="modal fade show"
@@ -791,39 +786,50 @@ export default function WalletStatisticModal(props) {
                                         setIsFetch(!isFetch);
                                       }, 2000);
                                     } else if (item?.id === 1) {
-                                      await handleLevelTeam(1);
+                                      resetpage();
+                                      await handleLevelTeam(currentPage);
                                       setViewLevelTeamTable(item.id);
                                     } else if (item?.id === 2) {
+                                      resetpage();
                                       await fetchData(currentPage);
                                       setViewC50TeamTable(item.id);
                                     } else if (item?.id === 3) {
                                       setViewC50CappingTable(item.id);
                                     } else if (item?.id === 4) {
+                                      resetpage();
                                       await handleDirectTeam(currentPage);
                                       setViewDirectTeamTable(item.id);
                                     } else if (item?.id === 5) {
+                                      resetpage();
                                       setViewTotalBusinessesTable(item.id);
                                       await handleMagicTeam(currentPage);
                                     } else if (item?.id === 6) {
+                                      resetpage();
                                       await handleMagicIncome(currentPage);
                                       setViewMagicIncomeHistoryTable(item.id);
                                     } else if (item?.id === 7) {
+                                      resetpage();
                                       setIsLoading(item?.id);
                                       handleC50FlushedHistory(currentPage);
                                       setViewC50FlushedTable(item.id);
                                     } else if (item?.id === 8) {
+                                      resetpage();
                                       handleC50IncomeHistory(currentPage);
                                       setViewC50IncomeTable(item.id);
                                     } else if (item?.id === 9) {
+                                      resetpage();
                                       await handleOfferHistory(currentPage);
                                       setViewMagicBoosterTable(item.id);
                                     } else if (item?.id === 10) {
+                                      resetpage();
                                       handleOfferIncomeHistory(currentPage);
                                       setViewOfferIncomeTable(item.id);
                                     } else if (item?.id === 11) {
+                                      resetpage();
                                       setViewTotalEarnedTable(item.id);
                                       handleTotalEarned(currentPage);
                                     } else if (item?.id === 14) {
+                                      resetpage();
                                       setIsLoading(item?.id);
                                       await handleRankReward(currentPage);
                                       setViewRankRewardHistoryTable(item.id);
@@ -1228,12 +1234,14 @@ export default function WalletStatisticModal(props) {
                               </thead>
                               {dataTable?.data?.length > 0 && (
                                 <tbody className="table-body">
-                                  <tr>
-                                    <td>0</td>
-                                    <td>{userInfo?.user}</td>
-                                    <td>0</td>
-                                    <td>{userInfo?.directCount}</td>
-                                  </tr>
+                                  {/* {currentPage === 1 && (
+                                    <tr>
+                                      <td>0</td>
+                                      <td>{userInfo?.user}</td>
+                                      <td>0</td>
+                                      <td>{userInfo?.directCount}</td>
+                                    </tr>
+                                  )} */}
                                   {dataTable?.data?.map((user, index) => (
                                     <tr key={index}>
                                       <td>
@@ -2003,7 +2011,7 @@ export default function WalletStatisticModal(props) {
                                       </td>
                                       <td>{user?.user}</td>
                                       <td>
-                                        {user?.oraganicTeamBuisiness?.toFixed(
+                                        {user?.organicWeeklyTeamBusiness?.toFixed(
                                           2
                                         )}
                                       </td>

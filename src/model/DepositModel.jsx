@@ -89,6 +89,10 @@ export default function DepositModel(props) {
     setSecurityPin((prev) => !prev);
   };
 
+  function resetpage() {
+    setCurrentPage(1);
+  }
+
   const handleAmountInputChange = (event) => {
     setInputAmount(event.target.value);
   };
@@ -228,6 +232,7 @@ export default function DepositModel(props) {
   }, [walletAddress, isFetch]);
 
   const handleMainandFreeCore = async (walletAddress, inputAmount, rank) => {
+    console.log(walletAddress, inputAmount, rank, ":::::::::::1254125152");
     const virtualToken = await getReturnVirtualTokenAmountCanBeUsed(
       walletAddress,
       inputAmount,
@@ -243,37 +248,44 @@ export default function DepositModel(props) {
     console.log(freeCore, split, mainInput, virtualToken, "virtualToken");
   };
 
-  const handleIsDeposit = () => {
-    const newErrors = { amt: "", adr: "", pin: "" };
+  const handleIsDeposit = async () => {
+    try {
+      const newErrors = { amt: "", adr: "", pin: "" };
 
-    if (!inputAmount) {
-      newErrors.amt = "Transaction amount is required.";
-    }
-    console.log(inputAddress, "inputAddress");
-    if (!inputAddress) {
-      newErrors.adr = "Address is required.";
-    }
-    if (!inputPin) {
-      newErrors.pin = "Security Pin  is required.";
-    }
-    console.log(newErrors, "newErrors");
-    setErrors(newErrors);
+      if (!inputAmount) {
+        newErrors.amt = "Transaction amount is required.";
+      }
+      console.log(inputAddress, "inputAddress");
+      if (!inputAddress) {
+        newErrors.adr = "Address is required.";
+      }
+      if (!inputPin) {
+        newErrors.pin = "Security Pin  is required.";
+      }
+      console.log(newErrors, "newErrors");
+      setErrors(newErrors);
 
-    if (newErrors.amt != "" || newErrors.adr != "" || newErrors.pin != "") {
-      setTimeout(() => {
-        setErrors({ amt: "", adr: "", pin: "" });
-      }, 3000);
-      return;
-    }
+      if (newErrors.amt != "" || newErrors.adr != "" || newErrors.pin != "") {
+        setTimeout(() => {
+          setErrors({ amt: "", adr: "", pin: "" });
+        }, 3000);
+        return;
+      }
 
-    console.log(userInfo?.securityPin, "userInfo?.securityPin", inputPin);
-    if (inputPin == userInfo?.securityPin) {
-      setIsDepositMode(true);
-    } else {
-      toast.error("Security Pin is Incorrect");
+      console.log(userInfo?.securityPin, "userInfo?.securityPin", inputPin);
+      if (inputPin == userInfo?.securityPin) {
+        setIsDepositMode(true);
+      } else {
+        toast.error("Security Pin is Incorrect");
+      }
+      // setIsDepositMode(true);
+
+      const rank = await UserDetailsfn(walletAddress);
+      console.log(rank, "::::::::::215445445");
+      handleMainandFreeCore(walletAddress, inputAmount, rank[9]);
+    } catch (e) {
+      console.log(e, "error");
     }
-    // setIsDepositMode(true);
-    handleMainandFreeCore(walletAddress, inputAmount, 1);
   };
 
   const handleDeposit = async () => {
@@ -720,24 +732,31 @@ export default function DepositModel(props) {
                                     if (item.id === 5) {
                                       setInputDeposit(true);
                                     } else if (item?.id === 0) {
+                                      resetpage();
                                       setViewSplitwalletTable(item.id);
                                       handleMyReInvestment(currentPage);
                                     } else if (item?.id === 1) {
+                                      resetpage();
                                       setViewLeftFreeCoreTable(item.id);
                                       handleLeftFreeCoreHistory(currentPage);
                                     } else if (item?.id === 2) {
+                                      resetpage();
                                       setViewLeftSplitWalletTable(item.id);
                                       handleSplitFreeWallet(currentPage);
                                     } else if (item?.id === 3) {
+                                      resetpage();
                                       await handleDepositHistory(currentPage);
                                       setViewDepositHistoryTable(item.id);
                                     } else if (item?.id === 4) {
+                                      resetpage();
                                       setViewTotalWithdrawTable(item.id);
                                       handleMyReInvestment(currentPage);
                                     } else if (item?.id === 6) {
+                                      resetpage();
                                       setViewMyInvestmentTable(item.id);
                                       handleMyInvestment(currentPage);
                                     } else if (item?.id === 7) {
+                                      resetpage();
                                       setViewMyReInvestmentTable(item.id);
                                       handleMyReInvestment(currentPage);
                                     }
@@ -853,85 +872,7 @@ export default function DepositModel(props) {
                           </div>
                         </div>
                       </div>
-                      {tableview === item.name && (
-                        <>
-                          <div className="table-container">
-                            <div
-                              className="d-flex align-items-center justify-content-center"
-                              onClick={() => setTableview("")}
-                            >
-                              <div class="closee">
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                                <svg viewBox="0 0 36 36" class="circlu">
-                                  <path
-                                    stroke-dasharray="100, 100"
-                                    d="M18 2.0845
-                    a 15.9155 15.9155 0 0 1 0 31.831
-                    a 15.9155 15.9155 0 0 1 0 -31.831"
-                                  ></path>
-                                </svg>
-                              </div>
-                            </div>
 
-                            <div className="table-responsive">
-                              <table class="table table-dark">
-                                <thead
-                                  className="k-grid-header "
-                                  role="rowgroup"
-                                >
-                                  <tr role="row">
-                                    <th
-                                      role="columnheader"
-                                      data-field="SNO"
-                                      data-title="Name"
-                                      class="k-header"
-                                    >
-                                      SNO
-                                    </th>
-                                    <th
-                                      role="columnheader"
-                                      data-field="SNO"
-                                      data-title="Name"
-                                      class="k-header"
-                                    >
-                                      Credit Amount
-                                    </th>
-
-                                    <th
-                                      role="columnheader"
-                                      data-field="Name"
-                                      data-title="Name"
-                                      class="k-header"
-                                    >
-                                      Dated
-                                    </th>
-                                    <th
-                                      role="columnheader"
-                                      data-field="Name"
-                                      data-title="Name"
-                                      class="k-header"
-                                    >
-                                      Description
-                                    </th>
-                                  </tr>
-                                </thead>
-
-                                <tbody className="table-body">
-                                  <tr>
-                                    <th scope="row">1</th>
-                                    <td>Mark</td>
-                                    <td>Otto</td>
-                                    <td>mdo</td>
-                                  </tr>
-                                </tbody>
-                              </table>
-                            </div>
-                          </div>
-                        </>
-                      )}
                       {viewSplitwalletTable === item.id && item.id === 0 && (
                         <>
                           <div className="table-container">

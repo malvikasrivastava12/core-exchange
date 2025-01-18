@@ -9,11 +9,7 @@ import DollarImage from "../assets/Images/dollar.png";
 import { useAccount } from "wagmi";
 import { base_url } from "../Helper/config";
 import toast from "react-hot-toast";
-import {
-  Depositfn,
-  getReturnVirtualTokenAmountCanBeUsed,
-  UserDetailsfn,
-} from "../Helper/Web3";
+import { Depositfn, UserDetailsfn } from "../Helper/Web3";
 import { isUserExist } from "../Helper/Web3";
 import { setUserExist, setUserInfo, setWallet } from "../redux/reducer";
 import { useDispatch, useSelector } from "react-redux";
