@@ -251,6 +251,7 @@ export default function WalletStatisticModal(props) {
         pageinate: data,
       });
       // setC50FlushedHistory(data.data);
+      setC50FlushedAmount(data?.totalFlushed);
       setIsLoading(-1);
     } else toast.error("Wallet is not connected!!");
   };
@@ -297,7 +298,7 @@ export default function WalletStatisticModal(props) {
       });
       // setC50IncomHistory(data?.data);
       setC50IncomeData(data?.totalRoi);
-      setC50FlushedAmount(data?.totalFlushed);
+      // setC50FlushedAmount(data?.totalFlushed);
       console.log(data, "C50 Income History");
     }
   };
@@ -429,6 +430,8 @@ export default function WalletStatisticModal(props) {
     handleC50IncomeHistory(currentPage);
     handleLevelTeam(currentPage);
   }, [walletAddress, isFetch]);
+
+  useEffect(() => {}, []);
 
   useEffect(() => {
     UserDetailsfn(walletAddress).then(async (res) => {
@@ -631,8 +634,41 @@ export default function WalletStatisticModal(props) {
     //   image: DAOIcon,
     // },
   ];
-  function resetpage() {
+
+  const [previousTable, setPreviousTable] = useState(-1);
+  function resetpage(id) {
     setCurrentPage(1);
+    console.log(previousTable, "previosuTable:::::::::::");
+    setPreviousTable(id);
+    if (previousTable != -1 && previousTable == 1) {
+      setViewLevelTeamTable("");
+      console.log(id, "::::::::::::::");
+    } else if (previousTable != -1 && previousTable == 2) {
+      setViewC50TeamTable("");
+    } else if (previousTable != -1 && previousTable == 3) {
+      setViewC50CappingTable("");
+    } else if (previousTable != -1 && previousTable == 4) {
+      setViewDirectTeamTable("");
+    } else if (previousTable != -1 && previousTable == 5) {
+      setViewTotalBusinessesTable("");
+    } else if (previousTable != -1 && previousTable == 6) {
+      setViewMagicIncomeHistoryTable("");
+    } else if (previousTable != -1 && previousTable == 7) {
+      setViewC50FlushedTable("");
+    } else if (previousTable != -1 && previousTable == 8) {
+      setViewC50IncomeTable("");
+    } else if (previousTable != -1 && previousTable == 9) {
+      setViewMagicBoosterTable("");
+    } else if (previousTable != -1 && previousTable == 10) {
+      setViewOfferIncomeTable("");
+    } else if (previousTable != -1 && previousTable == 11) {
+      setViewTotalEarnedTable("");
+    } else if (previousTable != -1 && previousTable == 14) {
+      setViewRankRewardHistoryTable("");
+    }
+    console.log(id, ":::::::shfsdjjsasdgk");
+    if (previousTable == 1) {
+    }
   }
   return (
     <div
@@ -786,50 +822,50 @@ export default function WalletStatisticModal(props) {
                                         setIsFetch(!isFetch);
                                       }, 2000);
                                     } else if (item?.id === 1) {
-                                      resetpage();
+                                      resetpage(1);
                                       await handleLevelTeam(currentPage);
                                       setViewLevelTeamTable(item.id);
                                     } else if (item?.id === 2) {
-                                      resetpage();
+                                      resetpage(2);
                                       await fetchData(currentPage);
                                       setViewC50TeamTable(item.id);
                                     } else if (item?.id === 3) {
                                       setViewC50CappingTable(item.id);
                                     } else if (item?.id === 4) {
-                                      resetpage();
+                                      resetpage(4);
                                       await handleDirectTeam(currentPage);
                                       setViewDirectTeamTable(item.id);
                                     } else if (item?.id === 5) {
-                                      resetpage();
+                                      resetpage(5);
                                       setViewTotalBusinessesTable(item.id);
                                       await handleMagicTeam(currentPage);
                                     } else if (item?.id === 6) {
-                                      resetpage();
+                                      resetpage(6);
                                       await handleMagicIncome(currentPage);
                                       setViewMagicIncomeHistoryTable(item.id);
                                     } else if (item?.id === 7) {
-                                      resetpage();
+                                      resetpage(7);
                                       setIsLoading(item?.id);
                                       handleC50FlushedHistory(currentPage);
                                       setViewC50FlushedTable(item.id);
                                     } else if (item?.id === 8) {
-                                      resetpage();
+                                      resetpage(8);
                                       handleC50IncomeHistory(currentPage);
                                       setViewC50IncomeTable(item.id);
                                     } else if (item?.id === 9) {
-                                      resetpage();
+                                      resetpage(9);
                                       await handleOfferHistory(currentPage);
                                       setViewMagicBoosterTable(item.id);
                                     } else if (item?.id === 10) {
-                                      resetpage();
+                                      resetpage(10);
                                       handleOfferIncomeHistory(currentPage);
                                       setViewOfferIncomeTable(item.id);
                                     } else if (item?.id === 11) {
-                                      resetpage();
+                                      resetpage(11);
                                       setViewTotalEarnedTable(item.id);
                                       handleTotalEarned(currentPage);
                                     } else if (item?.id === 14) {
-                                      resetpage();
+                                      resetpage(14);
                                       setIsLoading(item?.id);
                                       await handleRankReward(currentPage);
                                       setViewRankRewardHistoryTable(item.id);
@@ -2358,7 +2394,7 @@ export default function WalletStatisticModal(props) {
                                           index +
                                           1}
                                       </td>
-                                      <td>{(user?.amount * 20)?.toFixed(2)}</td>
+                                      <td>{user?.amount?.toFixed(2)}</td>
                                       <td>
                                         {user?.timestamp
                                           ? new Date(

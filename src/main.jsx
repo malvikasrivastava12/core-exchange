@@ -85,13 +85,13 @@ import React from "react";
 import "@rainbow-me/rainbowkit/styles.css";
 import { getDefaultConfig, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { WagmiProvider } from "wagmi";
-import { opBNBTestnet } from "wagmi/chains";
+import { coreDao, opBNBTestnet } from "wagmi/chains";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 
 export const config = getDefaultConfig({
   appName: "My RainbowKit App",
   projectId: "0f5eb76626c44bb9cfe4f2c7c6bb7c47",
-  chains: [opBNBTestnet],
+  chains: [coreDao],
   ssr: true,
 });
 

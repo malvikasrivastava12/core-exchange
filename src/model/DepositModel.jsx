@@ -89,8 +89,35 @@ export default function DepositModel(props) {
     setSecurityPin((prev) => !prev);
   };
 
-  function resetpage() {
+  // function resetpage() {
+  //   setCurrentPage(1);
+  // }
+
+  const [previousTable, setPreviousTable] = useState(-1);
+  function resetpage(id) {
     setCurrentPage(1);
+    console.log(previousTable, "previosuTable:::::::::::");
+    setPreviousTable(id);
+    if (previousTable != -1 && previousTable == 0) {
+      setViewSplitwalletTable("");
+      console.log(id, "::::::::::::::");
+    } else if (previousTable != -1 && previousTable == 1) {
+      setViewLeftFreeCoreTable("");
+    } else if (previousTable != -1 && previousTable == 2) {
+      setViewLeftSplitWalletTable("");
+    } else if (previousTable != -1 && previousTable == 3) {
+      setViewDepositHistoryTable("");
+    } else if (previousTable != -1 && previousTable == 4) {
+      setViewTotalWithdrawTable("");
+    } else if (previousTable != -1 && previousTable == 6) {
+      setViewMyInvestmentTable("");
+    } else if (previousTable != -1 && previousTable == 7) {
+      setViewMyReInvestmentTable("");
+    }
+
+    console.log(id, ":::::::shfsdjjsasdgk");
+    if (previousTable == 1) {
+    }
   }
 
   const handleAmountInputChange = (event) => {
@@ -732,31 +759,31 @@ export default function DepositModel(props) {
                                     if (item.id === 5) {
                                       setInputDeposit(true);
                                     } else if (item?.id === 0) {
-                                      resetpage();
+                                      resetpage(0);
                                       setViewSplitwalletTable(item.id);
                                       handleMyReInvestment(currentPage);
                                     } else if (item?.id === 1) {
-                                      resetpage();
+                                      resetpage(1);
                                       setViewLeftFreeCoreTable(item.id);
                                       handleLeftFreeCoreHistory(currentPage);
                                     } else if (item?.id === 2) {
-                                      resetpage();
+                                      resetpage(2);
                                       setViewLeftSplitWalletTable(item.id);
                                       handleSplitFreeWallet(currentPage);
                                     } else if (item?.id === 3) {
-                                      resetpage();
+                                      resetpage(3);
                                       await handleDepositHistory(currentPage);
                                       setViewDepositHistoryTable(item.id);
                                     } else if (item?.id === 4) {
-                                      resetpage();
+                                      resetpage(4);
                                       setViewTotalWithdrawTable(item.id);
                                       handleMyReInvestment(currentPage);
                                     } else if (item?.id === 6) {
-                                      resetpage();
+                                      resetpage(6);
                                       setViewMyInvestmentTable(item.id);
                                       handleMyInvestment(currentPage);
                                     } else if (item?.id === 7) {
-                                      resetpage();
+                                      resetpage(7);
                                       setViewMyReInvestmentTable(item.id);
                                       handleMyReInvestment(currentPage);
                                     }
