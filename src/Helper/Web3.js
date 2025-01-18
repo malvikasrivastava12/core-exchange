@@ -24,6 +24,7 @@ export async function registerfn(refAddress) {
     address: CONTRACT_ADDRESS,
     functionName: "register",
     args: [refAddress],
+    value: [(0.1 * 1e18).toLocaleString("fullwide", { useGrouping: false })],
   });
   const res = waitForTransactionReceipt(config, { hash: result });
   const data = await toast.promise(res, {
@@ -45,7 +46,11 @@ export async function Depositfn(payAmount, amount, address) {
       }),
       address,
     ],
-    value: payAmount,
+    value: [
+      (payAmount * 1e18).toLocaleString("fullwide", {
+        useGrouping: false,
+      }),
+    ],
   });
 
   const res = waitForTransactionReceipt(config, { hash: result });

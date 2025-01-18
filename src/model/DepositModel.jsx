@@ -355,7 +355,7 @@ export default function DepositModel(props) {
 
         console.log(responseDownline, "Downline:::");
         if (responseDownline.success === true) {
-          await Depositfn(0, inputAmount, inputAddress);
+          await Depositfn(mainInput, inputAmount, inputAddress);
           setIsLoader(false);
 
           setTimeout(() => {
