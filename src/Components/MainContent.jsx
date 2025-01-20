@@ -329,7 +329,7 @@ const MainContent = () => {
                       </p> */}
                       <div className="maindesclink">
                         <a
-                          // href="https://polygonscan.com/address/0x24b3f63b74a633c4d972e5b0ce1418e3ccc3f87a"
+                          href="https://scan.coredao.org/address/0x7a51DAF63E620DC00be296A2c237aE47Dd3B31A6"
                           className="maindesclink"
                           target="_blank"
                           rel="noopener noreferrer"
@@ -338,24 +338,6 @@ const MainContent = () => {
                           Check Current State CoreExchange smart-contract
                         </a>
                       </div>
-
-                      <div id="rescanDiv" style={{ display: "none" }}>
-                        <a
-                          href="#"
-                          data-remodal-target="rescanbox"
-                          id="rescanbox"
-                          className="maindescbut"
-                        >
-                          Rescan
-                        </a>
-                        <p style={{ color: "white" }}>
-                          If MATIC is deducted and ID not registered, PLEASE
-                          DON'T MAKE THE PAYMENT AGAIN and rescan your
-                          transaction here.
-                        </p>
-                      </div>
-
-                      <div className="maindesclink"></div>
                     </div>
                   </div>
                 </div>
@@ -364,14 +346,16 @@ const MainContent = () => {
           </div>
         </div>
       </div>
-      <div className="content">
+      <div className="content clearfix">
         <div className="mainabout" id="about">
-          <div className="wrap">
-            <h2 data-aos="fade-up" className="we-will-multipy-div">
+          <div data-aos="fade-up">
+            <h2 className="we-will-multipy-div">
               We will <span className="gt">multiply</span> your funds{" "}
               <span className="gt">unlimited</span>
               <small>without any risks</small>
             </h2>
+          </div>
+          <div className="wrap clearfix">
             <div className="mainaboutitemsblock">
               <div className="aboutdashtop"></div>
               <div className="aboutdashbottom"></div>

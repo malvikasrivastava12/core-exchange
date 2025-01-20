@@ -378,6 +378,7 @@ export default function DepositModel(props) {
     setIsDepositMode(false);
     setInputAmount("");
     setInputAddress("");
+    setInputPin("");
   };
   const handleWithdraw = async () => {
     await withdrawBalancefn();

@@ -54,11 +54,13 @@ const Footer = () => {
             <p>
               Smart-contract address:
               <a
-                href="#"
+                href="https://scan.coredao.org/address/0x7a51DAF63E620DC00be296A2c237aE47Dd3B31A6"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ color: "#fd9500", wordWrap: "break-word" }}
-              ></a>
+              >
+                0x7a51DAF63E620DC00be296A2c237aE47Dd3B31A6
+              </a>
             </p>
             <p>
               Powered by

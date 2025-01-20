@@ -32820,16 +32820,20 @@ color:#fd9500
   color: #007bff; */
 }
 
+
 .maindesclink {
   text-align: center;
   font-weight: 500;
   margin-top: 20px;
+  /* overflow: hidden;
+  clear: both; */
 }
 
 .maindesclink a {
   border-bottom: 1px dashed #fff;
   color: #dbdbdb;
   text-decoration: none;
+  /* display: block; */
 }
 
 .maindesclink a:hover {
@@ -35588,6 +35592,7 @@ body {
     margin-top: 4px !important;
   }
 }
+
 
 
 

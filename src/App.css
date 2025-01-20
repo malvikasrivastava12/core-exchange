@@ -1742,3 +1742,30 @@ html .km-pane-wrapper .k-header {
     padding-top: 30px;
   }
 }
+
+@media screen and (max-width: 768px) {
+  .maindesclink {
+    text-align: center;
+    font-weight: 500;
+    margin-top: 20px;
+    overflow: hidden !important;
+    clear: both !important;
+  }
+
+  .maindesclink a {
+    border-bottom: 1px dashed #fff;
+    color: #dbdbdb;
+    text-decoration: none;
+    display: block !important;
+  }
+
+  .mainabout h2 {
+    margin: 64px 11px !important;
+  }
+}
+
+@media screen and (max-width: 360px) {
+  .cbp-af-header nav a:nth-child(n + 5) {
+    width: 45% !important;
+  }
+}

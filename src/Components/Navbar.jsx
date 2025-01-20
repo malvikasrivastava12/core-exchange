@@ -96,7 +96,7 @@ const Navbar = () => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
 
-      if (currentScrollY > lastScrollY && window.innerWidth <= 420) {
+      if (currentScrollY > lastScrollY && window.innerWidth <= 410) {
         setShowElement(false);
       } else {
         setShowElement(true);
