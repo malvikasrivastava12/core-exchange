@@ -32843,7 +32843,7 @@ color:#fd9500
 
 .mainabout {
   padding: 60px 0 20px;
-  position: relative;
+  /* position: relative; */
 }
 
 .mainabout h2 {
@@ -35590,6 +35590,15 @@ body {
 @media (max-width: 500px) {
   .cbp-af-header .mainlogo {
     margin-top: 4px !important;
+  }
+}
+
+
+@media (max-width: 768px) {
+  .footblock {
+    width: 50% !important;
+    line-height: 1.4 !important;
+    font-size: 13px !important;
   }
 }
 

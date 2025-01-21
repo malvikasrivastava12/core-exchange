@@ -152,7 +152,7 @@ export default function WalletStatisticModal(props) {
         data: Array.isArray(data.data) ? data.data : [],
         pageinate: data,
       });
-      // setIsLoading(-1);
+      setIsLoading(-1);
     } else toast.error("Wallet is not connected!!");
   };
 
@@ -168,7 +168,7 @@ export default function WalletStatisticModal(props) {
         pageinate: data,
       });
       // setOfferIncome(Array.isArray(data.data) ? data.data : []);
-      // setIsLoading(-1);
+      setIsLoading(-1);
     } else toast.error("Wallet is not connected!!");
   };
 
@@ -208,7 +208,7 @@ export default function WalletStatisticModal(props) {
   const handleTotalWithdraw = async () => {
     const TotalIncome = await TotalIncomefn(walletAddress);
     setTotalWithdraw(TotalIncome / 1e18);
-    // console.log(TotalIncome / 1e18?.toFixed(2), "TotalIncome");
+    // console.log(TotalIncome / 1e18?.toFixed(4), "TotalIncome");
   };
 
   const handleMagicTeam = async (page) => {
@@ -298,6 +298,7 @@ export default function WalletStatisticModal(props) {
       });
       // setC50IncomHistory(data?.data);
       setC50IncomeData(data?.totalRoi);
+      setIsLoading(-1);
       // setC50FlushedAmount(data?.totalFlushed);
       console.log(data, "C50 Income History");
     }
@@ -429,6 +430,7 @@ export default function WalletStatisticModal(props) {
     fetchData(currentPage);
     handleC50IncomeHistory(currentPage);
     handleLevelTeam(currentPage);
+    handleC50FlushedHistory(currentPage);
   }, [walletAddress, isFetch]);
 
   useEffect(() => {}, []);
@@ -463,7 +465,7 @@ export default function WalletStatisticModal(props) {
       label: "Total Free Core :",
       value:
         Number(userDetails[10]) / 1e18 > 0
-          ? (Number(userDetails[10]) / 1e18)?.toFixed(2)
+          ? (Number(userDetails[10]) / 1e18)?.toFixed(4)
           : 0,
       label2: "Request to get :",
       buttonText: rank,
@@ -475,7 +477,7 @@ export default function WalletStatisticModal(props) {
       label: "Total Core Remaining Amount:",
       value:
         Number(userDetails[6]) / 1e18 > 0
-          ? (Number(userDetails[6]) / 1e18 - totalWithdraw)?.toFixed(2)
+          ? (Number(userDetails[6]) / 1e18 - totalWithdraw)?.toFixed(4)
           : 0,
       label2: "Request withdraw:",
       buttonText: "DAO User",
@@ -507,7 +509,7 @@ export default function WalletStatisticModal(props) {
       label: "C50 Capping :",
       value:
         C50Income && C50Income?.totalAmount
-          ? ((Number(C50Income?.totalAmount || 0) * 4) / 100).toFixed(2)
+          ? ((Number(C50Income?.totalAmount || 0) * 4) / 100).toFixed(4)
           : 0.0,
       label2: "Click to View:",
       buttonText: "View Team",
@@ -515,7 +517,7 @@ export default function WalletStatisticModal(props) {
     {
       id: 4,
       label: "Direct Businesses :",
-      value: userInfo?.directBonus?.toFixed(2) ?? 0.0,
+      value: userInfo?.directBonus?.toFixed(4) ?? 0.0,
       label2: "Click to View:",
       buttonText: "View Direct Team",
       image: DAOIcon,
@@ -523,7 +525,7 @@ export default function WalletStatisticModal(props) {
     {
       id: 5,
       label: "Total Businesses :",
-      value: userInfo?.teamBusiness?.toFixed(2) ?? 0,
+      value: userInfo?.teamBusiness?.toFixed(4) ?? 0,
       label2: "Click to View:",
       buttonText: "Magic Team",
       image: DAOIcon,
@@ -539,7 +541,7 @@ export default function WalletStatisticModal(props) {
     {
       id: 14,
       label: "Rank and Reward Income :",
-      value: userInfo?.starRankIncome?.toFixed(2) ?? 0,
+      value: userInfo?.starRankIncome?.toFixed(4) ?? 0,
       label2: "Request withdraw:",
       buttonText: "RANK AND REWARD HISTORY",
       image: DAOIcon,
@@ -548,7 +550,7 @@ export default function WalletStatisticModal(props) {
     {
       id: 15,
       label: "Organic Deposit :",
-      value: userInfo?.organicAmount?.toFixed(2) ?? 0,
+      value: userInfo?.organicAmount?.toFixed(4) ?? 0,
 
       image: DAOIcon,
       name: "B",
@@ -556,7 +558,7 @@ export default function WalletStatisticModal(props) {
     {
       id: 16,
       label: "Organic Direct Business :",
-      value: userInfo?.organicDirectBusiness?.toFixed(2) ?? 0,
+      value: userInfo?.organicDirectBusiness?.toFixed(4) ?? 0,
       label2: "",
       buttonText: "",
       image: DAOIcon,
@@ -565,7 +567,7 @@ export default function WalletStatisticModal(props) {
     {
       id: 17,
       label: "Organic Team Business :",
-      value: userInfo?.oraganicTeamBuisiness?.toFixed(2) ?? 0,
+      value: userInfo?.oraganicTeamBuisiness?.toFixed(4) ?? 0,
       label2: "",
       buttonText: "",
       image: DAOIcon,
@@ -574,7 +576,7 @@ export default function WalletStatisticModal(props) {
     {
       id: 6,
       label: "Magic Income :",
-      value: userInfo?.magicIncome?.toFixed(2) ?? 0,
+      value: userInfo?.magicIncome?.toFixed(4) ?? 0,
       label2: "Magic Income History:",
       buttonText: "Magic Income History",
       image: DAOIcon,
@@ -583,7 +585,7 @@ export default function WalletStatisticModal(props) {
     {
       id: 7,
       label: "C50 Flushed :",
-      value: C50FlushedAmount && C50FlushedAmount?.toFixed(2),
+      value: C50FlushedAmount && C50FlushedAmount?.toFixed(4),
       label2: "C50 Flushed History:",
       buttonText: "C50 Flushed History",
       image: DAOIcon,
@@ -592,7 +594,7 @@ export default function WalletStatisticModal(props) {
     {
       id: 8,
       label: "C50 Income :",
-      value: C50IncomeData?.toFixed(2),
+      value: C50IncomeData?.toFixed(4),
       label2: "Recent Days Income Total:",
       buttonText: "C50 Income History",
       image: DAOIcon,
@@ -601,7 +603,7 @@ export default function WalletStatisticModal(props) {
     {
       id: 9,
       label: "Offer :",
-      value: offerAmount?.toFixed(2),
+      value: offerAmount?.toFixed(4),
       label2: "Offer  History:",
       buttonText: "Offer  History",
       image: DAOIcon,
@@ -610,7 +612,7 @@ export default function WalletStatisticModal(props) {
     {
       id: 10,
       label: "Offer Income :",
-      value: userInfo?.magicBoosterIncome?.toFixed(2) ?? 0,
+      value: userInfo?.magicBoosterIncome?.toFixed(4) ?? 0,
       label2: "Offer Income History:",
       buttonText: "Offer Income History",
       image: DAOIcon,
@@ -619,7 +621,7 @@ export default function WalletStatisticModal(props) {
     {
       id: 11,
       label: "Total earned :",
-      value: totalEarned?.toFixed(2),
+      value: totalEarned?.toFixed(4),
       label2: "All Earning History:",
       buttonText: "All Earning History",
       image: DAOIcon,
@@ -823,24 +825,29 @@ export default function WalletStatisticModal(props) {
                                       }, 2000);
                                     } else if (item?.id === 1) {
                                       resetpage(1);
+
                                       await handleLevelTeam(currentPage);
                                       setViewLevelTeamTable(item.id);
                                     } else if (item?.id === 2) {
                                       resetpage(2);
+
                                       await fetchData(currentPage);
                                       setViewC50TeamTable(item.id);
                                     } else if (item?.id === 3) {
                                       setViewC50CappingTable(item.id);
                                     } else if (item?.id === 4) {
                                       resetpage(4);
+                                      setIsLoading(item?.id);
                                       await handleDirectTeam(currentPage);
                                       setViewDirectTeamTable(item.id);
                                     } else if (item?.id === 5) {
                                       resetpage(5);
+                                      setIsLoading(item?.id);
                                       setViewTotalBusinessesTable(item.id);
                                       await handleMagicTeam(currentPage);
                                     } else if (item?.id === 6) {
                                       resetpage(6);
+                                      setIsLoading(item?.id);
                                       await handleMagicIncome(currentPage);
                                       setViewMagicIncomeHistoryTable(item.id);
                                     } else if (item?.id === 7) {
@@ -850,18 +857,22 @@ export default function WalletStatisticModal(props) {
                                       setViewC50FlushedTable(item.id);
                                     } else if (item?.id === 8) {
                                       resetpage(8);
+                                      setIsLoading(item?.id);
                                       handleC50IncomeHistory(currentPage);
                                       setViewC50IncomeTable(item.id);
                                     } else if (item?.id === 9) {
                                       resetpage(9);
+                                      setIsLoading(item?.id);
                                       await handleOfferHistory(currentPage);
                                       setViewMagicBoosterTable(item.id);
                                     } else if (item?.id === 10) {
                                       resetpage(10);
+                                      setIsLoading(item?.id);
                                       handleOfferIncomeHistory(currentPage);
                                       setViewOfferIncomeTable(item.id);
                                     } else if (item?.id === 11) {
                                       resetpage(11);
+                                      setIsLoading(item?.id);
                                       setViewTotalEarnedTable(item.id);
                                       handleTotalEarned(currentPage);
                                     } else if (item?.id === 14) {
@@ -1108,8 +1119,8 @@ export default function WalletStatisticModal(props) {
                                           1}
                                       </td>
                                       <td>{user?.user}</td>
-                                      <td>{user?.depositWallet?.toFixed(2)}</td>
-                                      <td>{user?.reInvestment?.toFixed(2)}</td>
+                                      <td>{user?.depositWallet?.toFixed(4)}</td>
+                                      <td>{user?.reInvestment?.toFixed(4)}</td>
                                     </tr>
                                   ))}
                                 </tbody>
@@ -1270,14 +1281,13 @@ export default function WalletStatisticModal(props) {
                               </thead>
                               {dataTable?.data?.length > 0 && (
                                 <tbody className="table-body">
-                                  {/* {currentPage === 1 && (
-                                    <tr>
-                                      <td>0</td>
-                                      <td>{userInfo?.user}</td>
-                                      <td>0</td>
-                                      <td>{userInfo?.directCount}</td>
-                                    </tr>
-                                  )} */}
+                                  <tr>
+                                    <td>0</td>
+                                    <td>{userInfo?.user}</td>
+                                    <td>0</td>
+                                    <td>{userInfo?.directCount}</td>
+                                  </tr>
+
                                   {dataTable?.data?.map((user, index) => (
                                     <tr key={index}>
                                       <td>
@@ -1458,7 +1468,7 @@ export default function WalletStatisticModal(props) {
                                       </td>
                                       <td>{user?.rewardFrom}</td>
                                       <td>
-                                        {user?.distributionAmount?.toFixed(2)}
+                                        {user?.distributionAmount?.toFixed(4)}
                                       </td>
                                       <td>
                                         {user?.magicBoosterTime
@@ -1643,7 +1653,7 @@ export default function WalletStatisticModal(props) {
                                             1}
                                         </td>
 
-                                        <td>{user?.amount?.toFixed(2)}</td>
+                                        <td>{user?.amount?.toFixed(4)}</td>
                                         <td>
                                           {moment(user?.createdAt).format(
                                             "M/D/YYYY h:mm:ss A"
@@ -1973,8 +1983,8 @@ export default function WalletStatisticModal(props) {
 
                               <tbody className="table-body">
                                 <tr>
-                                  <td>{userInfo?.depositWallet?.toFixed(2)}</td>
-                                  <td>{userInfo?.directBonus?.toFixed(2)}</td>
+                                  <td>{userInfo?.depositWallet?.toFixed(4)}</td>
+                                  <td>{userInfo?.directBonus?.toFixed(4)}</td>
                                 </tr>
                               </tbody>
                             </table>
@@ -2218,7 +2228,7 @@ export default function WalletStatisticModal(props) {
                                           index +
                                           1}
                                       </td>
-                                      <td>{user?.amount?.toFixed(2)}</td>
+                                      <td>{user?.amount?.toFixed(4)}</td>
                                       <td>
                                         {" "}
                                         {moment(user.createdAt).format(
@@ -2394,13 +2404,11 @@ export default function WalletStatisticModal(props) {
                                           index +
                                           1}
                                       </td>
-                                      <td>{user?.amount?.toFixed(2)}</td>
+                                      <td>{user?.amount?.toFixed(4)}</td>
                                       <td>
-                                        {user?.timestamp
-                                          ? new Date(
-                                              Number(user?.timestamp) * 1000
-                                            ).toLocaleString()
-                                          : "N/A"}
+                                        {moment(user?.createdAt).format(
+                                          "M/D/YYYY h:mm:ss A"
+                                        )}
                                       </td>
                                       <td>C50 Bonus</td>
                                     </tr>
@@ -2572,7 +2580,7 @@ export default function WalletStatisticModal(props) {
                                           1}
                                       </td>
                                       <td>Offer Income</td>
-                                      <td>{user?.amount?.toFixed(2)}</td>
+                                      <td>{user?.amount?.toFixed(4)}</td>
                                       <td>
                                         {user?.time
                                           ? new Date(
@@ -2748,7 +2756,7 @@ export default function WalletStatisticModal(props) {
                                           index +
                                           1}
                                       </td>
-                                      <td>{user?.amount?.toFixed(2)}</td>
+                                      <td>{user?.amount?.toFixed(4)}</td>
                                       <td>
                                         {moment(user?.createdAt).format(
                                           "M/D/YYYY h:mm:ss A"

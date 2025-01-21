@@ -1769,3 +1769,9 @@ html .km-pane-wrapper .k-header {
     width: 45% !important;
   }
 }
+
+@media screen and (max-width: 344px) {
+  .cancel {
+    width: 60% !important;
+  }
+}

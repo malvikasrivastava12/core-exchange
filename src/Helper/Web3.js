@@ -36,6 +36,7 @@ export async function registerfn(refAddress) {
 }
 
 export async function Depositfn(payAmount, amount, address) {
+  console.log(payAmount, "amount in depsoit func", address, amount);
   const result = await writeContract(config, {
     abi: CONTRACT_ADDRESS_ABI,
     address: CONTRACT_ADDRESS,
@@ -100,6 +101,7 @@ export async function getReturnVirtualTokenAmountCanBeUsed(
   amount,
   rank
 ) {
+  console.log(address, amount, rank, ":::::123456 in getRetturn");
   const result = await readContract(config, {
     abi: CONTRACT_ADDRESS_ABI,
     address: CONTRACT_ADDRESS,

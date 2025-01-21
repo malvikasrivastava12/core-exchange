@@ -155,7 +155,7 @@ export default function DepositModel(props) {
       const TotalIncome = await TotalIncomefn(walletAddress);
       setTotalWithdrawn(TotalIncome / 1e18);
       // setTotalWithdrawn(TotalIncome / 1e18);
-      // console.log(TotalIncome / 1e18?.toFixed(2), "TotalIncome");
+      // console.log(TotalIncome / 1e18?.toFixed(4), "TotalIncome");
     }
   };
 
@@ -165,7 +165,7 @@ export default function DepositModel(props) {
       setBalance(Number(TotalClaimableIncome) / 1e18);
     }
   };
-
+  // console.log(balance, "Balance Amount");
   const handleDepositHistory = async (page) => {
     if (walletAddress) {
       const data = await getUserDepositList(walletAddress, page, itemsPerPage);
@@ -269,9 +269,9 @@ export default function DepositModel(props) {
 
     const freeCore = Number(virtualToken[0]) / 1e18;
     const split = Number(virtualToken[1]) / 1e18;
-    setFreeWallet(freeCore?.toFixed(2));
-    setSplitInput(split?.toFixed(2));
-    setMainInput((inputAmount - (split + freeCore))?.toFixed(2));
+    setFreeWallet(freeCore);
+    setSplitInput(split);
+    setMainInput(inputAmount - (split + freeCore));
     console.log(freeCore, split, mainInput, virtualToken, "virtualToken");
   };
 
@@ -356,6 +356,7 @@ export default function DepositModel(props) {
         console.log(responseDownline, "Downline:::");
         if (responseDownline.success === true) {
           await Depositfn(mainInput, inputAmount, inputAddress);
+          console.log(inputAddress, "inputAddress in deposit");
           setIsLoader(false);
 
           setTimeout(() => {
@@ -465,7 +466,7 @@ export default function DepositModel(props) {
     {
       id: 0,
       label1: "Split Wallet :",
-      value: splitWallet?.toFixed(2) ?? 0,
+      value: splitWallet?.toFixed(6) ?? 0,
       label2: "Click to View :",
       buttonText: "View History",
       image: DAOIcon,
@@ -475,7 +476,7 @@ export default function DepositModel(props) {
       id: 1,
       label1: "Left Free Core :",
       value: userDetails?.[11]
-        ? (Number(userDetails[11]) / 1e18)?.toFixed(2)
+        ? (Number(userDetails[11]) / 1e18)?.toFixed(6)
         : 0.0,
       label2: "Click to View :",
       buttonText: "View History",
@@ -485,7 +486,7 @@ export default function DepositModel(props) {
     {
       id: 2,
       label1: "Left Split Wallet :",
-      value: leftSplitWallet?.toFixed(2) || 0,
+      value: leftSplitWallet?.toFixed(6) || 0,
       label2: "Click to View :",
       buttonText: "View History",
       image: DAOIcon,
@@ -496,7 +497,7 @@ export default function DepositModel(props) {
       label1: "My Investment :",
       value:
         (Number(userInfo?.depositWallet ?? 0) - Number(reInvest ?? 0)).toFixed(
-          2
+          6
         ) ?? 0,
       label2: "Click to View :",
       buttonText: "View History",
@@ -506,7 +507,7 @@ export default function DepositModel(props) {
     {
       id: 7,
       label1: "My Re-investment :",
-      value: reInvest?.toFixed(2) ?? 0,
+      value: reInvest?.toFixed(6) ?? 0,
       label2: "Click to View :",
       buttonText: "View History",
       image: DAOIcon,
@@ -517,7 +518,7 @@ export default function DepositModel(props) {
       label1: "Total Investment :",
       value:
         Number(userDetails[5]) / 1e18 > 0
-          ? (Number(userDetails[5]) / 1e18)?.toFixed(2)
+          ? (Number(userDetails[5]) / 1e18)?.toFixed(6)
           : 0,
       label2: "",
       buttonText: "Deposit History",
@@ -527,7 +528,7 @@ export default function DepositModel(props) {
     {
       id: 4,
       label1: "Total withdrawn :",
-      value: totalWithdrawn?.toFixed(2) ?? 0,
+      value: totalWithdrawn?.toFixed(6) ?? 0,
       label2: "",
       buttonText: "Withdraw History",
       image: DAOIcon,
@@ -537,7 +538,7 @@ export default function DepositModel(props) {
     {
       id: 5,
       label1: "Balance :",
-      value: balance?.toFixed(2) ?? 0,
+      value: balance?.toFixed(6) ?? 0,
       label2: "Request withdraw:",
       buttonText: "Withdraw ",
       image: DAOIcon,
@@ -640,12 +641,14 @@ export default function DepositModel(props) {
                         <input
                           type="text"
                           placeholder="Enter amount"
+                          autoComplete="off"
                           value={inputAmount}
                           onChange={handleAmountInputChange}
                         />
                         {errors.amt && <p className="error">{errors.amt}</p>}
                         <input
                           type="text"
+                          autoComplete="off"
                           placeholder="Enter User Address"
                           value={inputAddress}
                           onChange={(e) => setInputAddress(e.target.value)}
@@ -788,17 +791,7 @@ export default function DepositModel(props) {
                                       setViewMyReInvestmentTable(item.id);
                                       handleMyReInvestment(currentPage);
                                     }
-                                    // else {
-                                    //   setTableview(item.id);
-                                    // }
                                   }}
-
-                                  // onClick={() => {
-
-                                  //   if (item.id === 5) {
-                                  //     setInputDeposit(true);
-                                  //   } else setTableview(item.id);
-                                  // }}
                                 >
                                   {item.buttonText}
                                 </p>
@@ -823,14 +816,22 @@ export default function DepositModel(props) {
                                         <button
                                           className="maindescbut"
                                           onClick={() => {
-                                            if (
-                                              userInfo?.securityPin ==
-                                              inputPinWithdwaw
-                                            ) {
-                                              setIsWithdraw(true);
-                                              inputWithdraws();
+                                            console.log("Balance:", balance);
+                                            if (balance >= 5) {
+                                              console.log(":::::::::::::23424");
+                                              if (
+                                                userInfo?.securityPin ==
+                                                inputPinWithdwaw
+                                              ) {
+                                                setIsWithdraw(true);
+                                                inputWithdraws();
+                                              } else {
+                                                toast.error("Pin Not Match!!");
+                                              }
                                             } else {
-                                              toast.error("Pin Not Match!!");
+                                              toast.error(
+                                                "Insufficient Balance!!"
+                                              );
                                             }
                                           }}
                                         >
@@ -975,7 +976,7 @@ export default function DepositModel(props) {
                                             1}
                                         </td>
                                         <td>
-                                          {user?.splitBalance?.toFixed(2)}
+                                          {user?.splitBalance?.toFixed(4)}
                                         </td>
                                         <td>
                                           {moment(user.createdAt).format(
@@ -987,7 +988,7 @@ export default function DepositModel(props) {
                                             user?.splitBalance +
                                             user?.topupBalance +
                                             user?.wallet
-                                          ).toFixed(2)}`}
+                                          ).toFixed(4)}`}
                                         </td>
                                       </tr>
                                     ))}
@@ -1194,15 +1195,15 @@ export default function DepositModel(props) {
                                             1}
                                         </td>
                                         <td>{user?.user}</td>
-                                        <td>{user?.amount?.toFixed(2)}</td>
-                                        <td>{user?.amount?.toFixed(2)}</td>
+                                        <td>{user?.amount?.toFixed(4)}</td>
+                                        <td>{user?.amount?.toFixed(4)}</td>
                                         <td>
                                           {(
                                             user?.amount - user?.offAmount
-                                          ).toFixed(2)}
+                                          ).toFixed(4)}
                                         </td>
-                                        <td>{user?.level?.toFixed(2)}</td>
-                                        <td>{user?.splitWallet?.toFixed(2)}</td>
+                                        <td>{user?.level?.toFixed(4)}</td>
+                                        <td>{user?.splitWallet?.toFixed(4)}</td>
                                         <td>
                                           {moment(user.createdAt).format(
                                             "M/D/YYYY h:mm:ss A"
@@ -1391,7 +1392,7 @@ export default function DepositModel(props) {
                                             1}
                                         </td>
                                         <td>{user?.user}</td>
-                                        <td>{user?.level?.toFixed(2)}</td>
+                                        <td>{user?.level?.toFixed(4)}</td>
                                         <td>
                                           {moment(user.createdAt).format(
                                             "M/D/YYYY h:mm:ss A"
@@ -1574,7 +1575,7 @@ export default function DepositModel(props) {
                                           </td>
                                           <td>{user?.user}</td>
                                           <td>
-                                            {user?.splitWallet?.toFixed(2)}
+                                            {user?.splitWallet?.toFixed(4)}
                                           </td>
                                           <td>
                                             {moment(user.createdAt).format(
@@ -1747,7 +1748,7 @@ export default function DepositModel(props) {
                                             index +
                                             1}
                                         </td>
-                                        <td>{user?.amount?.toFixed(2)}</td>
+                                        <td>{user?.amount?.toFixed(4)}</td>
                                         <td>
                                           {moment(user.createdAt).format(
                                             "M/D/YYYY h:mm:ss A"
@@ -1919,7 +1920,7 @@ export default function DepositModel(props) {
                                             1}
                                         </td>
                                         <td>
-                                          {user?.topupBalance?.toFixed(2)}
+                                          {user?.topupBalance?.toFixed(4)}
                                         </td>
                                         <td>
                                           {moment(user.createdAt).format(
@@ -2121,14 +2122,14 @@ export default function DepositModel(props) {
                                             user?.topupBalance +
                                             user?.wallet +
                                             user?.splitBalance
-                                          ).toFixed(2)}
+                                          ).toFixed(4)}
                                         </td>
                                         <td>
-                                          {user?.topupBalance?.toFixed(2)}
+                                          {user?.topupBalance?.toFixed(4)}
                                         </td>
-                                        <td>{user?.wallet?.toFixed(2)}</td>
+                                        <td>{user?.wallet?.toFixed(4)}</td>
                                         <td>
-                                          {user?.splitBalance?.toFixed(2)}
+                                          {user?.splitBalance?.toFixed(4)}
                                         </td>
                                         <td>
                                           {moment(user.createdAt).format(
