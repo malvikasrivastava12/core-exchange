@@ -6,6 +6,8 @@ import {
 import { toast } from "react-hot-toast";
 import { CONTRACT_ADDRESS_ABI, CONTRACT_ADDRESS } from "../Helper/config";
 import { config } from "../main";
+import Web3 from "web3";
+const web3 = new Web3(Web3.givenProvider);
 
 export async function isUserExist(address) {
   const result = await readContract(config, {
@@ -36,7 +38,12 @@ export async function registerfn(refAddress) {
 }
 
 export async function Depositfn(payAmount, amount, address) {
-  console.log(payAmount, "amount in depsoit func", address, amount);
+  console.log(payAmount, "amount in depsoit func :::::::", address, amount);
+  console.log(
+    web3.utils.toWei((payAmount + 0.01).toString(), "ether"),
+    "::::::::",
+    payAmount
+  );
   const result = await writeContract(config, {
     abi: CONTRACT_ADDRESS_ABI,
     address: CONTRACT_ADDRESS,
@@ -47,11 +54,7 @@ export async function Depositfn(payAmount, amount, address) {
       }),
       address,
     ],
-    value: [
-      (payAmount * 1e18).toLocaleString("fullwide", {
-        useGrouping: false,
-      }),
-    ],
+    value: [web3.utils.toWei((Number(payAmount) + 0.01).toString(), "ether")],
   });
 
   const res = waitForTransactionReceipt(config, { hash: result });

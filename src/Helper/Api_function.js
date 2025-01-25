@@ -2,7 +2,7 @@ import axios from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
 export const URLApi = "https://core-exchange.com/api";
-// export const URLApi = "http://192.168.1.96:1414/api";
+// export const URLApi = "http://192.168.1.121:1414/api";
 export async function getUserInfo(address) {
   try {
     const response = await axios.get(`${URLApi}/user-info`, {

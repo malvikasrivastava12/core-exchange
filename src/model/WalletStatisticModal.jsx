@@ -55,6 +55,7 @@ export default function WalletStatisticModal(props) {
   const [magicIncome, setMagicIncome] = useState([]);
   const [magicBooster, setMagicBooster] = useState([]);
   const [dataTable, setDataTable] = useState({ data: [], pageinate: {} });
+  const [earnedTable, setEarnedTable] = useState();
   const [isloading, setIsLoading] = useState(-1);
   const [viewC50TeamTable, setViewC50TeamTable] = useState("");
   const [viewLevelTeamTable, setViewLevelTeamTable] = useState("");
@@ -98,6 +99,7 @@ export default function WalletStatisticModal(props) {
 
   const [C50IncomeData, setC50IncomeData] = useState(0);
   const [C50FlushedAmount, setC50FlushedAmount] = useState(0);
+  const [totalMagicTeam, setTotalMagicTeam] = useState(0);
 
   // const [filteredTeam, setFilteredTeam] = useState([]);
   const handleSecurityPin = () => {
@@ -201,8 +203,9 @@ export default function WalletStatisticModal(props) {
   };
 
   const handletotalEarnedAmount = async () => {
-    const TotalClaimableIncome = await TotalClaimableIncomefn(walletAddress);
+    const TotalClaimableIncome = await TotalIncomefn(walletAddress);
     setTotalEarned(TotalClaimableIncome / 1e18);
+    console.log(walletAddress, TotalClaimableIncome, "-------------1234-----");
   };
 
   const handleTotalWithdraw = async () => {
@@ -219,6 +222,11 @@ export default function WalletStatisticModal(props) {
         data: Array.isArray(data?.data) ? data?.data : [],
         pageinate: data,
       });
+      const d = data.data.reduce((ac, ite) => {
+        return ac + Number(ite.organicWeeklyTeamBusiness);
+      }, 0);
+      console.log(d, "DDDDDDDDDDDDD");
+      setTotalMagicTeam(d);
       setIsLoading(-1);
     } else toast.error("Wallet is not connected!!");
   };
@@ -268,7 +276,7 @@ export default function WalletStatisticModal(props) {
       setOfferAmount(data.offerAmount);
     } else toast.error("Wallet is not connected!!");
   };
-
+  const [totalEarn, setTotalEarn] = useState(0);
   const handleTotalEarned = async (page) => {
     if (walletAddress) {
       const data = await gettotalEarnedHistoryfn(
@@ -276,10 +284,16 @@ export default function WalletStatisticModal(props) {
         page,
         itemsPerPage
       );
-      setDataTable({
-        data: Array.isArray(data?.data) ? data?.data : [],
-        pageinate: data,
-      });
+      console.log(data, "::data");
+      setEarnedTable(data);
+
+      const total =
+        data?.totalRoi +
+        data?.totalMagicBoosterIncome +
+        data?.totalMagicIncome +
+        data?.totalRankIncome;
+      console.log(total, "Total Earned");
+      setTotalEarn(total);
       // setTotalEarnedTable(Array.isArray(data.data) ? data.data : []);
       setIsLoading(-1);
     } else toast.error("Wallet is not connected!!");
@@ -309,6 +323,8 @@ export default function WalletStatisticModal(props) {
     handletotalEarnedAmount();
     handleTotalWithdraw();
     handleOfferHistory();
+    handleMagicTeam();
+    handleTotalEarned();
   }, [walletAddress, isFetch]);
 
   const handleRankReward = async (newPage) => {
@@ -525,7 +541,7 @@ export default function WalletStatisticModal(props) {
     {
       id: 5,
       label: "Total Businesses :",
-      value: userInfo?.teamBusiness?.toFixed(4) ?? 0,
+      value: totalMagicTeam.toFixed(4) ?? 0,
       label2: "Click to View:",
       buttonText: "Magic Team",
       image: DAOIcon,
@@ -621,7 +637,7 @@ export default function WalletStatisticModal(props) {
     {
       id: 11,
       label: "Total earned :",
-      value: totalEarned?.toFixed(4),
+      value: totalEarn?.toFixed(4),
       label2: "All Earning History:",
       buttonText: "All Earning History",
       image: DAOIcon,
@@ -871,7 +887,7 @@ export default function WalletStatisticModal(props) {
                                       handleOfferIncomeHistory(currentPage);
                                       setViewOfferIncomeTable(item.id);
                                     } else if (item?.id === 11) {
-                                      resetpage(11);
+                                      // resetpage(11);
                                       setIsLoading(item?.id);
                                       setViewTotalEarnedTable(item.id);
                                       handleTotalEarned(currentPage);
@@ -2729,14 +2745,14 @@ export default function WalletStatisticModal(props) {
                                   >
                                     Amount
                                   </th>
-                                  <th
+                                  {/* <th
                                     role="columnheader"
                                     data-field="SNO"
                                     data-title="Name"
                                     class="k-header"
                                   >
                                     Dated
-                                  </th>
+                                  </th> */}
                                   <th
                                     role="columnheader"
                                     data-field="SNO"
@@ -2747,33 +2763,47 @@ export default function WalletStatisticModal(props) {
                                   </th>
                                 </tr>
                               </thead>
-                              {dataTable?.data?.length > 0 && (
-                                <tbody className="table-body">
-                                  {dataTable?.data?.map((user, index) => (
-                                    <tr key={index}>
-                                      <td>
-                                        {(currentPage - 1) * itemsPerPage +
-                                          index +
-                                          1}
-                                      </td>
-                                      <td>{user?.amount?.toFixed(4)}</td>
-                                      <td>
-                                        {moment(user?.createdAt).format(
-                                          "M/D/YYYY h:mm:ss A"
-                                        )}
-                                      </td>
-                                      <td>Income</td>
-                                    </tr>
-                                  ))}
-                                </tbody>
-                              )}
+
+                              <tbody className="table-body">
+                                <tr key={index}>
+                                  <td>1</td>
+                                  <td>{earnedTable?.totalRoi?.toFixed(4)}</td>
+
+                                  <td>C50 Income</td>
+                                </tr>
+                                <tr key={index}>
+                                  <td>2</td>
+                                  <td>
+                                    {earnedTable?.totalMagicBoosterIncome?.toFixed(
+                                      4
+                                    )}
+                                  </td>
+                                  <td>Booster Income</td>
+                                </tr>
+                                <tr key={index}>
+                                  <td>3</td>
+                                  <td>
+                                    {earnedTable?.totalMagicIncome?.toFixed(4)}
+                                  </td>
+
+                                  <td>Magical Income</td>
+                                </tr>
+                                <tr key={index}>
+                                  <td>4</td>
+                                  <td>
+                                    {earnedTable?.totalRankIncome?.toFixed(4)}
+                                  </td>
+
+                                  <td>Rank Income</td>
+                                </tr>
+                              </tbody>
                             </table>
-                            {dataTable?.data?.length === 0 && (
+                            {/* {dataTable?.data?.length === 0 && (
                               <div className="p-4 d-flex justify-content-center">
                                 <div>No Data Found!</div>
                               </div>
-                            )}
-                            <div
+                            )} */}
+                            {/* <div
                               class="k-pager-wrap k-grid-pager k-widget"
                               data-role="pager"
                             >
@@ -2855,7 +2885,7 @@ export default function WalletStatisticModal(props) {
                                   totalItems
                                 )} out of ${totalItems} items`}
                               </span>
-                            </div>
+                            </div> */}
                           </div>
                         </div>
                       </>

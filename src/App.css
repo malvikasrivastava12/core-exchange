@@ -1737,7 +1737,7 @@ html .km-pane-wrapper .k-header {
   }
 }
 
-@media screen and (max-width: 375px) {
+@media screen and (max-width: 400px) {
   .we-will-multipy-div {
     padding-top: 30px;
   }
@@ -1760,7 +1760,7 @@ html .km-pane-wrapper .k-header {
   }
 
   .mainabout h2 {
-    margin: 64px 11px !important;
+    margin: 64px 23px !important;
   }
 }
 
@@ -1773,5 +1773,11 @@ html .km-pane-wrapper .k-header {
 @media screen and (max-width: 344px) {
   .cancel {
     width: 60% !important;
+  }
+}
+
+@media screen and (min-width: 401px) and (max-width: 992px) {
+  .mainbackdesc {
+    margin-top: 130px !important;
   }
 }
