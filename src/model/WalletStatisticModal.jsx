@@ -222,7 +222,8 @@ export default function WalletStatisticModal(props) {
         data: Array.isArray(data?.data) ? data?.data : [],
         pageinate: data,
       });
-      const d = data.data.reduce((ac, ite) => {
+      const data1 = await getMagicTeamfn(walletAddress, 1, 10000000);
+      const d = data1.data.reduce((ac, ite) => {
         return ac + Number(ite.organicWeeklyTeamBusiness);
       }, 0);
       console.log(d, "DDDDDDDDDDDDD");
@@ -273,7 +274,7 @@ export default function WalletStatisticModal(props) {
       });
       // setMagicBooster(Array.isArray(data.data) ? data.data : []);
       setIsLoading(-1);
-      setOfferAmount(data.offerAmount);
+      setOfferAmount(data?.offerAmount);
     } else toast.error("Wallet is not connected!!");
   };
   const [totalEarn, setTotalEarn] = useState(0);

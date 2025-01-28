@@ -1,4 +1,11 @@
 import React, { useEffect } from "react";
+import english from "../assets/LanguageImage/english.webp";
+import Russia from "../assets/LanguageImage/Russia.png";
+import china from "../assets/LanguageImage/china.png";
+import spanish from "../assets/LanguageImage/Spain.webp";
+import arabic from "../assets/LanguageImage/arebic.png";
+import Turkish from "../assets/LanguageImage/Turkish.png";
+import farsi from "../assets/LanguageImage/farsi.jpg";
 
 const LanguageSelector = () => {
   // Function to initialize Google Translate
@@ -33,10 +40,7 @@ const LanguageSelector = () => {
           className="intohi langwrap langwrap_en flag_link eng"
           onClick={() => handleFlagClick("en")}
         >
-          <img
-            src="https://maticverious.com/images/flags/eng2.svg"
-            alt="English"
-          />
+          <img src={english} alt="English" />
         </a>
 
         <a
@@ -45,10 +49,7 @@ const LanguageSelector = () => {
           className="intohi langwrap langwrap_fa flag_link taj"
           onClick={() => handleFlagClick("fa")}
         >
-          <img
-            src="https://maticverious.com/images/flags/irn2.svg"
-            alt="Farsi"
-          />
+          <img src={farsi} alt="Farsi" />
         </a>
 
         <a
@@ -57,10 +58,7 @@ const LanguageSelector = () => {
           className="intohi langwrap langwrap_ru flag_link rus"
           onClick={() => handleFlagClick("ru")}
         >
-          <img
-            src="https://maticverious.com/images/flags/rus2.svg"
-            alt="Russian"
-          />
+          <img src={Russia} alt="Russian" />
         </a>
 
         <a
@@ -69,10 +67,7 @@ const LanguageSelector = () => {
           className="intohi langwrap langwrap_zh flag_link zh"
           onClick={() => handleFlagClick("zh")}
         >
-          <img
-            src="https://maticverious.com/images/flags/chi25e1f.svg?v=2"
-            alt="Chinese"
-          />
+          <img src={china} alt="Chinese" />
         </a>
 
         <a
@@ -81,10 +76,7 @@ const LanguageSelector = () => {
           className="intohi langwrap langwrap_es flag_link es"
           onClick={() => handleFlagClick("es")}
         >
-          <img
-            src="https://maticverious.com/images/flags/esp2.svg"
-            alt="Spanish"
-          />
+          <img src={spanish} alt="Spanish" />
         </a>
 
         <a
@@ -93,10 +85,7 @@ const LanguageSelector = () => {
           className="intohi langwrap langwrap_ar flag_link ara"
           onClick={() => handleFlagClick("ar")}
         >
-          <img
-            src="https://maticverious.com/images/flags/ara2.svg"
-            alt="Arabic"
-          />
+          <img src={arabic} alt="Arabic" />
         </a>
 
         <a
@@ -105,10 +94,7 @@ const LanguageSelector = () => {
           className="intohi langwrap langwrap_tr flag_link tur"
           onClick={() => handleFlagClick("tr")}
         >
-          <img
-            src="https://maticverious.com/images/flags/trk2.svg"
-            alt="Turkish"
-          />
+          <img src={Turkish} alt="Turkish" />
         </a>
       </div>
     </div>

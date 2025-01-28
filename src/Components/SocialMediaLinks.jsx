@@ -1,5 +1,11 @@
 import React from "react";
-
+import whatsapp from "../assets/SocialMediaImages/whatsapp.webp";
+import youtube from "../assets/SocialMediaImages/youtube.png";
+import telegram from "../assets/SocialMediaImages/telegram.webp";
+import facebook from "../assets/SocialMediaImages/facebook.png";
+import twitter from "../assets/SocialMediaImages/Twitter2.webp";
+import instagram from "../assets/SocialMediaImages/instagram.jpg";
+import threads from "../assets/SocialMediaImages/threads.png";
 const SocialMediaLinks = () => {
   return (
     <div className="langblockk">
@@ -10,10 +16,7 @@ const SocialMediaLinks = () => {
         className="langwrapp langwrap_en"
         rel="noopener noreferrer"
       >
-        <img
-          src="https://maticverious.com/images/flags/whatsapp.jpg"
-          alt="WhatsApp"
-        />
+        <img src={whatsapp} alt="WhatsApp" />
       </a>
       <a
         href="https://youtube.com/@coreexhangeofficial?si=AXhAUNu6Mcz9ctwM"
@@ -22,10 +25,7 @@ const SocialMediaLinks = () => {
         className="langwrapp langwrap_fa"
         rel="noopener noreferrer"
       >
-        <img
-          src="https://maticverious.com/images/flags/youtube.jpg"
-          alt="Youtube"
-        />
+        <img src={youtube} alt="Youtube" />
       </a>
       <a
         href="https://t.me/coreexchangeoffcial"
@@ -34,10 +34,7 @@ const SocialMediaLinks = () => {
         className="langwrapp langwrap_ru"
         rel="noopener noreferrer"
       >
-        <img
-          src="https://maticverious.com/images/flags/telegram.jpg?v=1.0"
-          alt="Telegram"
-        />
+        <img src={telegram} alt="Telegram" />
       </a>
       <a
         href="#"
@@ -46,12 +43,9 @@ const SocialMediaLinks = () => {
         className="langwrapp langwrap_zh"
         rel="noopener noreferrer"
       >
-        <img
-          src="https://maticverious.com/images/flags/facebook.jpg"
-          alt="Facebook"
-        />
+        <img src={facebook} alt="Facebook" />
       </a>
-      <a
+      {/* <a
         href="#"
         target="_blank"
         title="Dailymotion"
@@ -62,7 +56,7 @@ const SocialMediaLinks = () => {
           src="https://maticverious.com/images/flags/dailymo.jpg"
           alt="Dailymotion"
         />
-      </a>
+      </a> */}
       <a
         href="#"
         target="_blank"
@@ -70,9 +64,9 @@ const SocialMediaLinks = () => {
         className="langwrapp langwrap_ar"
         rel="noopener noreferrer"
       >
-        <img src="https://maticverious.com/images/flags/twitter.jpg" alt="X" />
+        <img src={twitter} alt="X" />
       </a>
-      <a
+      {/* <a
         href="#"
         target="_blank"
         title="Koo"
@@ -83,7 +77,7 @@ const SocialMediaLinks = () => {
           src="https://maticverious.com/images/flags/kooap.jpg?v=2.0"
           alt="Koo"
         />
-      </a>
+      </a> */}
       <a
         href="https://www.instagram.com/coreexhangeofficial/?igsh=MWdqNDcwcmkzdzVrcA%3D%3D#"
         target="_blank"
@@ -91,10 +85,7 @@ const SocialMediaLinks = () => {
         className="langwrapp langwrap_tr"
         rel="noopener noreferrer"
       >
-        <img
-          src="https://maticverious.com/images/flags/instagram.jpg"
-          alt="Instagram"
-        />
+        <img src={instagram} alt="Instagram" />
       </a>
       <a
         href="#"
@@ -103,10 +94,7 @@ const SocialMediaLinks = () => {
         className="langwrapp langwrap_tr"
         rel="noopener noreferrer"
       >
-        <img
-          src="https://maticverious.com/images/flags/threads.jpg"
-          alt="Threads"
-        />
+        <img src={threads} alt="Threads" />
       </a>
     </div>
   );
