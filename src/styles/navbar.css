@@ -32673,7 +32673,7 @@ body.no-scroll {
 .dash1 {
   width: 440px;
   height: 2px;
-  background: url(https://maticverious.com/images/flags/dash.png) left;
+  background: url(../assets/Images/dash.png) left;
   position: absolute;
   top: 221px;
   left: 18px;
@@ -32684,7 +32684,7 @@ body.no-scroll {
 .dash2 {
   width: 500px;
   height: 2px;
-  background: url(https://maticverious.com/images/flags/dash.png) left;
+  background: url(../assets/Images/dash.png) left;
   position: absolute;
   top: 561px;
   left: 82px;
@@ -32695,7 +32695,7 @@ body.no-scroll {
 .dash3 {
   width: 659px;
   height: 2px;
-  background: url(https://maticverious.com/images/flags/dash.png) left;
+  background: url(../assets/Images/dash.png) left;
   position: absolute;
   top: 408px;
   left: -72px;
@@ -32706,7 +32706,7 @@ body.no-scroll {
 .dash4 {
   width: 600px;
   height: 2px;
-  background: url(https://maticverious.com/images/flags/dash.png) left;
+  background: url(../assets/Images/dash.png) left;
   position: absolute;
   top: 388px;
   left: 85px;
@@ -32819,7 +32819,6 @@ color:#fd9500
   /* text-decoration: underline;
   color: #007bff; */
 }
-
 
 .maindesclink {
   text-align: center;
@@ -33040,7 +33039,7 @@ color:#fd9500
 /* .dashtop {
   width: 2200px;
   height: 2px;
-  background: url(https://maticverious.com/images/flags/dash.png) center;
+  background: url(../assets/Images/dash.png) center;
   position: absolute;
   top: -1px;
   left: -500px;
@@ -33250,7 +33249,7 @@ color:#fd9500
 .aboutdashtop {
   width: 100%;
   height: 2px;
-  background: url(https://maticverious.com/images/flags/dash.png) center;
+  background: url(../assets/Images/dash.png) center;
   position: absolute;
   top: -33px;
   left: 0;
@@ -33259,7 +33258,7 @@ color:#fd9500
 .aboutdashbottom {
   width: 100%;
   height: 2px;
-  background: url(https://maticverious.com/images/flags/dash.png) center;
+  background: url(../assets/Images/dash.png) center;
   position: absolute;
   bottom: -33px;
   left: 0;
@@ -33268,7 +33267,7 @@ color:#fd9500
 .aboutdashleft {
   width: 500px;
   height: 2px !important;
-  background: url(https://maticverious.com/images/flags/dash.png) left !important;
+  background: url(../assets/Images/dash.png) left !important;
   position: absolute !important;
   top: 152px;
   left: 159px;
@@ -33278,7 +33277,7 @@ color:#fd9500
 .aboutdashright {
   width: 500px;
   height: 2px;
-  background: url(https://maticverious.com/images/flags/dash.png) left;
+  background: url(../assets/Images/dash.png) left;
   position: absolute;
   top: 152px;
   left: 501px;
@@ -33654,7 +33653,7 @@ color:#fd9500
   margin-left: -1px;
   width: 3px;
   height: 800px;
-  background: url(https://maticverious.com/images/flags/dash2.png);
+  background: url(../assets/Images/dash2.png);
   z-index: -1;
 }
 
@@ -34648,7 +34647,7 @@ html.remodal-is-locked {
 }
 
 .modaldesc {
-  margin-top:2px !important;
+  margin-top: 2px !important;
   font-size: 16px;
   line-height: 1.4;
   text-align: left;
@@ -34691,7 +34690,7 @@ html.remodal-is-locked {
 .dashmodal {
   width: 100%;
   height: 2px;
-  background: url(../images/flags/dash.png) center;
+  background: url(../assets/Images/dash.png) center;
   margin-bottom: 35px;
 }
 
@@ -35402,7 +35401,7 @@ body {
 .dashmodal {
   width: 100%;
   height: 2px;
-  background: url(https://maticverious.com/images/flags/dash.png) center;
+  background: url(../assets/Images/dash.png) center;
   margin-bottom: 35px;
 }
 .modaldesc {
@@ -35517,7 +35516,7 @@ body {
 .modaldash {
   width: 80%;
   height: 2px;
-  background: url(https://maticverious.com/images/flags/dash.png) center;
+  background: url(../assets/Images/dash.png) center;
   position: absolute;
   top: 368px;
   left: 52px;
@@ -35593,7 +35592,6 @@ body {
   }
 }
 
-
 @media screen and (min-width: 401px) and (max-width: 576px) {
   .footblock {
     width: 50% !important;
@@ -35611,10 +35609,3 @@ body {
     font-size: 13px !important;
   }
 } */
-
-
-
-
-
-
-

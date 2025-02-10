@@ -60,7 +60,7 @@ const MainContent = () => {
   //   userInfo?.isMagicBooster === true
   //     ? "Completed"
   //     : userInfo?.firstDepositAt * 1000 + 30 * 24 * 60 * 60 * 1000;
-  const day10 = userInfo?.firstDepositAt * 1000 + 10 * 24 * 60 * 60 * 1000;
+  const day10 = userInfo?.timestamp * 1000 + 10 * 24 * 60 * 60 * 1000;
   const day50 =
     userInfo?.rankReward > 0
       ? "Completed"
