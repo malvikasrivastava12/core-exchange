@@ -35,7 +35,7 @@
   width: 100%;
   background: #000000b8;
   z-index: 1000;
-  height: 73px;
+  height: 95px;
   -webkit-transition: height 0.4s;
   -moz-transition: height 0.4s;
   transition: height 0.4s;
@@ -121,7 +121,7 @@ cbp-af-header.cbp-af-header-shrink {
 
 .cbp-af-header nav a:hover {
   color: #fff;
-  border-top: 6px solid #fd9500;
+  border-top: 6px solid;
 }
 
 .cbp-af-header nav a small {
@@ -141,7 +141,7 @@ cbp-af-header.cbp-af-header-shrink {
 }
 
 .cbp-af-header nav a i {
-  color: #fd9500;
+  color: #83d8f1;
   font-size: 20px;
   vertical-align: -1px;
 }
@@ -165,7 +165,7 @@ cbp-af-header.cbp-af-header-shrink {
 }
 
 .cbp-af-header.cbp-af-header-shrink nav a:hover {
-  border-bottom: 4px solid #fd9500;
+  border-bottom: 4px solid #83d8f1;
 }
 
 .cbp-af-header.cbp-af-header-shrink h1 {
@@ -665,7 +665,7 @@ cbp-af-header.cbp-af-header-shrink {
     width: 100% !important;
   }
   .icosteps2 {
-    display: none;
+    /* display: none; */
   }
   .stepsblock.stepsblockfull2 {
     width: 100%;
@@ -1382,7 +1382,7 @@ cbp-af-header.cbp-af-header-shrink {
 
 .custom-underline {
   text-decoration: underline;
-  text-decoration-color: #fd9500;
+  text-decoration-color: var(--card-border);
   text-decoration-thickness: 2px;
   text-underline-offset: 2px;
 }

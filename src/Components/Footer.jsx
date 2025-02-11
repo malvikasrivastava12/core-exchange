@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Icon from "../assets/Images/Core_Exchange_Logo_favicon.png";
+import Icon from "../assets/Images/ForeXFavicon.png";
 import DepositModel from "../model/DepositModel";
 import { useSelector } from "react-redux";
 import { base_url } from "../Helper/config";
@@ -38,9 +38,9 @@ const Footer = () => {
             <p>
               Copyrights:
               <br />
-              Core Exchange LTD |
+              Forex Fusion LTD |
               <a href="index.html" style={{ color: "#fd9500" }}>
-                https://core-exchange.com/
+                {/* https://core-exchange.com/ */}
               </a>
               <br />
               Blockchain investment platform
@@ -59,13 +59,12 @@ const Footer = () => {
                 rel="noopener noreferrer"
                 style={{ color: "#fd9500", wordWrap: "break-word" }}
               >
-                0x7a51DAF63E620DC00be296A2c237aE47Dd3B31A6
+                {/* 0x7a51DAF63E620DC00be296A2c237aE47Dd3B31A6 */}
               </a>
             </p>
             <p>
-              Powered by
-              <img src={Icon} className="footimg" alt="Polygon Logo" />
-              DAO blockchain
+              Powered by DAO blockchain
+              {/* <img src={Icon} className="footimg" alt="Polygon Logo" /> */}
             </p>
           </div>
 

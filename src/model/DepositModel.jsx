@@ -469,7 +469,7 @@ export default function DepositModel(props) {
       value: splitWallet?.toFixed(6) ?? 0,
       label2: "Click to View :",
       buttonText: "View History",
-      image: DAOIcon,
+      // image: DAOIcon,
       name: "SW",
     },
     {
@@ -480,7 +480,7 @@ export default function DepositModel(props) {
         : 0.0,
       label2: "Click to View :",
       buttonText: "View History",
-      image: DAOIcon,
+      // image: DAOIcon,
       name: "LFPOP",
     },
     {
@@ -489,7 +489,7 @@ export default function DepositModel(props) {
       value: leftSplitWallet?.toFixed(6) || 0,
       label2: "Click to View :",
       buttonText: "View History",
-      image: DAOIcon,
+      // image: DAOIcon,
       name: "LSW",
     },
     {
@@ -501,7 +501,7 @@ export default function DepositModel(props) {
         ) ?? 0,
       label2: "Click to View :",
       buttonText: "View History",
-      image: DAOIcon,
+      // image: DAOIcon,
       name: "MI",
     },
     {
@@ -510,7 +510,7 @@ export default function DepositModel(props) {
       value: reInvest?.toFixed(6) ?? 0,
       label2: "Click to View :",
       buttonText: "View History",
-      image: DAOIcon,
+      // image: DAOIcon,
       name: "MRI",
     },
     {
@@ -522,7 +522,7 @@ export default function DepositModel(props) {
           : 0,
       label2: "",
       buttonText: "Deposit History",
-      image: DAOIcon,
+      // image: DAOIcon,
       name: "TI",
     },
     {
@@ -531,7 +531,7 @@ export default function DepositModel(props) {
       value: totalWithdrawn?.toFixed(6) ?? 0,
       label2: "",
       buttonText: "Withdraw History",
-      image: DAOIcon,
+      // image: DAOIcon,
       name: "TW",
     },
 
@@ -541,7 +541,7 @@ export default function DepositModel(props) {
       value: balance?.toFixed(6) ?? 0,
       label2: "Request withdraw:",
       buttonText: "Withdraw ",
-      image: DAOIcon,
+      // image: DAOIcon,
       name: "B",
       text: "**In the event of an unsuccessful withdrawal resulting in a zero balance display, re-initiate the withdrawal process, disregarding the current balance state. This will re-trigger the pending withdrawal request, facilitating the successful transfer of funds to your designated wallet address*",
     },
@@ -613,17 +613,17 @@ export default function DepositModel(props) {
               <form className="maincontform authFalse">
                 <p>You need to register before deposition</p>
                 <button className="maindescbut">Register Now</button>
-                <div className="modaldash" style={{ top: "200px" }}></div>
+                {/* <div className="modaldash" style={{ top: "200px" }}></div> */}
               </form>
             )}
 
-            {userExist && (
+            {!userExist && (
               <>
                 <form className="maincontform authFalse">
                   <div style={{ paddingBottom: "15px" }}>
                     <h6 className="d-flex justify-content-center align-items-center pb-2">
-                      Specify deposit
-                      <img
+                      Specify deposit&nbsp;
+                      {/* <img
                         src={DAOIcon}
                         style={{
                           width: "20px",
@@ -631,7 +631,7 @@ export default function DepositModel(props) {
                           margin: "0px 8px",
                         }}
                         alt="DAO Icon"
-                      />
+                      /> */}
                       DAO amount here
                     </h6>
                   </div>

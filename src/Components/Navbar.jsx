@@ -4,7 +4,7 @@ import { FaDonate } from "react-icons/fa";
 import { FaTrophy } from "react-icons/fa";
 import { FaWallet } from "react-icons/fa";
 import { IoIosLink } from "react-icons/io";
-import DAOIcon from "../assets/Images/Core_Exchange_Logo_favicon.png";
+import DAOIcon from "../assets/Images/ForeXFavicon.png";
 import DollarImage from "../assets/Images/dollar.png";
 import { useAccount } from "wagmi";
 import { base_url } from "../Helper/config";

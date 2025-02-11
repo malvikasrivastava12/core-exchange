@@ -498,7 +498,7 @@ export default function WalletStatisticModal(props) {
           : 0,
       label2: "Request withdraw:",
       buttonText: "DAO User",
-      image: DAOIcon,
+      // image: DAOIcon,
       name: "TW",
     },
 
@@ -537,7 +537,7 @@ export default function WalletStatisticModal(props) {
       value: userInfo?.directBonus?.toFixed(4) ?? 0.0,
       label2: "Click to View:",
       buttonText: "View Direct Team",
-      image: DAOIcon,
+      // image: DAOIcon,
     },
     {
       id: 5,
@@ -545,14 +545,14 @@ export default function WalletStatisticModal(props) {
       value: totalMagicTeam.toFixed(4) ?? 0,
       label2: "Click to View:",
       buttonText: "Magic Team",
-      image: DAOIcon,
+      // image: DAOIcon,
     },
     {
       id: 15,
       label: "Star Rank :",
       value: userInfo?.rankReward > 0 ? userInfo?.rankReward + " STAR" : 0,
 
-      image: DAOIcon,
+      // image: DAOIcon,
       name: "B",
     },
     {
@@ -561,7 +561,7 @@ export default function WalletStatisticModal(props) {
       value: userInfo?.starRankIncome?.toFixed(4) ?? 0,
       label2: "Request withdraw:",
       buttonText: "RANK AND REWARD HISTORY",
-      image: DAOIcon,
+      // image: DAOIcon,
       name: "B",
     },
     {
@@ -569,7 +569,7 @@ export default function WalletStatisticModal(props) {
       label: "Organic Deposit :",
       value: userInfo?.organicAmount?.toFixed(4) ?? 0,
 
-      image: DAOIcon,
+      // image: DAOIcon,
       name: "B",
     },
     {
@@ -578,7 +578,7 @@ export default function WalletStatisticModal(props) {
       value: userInfo?.organicDirectBusiness?.toFixed(4) ?? 0,
       label2: "",
       buttonText: "",
-      image: DAOIcon,
+      // image: DAOIcon,
       name: "B",
     },
     {
@@ -587,7 +587,7 @@ export default function WalletStatisticModal(props) {
       value: userInfo?.oraganicTeamBuisiness?.toFixed(4) ?? 0,
       label2: "",
       buttonText: "",
-      image: DAOIcon,
+      // image: DAOIcon,
       name: "B",
     },
     {
@@ -596,7 +596,7 @@ export default function WalletStatisticModal(props) {
       value: userInfo?.magicIncome?.toFixed(4) ?? 0,
       label2: "Magic Income History:",
       buttonText: "Magic Income History",
-      image: DAOIcon,
+      // image: DAOIcon,
     },
 
     {
@@ -605,7 +605,7 @@ export default function WalletStatisticModal(props) {
       value: C50FlushedAmount && C50FlushedAmount?.toFixed(4),
       label2: "C50 Flushed History:",
       buttonText: "C50 Flushed History",
-      image: DAOIcon,
+      // image: DAOIcon,
     },
 
     {
@@ -614,7 +614,7 @@ export default function WalletStatisticModal(props) {
       value: C50IncomeData?.toFixed(4),
       label2: "Recent Days Income Total:",
       buttonText: "C50 Income History",
-      image: DAOIcon,
+      // image: DAOIcon,
     },
 
     {
@@ -623,7 +623,7 @@ export default function WalletStatisticModal(props) {
       value: offerAmount?.toFixed(4),
       label2: "Offer  History:",
       buttonText: "Offer  History",
-      image: DAOIcon,
+      // image: DAOIcon,
     },
 
     {
@@ -632,7 +632,7 @@ export default function WalletStatisticModal(props) {
       value: userInfo?.magicBoosterIncome?.toFixed(4) ?? 0,
       label2: "Offer Income History:",
       buttonText: "Offer Income History",
-      image: DAOIcon,
+      // image: DAOIcon,
     },
 
     {
@@ -641,7 +641,7 @@ export default function WalletStatisticModal(props) {
       value: totalEarn?.toFixed(4),
       label2: "All Earning History:",
       buttonText: "All Earning History",
-      image: DAOIcon,
+      // image: DAOIcon,
     },
 
     // {
@@ -751,8 +751,8 @@ export default function WalletStatisticModal(props) {
                 style={{ paddingBottom: "30px" }}
               >
                 <h6 className="d-flex justify-content-center align-items-center pb-2">
-                  Your
-                  <img
+                  Your &nbsp;
+                  {/* <img
                     src={DAOIcon}
                     style={{
                       width: "20px",
@@ -760,7 +760,7 @@ export default function WalletStatisticModal(props) {
                       margin: "0px 8px",
                     }}
                     alt="DAO Icon"
-                  />
+                  /> */}
                   DAO Wallet Address
                 </h6>
                 <input
@@ -776,7 +776,11 @@ export default function WalletStatisticModal(props) {
                   </h6>
                   <a
                     href="javascript:(void:0)"
-                    style={{ color: "#fd9500", lineHeight: "1.4" }}
+                    style={{
+                      color: "#F4A623",
+                      lineHeight: "1.4",
+                      fontWeight: "400",
+                    }}
                     className="custom-underline"
                     onClick={handleCopy}
                   >

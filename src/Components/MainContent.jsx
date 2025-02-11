@@ -4,8 +4,10 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import { FaPrint, FaSearch } from "react-icons/fa";
 import { FaRegCheckCircle } from "react-icons/fa";
-import LogoWhite from "../assets/Images/Core_Exchange_Logo.png";
+import LogoWhite from "../assets/Images/ForeX.png";
 import DAOIcon from "../assets/Images/Core_Exchange_Logo_favicon.png";
+import usericon from "../assets/Images/user.png";
+
 import { ConnectBtn } from "./ConnectButton";
 import { useAccount } from "wagmi";
 import toast from "react-hot-toast";
@@ -239,35 +241,35 @@ const MainContent = () => {
                   className="mainphone parallax"
                   style={{ transform: "translate3d(6px, -15px, 0px)" }}
                 ></div>
-                <div className="dash1"></div>
-                <div className="dash2"></div>
+                {/* <div className="dash1"></div> */}
+                {/* <div className="dash2"></div>
                 <div className="dash3"></div>
-                <div className="dash4"></div>
-                <div className="perfection">perfection in details</div>
+                <div className="dash4"></div> */}
+                {/* <div className="perfection">perfection in details</div> */}
               </div>
               <div className="mainbackwrap">
                 <div className="mainbackdesc" data-aos="fade-left">
                   <h1>Reliable investments with</h1>
                   <img src={LogoWhite} className="mainico" alt="Tron Full" />
                   <h1>
-                    Get <span style={{ color: "#fd9500" }}>free 10 </span> Core
+                    Get <span style={{ color: "#83d8f1" }}>free 10 </span> Core
                     Rewards by free registration and also get benifit free
                     refferal program up to 11 Levels
                   </h1>
                   <div className="maindesc">
                     <div className="maindesctext">
                       <span>
-                        <FaRegCheckCircle color="#fd9500" /> Blockchain
+                        <FaRegCheckCircle color="#83d8f1" /> Blockchain
                         decentralized and anonymous platform
                       </span>
                       <span>
-                        <FaRegCheckCircle color="#fd9500" /> Totally secure
+                        <FaRegCheckCircle color="#83d8f1" /> Totally secure
                         income based on{" "}
-                        <img src={DAOIcon} alt="DAO Smart-Contract" /> DAO
+                        {/* <img src={DAOIcon} alt="DAO Smart-Contract" /> DAO */}
                         smart-contract
                       </span>
                       <span>
-                        <FaRegCheckCircle color="#fd9500" /> Smart-contract
+                        <FaRegCheckCircle color="#83d8f1" /> Smart-contract
                         verified and audited by an independent company
                       </span>
 
@@ -309,7 +311,7 @@ const MainContent = () => {
                       {address && !userExit && (
                         <div
                           className="maindescbut"
-                          onClick={() => handleRegister()}
+                          // onClick={() => handleRegister()}
                         >
                           Register Now
                         </div>
@@ -335,7 +337,7 @@ const MainContent = () => {
                           rel="noopener noreferrer"
                           style={{ color: "white" }}
                         >
-                          Check Current State CoreExchange smart-contract
+                          Check Current State Forex Fusion smart-contract
                         </a>
                       </div>
                     </div>
@@ -387,7 +389,7 @@ const MainContent = () => {
               </div>
               <div className="mainaboutitem2 aboutitemgrad" data-aos="fade-up">
                 <a href="#" target="_blank" rel="noopener noreferrer">
-                  <h3 style={{ color: "#fd9500", fontWeight: "bold" }}>
+                  <h3 style={{ color: "#83d8f1", fontWeight: "bold" }}>
                     See Core Scan
                   </h3>
                 </a>
@@ -396,7 +398,7 @@ const MainContent = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <h3 style={{ color: "#fd9500", fontWeight: "bold" }}>
+                  <h3 style={{ color: "#83d8f1", fontWeight: "bold" }}>
                     See Core Coin at Coin Market Cap
                   </h3>
                 </a>
@@ -430,12 +432,10 @@ const MainContent = () => {
               <div className="stepslinewrap">
                 <h3>Step #1: Sign Up</h3>
                 <div className="stepsblock ">
-                  <h4>
-                    Get <img src={DAOIcon} alt="" /> CORE (DAO)
-                  </h4>
+                  <h4>Get CORE (DAO)</h4>
                   We recommend to use:{" "}
-                  <b style={{ color: "#fd9500" }}>Token Pocket</b> /{" "}
-                  <b style={{ color: "#fd9500" }}>MetaMask</b> browsers
+                  <b style={{ color: "#83d8f1" }}>Token Pocket</b> /{" "}
+                  <b style={{ color: "#83d8f1" }}>MetaMask</b> browsers
                   extensions.
                   <br /> You can get DAO coins via popular exchangers.
                   <a
@@ -448,11 +448,11 @@ const MainContent = () => {
                   </a>
                 </div>
                 <div className="stepsblock ">
-                  <h4>
-                    Must have some <img src={DAOIcon} alt="" /> DAO for fee
-                  </h4>
+                  <h4>Must have some DAO for fee</h4>
                   Empowering users through decentralized design, distribution,
-                  and direction. <b style={{ color: "#fd9500" }}>#CoreDAO </b>{" "}
+                  and direction. <b style={{ color: "#83d8f1" }}>
+                    #CoreDAO{" "}
+                  </b>{" "}
                   is the 3D blockchain that is changing the way you interact
                   with crypto.
                   <a
@@ -468,18 +468,14 @@ const MainContent = () => {
 
             {/* Step #2 */}
             <div className="stepsline" data-aos="fade-up">
+              <div className="bigstepline"></div>
               <div className="bigsteplinecic1"></div>
               <div className="stepslinewrap ">
                 <div className="icosteps2">
-                  <img
-                    src="https://corevarious.com/themes/CoreVarious/Content/Site/img/icostep3.png"
-                    alt=""
-                  />
+                  <img src={usericon} alt="" />
                 </div>
                 <form className="maincontform">
-                  <label>
-                    Your <img src={DAOIcon} alt="" /> DAO wallet address:
-                  </label>
+                  <label>Your DAO wallet address:</label>
                   <input
                     type="text"
                     className="trxWallet authTrue"
@@ -491,12 +487,15 @@ const MainContent = () => {
                     type="text"
                     className="trxWallet authFalse"
                     placeholder="Connect with your wallet app..."
+                    value={walletAddress}
+                    style={{ width: "95%" }}
                     readOnly
                   />
                   <a
                     href="#"
                     data-remodal-target="wallet"
                     className="maindescbut"
+                    style={{ width: "95%" }}
                   >
                     Check wallet statistics
                   </a>
@@ -508,22 +507,20 @@ const MainContent = () => {
               >
                 <h3>Step #2: Get Dao earnings</h3>
                 <div className="stepsblock stepsblockfull">
-                  <h4>
-                    Get your <img src={DAOIcon} alt="" /> DAO every moment
-                  </h4>
+                  <h4>Get your DAO every moment</h4>
                   Free Refferal Core Rewards Programme .
                   <br />
                   <br /> Get free 10 Core Coin Reward just by free registration
                   and also get benefit free referral program up to 11 Levels
                   <u>Additional earnings with this program:</u>
                   <br /> Direct team's Reward:{" "}
-                  <b style={{ color: "#fd9500" }}>
+                  <b style={{ color: "#83d8f1" }}>
                     You will get benefit of 1 DAO from every level up to 11
                     Levels
                   </b>
-                  <br /> Self - <b style={{ color: "#fd9500" }}>10 Core</b>
+                  <br /> Self - <b style={{ color: "#83d8f1" }}>10 Core</b>
                   <br /> Each Level ={" "}
-                  <b style={{ color: "#fd9500" }}> 1 Core</b>
+                  <b style={{ color: "#83d8f1" }}> 1 Core</b>
                   <a
                     href="#"
                     data-remodal-target="wallet"
@@ -542,11 +539,9 @@ const MainContent = () => {
               <div className="stepslinewrap ">
                 <h3>Step #3: Get Benefit of C50</h3>
                 <div className="stepsblock stepsblockfull2">
-                  <h4>
-                    Get your <img src={DAOIcon} alt="" /> DAO Program
-                  </h4>
+                  <h4>Get your DAO Program</h4>
                   <FaRegCheckCircle /> Get a Huge Team in{" "}
-                  <b style={{ color: "#fd9500" }}>C50 Program</b>
+                  <b style={{ color: "#83d8f1" }}>C50 Program</b>
                   <br />
                   <br />
                   <FaRegCheckCircle /> C50 Program is Designed and Developed by
@@ -559,13 +554,12 @@ const MainContent = () => {
               </div>
             </div>
             <div className="stepsline" data-aos="fade-up">
+              <div className="bigstepline"></div>
               <div className="bigsteplinecic1"></div>
               <div className="stepslinewrap stepslinewrapright ">
                 <h3>Step #4: Get Benefit of Magic Income</h3>
                 <div className="stepsblock stepsblockfull2">
-                  <h4>
-                    <img src={DAOIcon} alt="" /> Magic Income Program
-                  </h4>
+                  <h4>Magic Income Program</h4>
                   <FaRegCheckCircle /> Magic Income will be distributed Weekly
                   Basis according to your Front Business Legs.
                   <br />
@@ -597,13 +591,12 @@ const MainContent = () => {
             </div>
 
             <div className="stepsline" data-aos="fade-up">
+              <div className="bigstepline"></div>
               <div className="bigsteplinecic1"></div>
               <div className="stepslinewrap ">
                 <h3>Step #5: Get Benefit of Pre Launching Bonanza</h3>
                 <div className="stepsblock stepsblockfull2">
-                  <h4>
-                    <img src={DAOIcon} alt="" /> Pre Launching Program
-                  </h4>
+                  <h4>Pre Launching Program</h4>
                   <FaRegCheckCircle /> Get 100% Direct income from your Active
                   Direct's Only first deposit Package.
                   <br />
@@ -621,59 +614,57 @@ const MainContent = () => {
               <div className="stepslinewrap ">
                 <h3>Step #6: Get Rank and Reward</h3>
                 <div className="stepsblock stepsblockfull2">
-                  <h4>
-                    <img src={DAOIcon} alt="" /> Get your rank and reward
-                  </h4>
+                  <h4>Get your rank and reward</h4>
                   <FaRegCheckCircle />
-                  1st Star Requires 250 Core (Self ID), 500 Core (Direct
+                  &nbsp;1st Star Requires 250 Core (Self ID), 500 Core (Direct
                   Business), and 5,000 Core (Team Business), offering 5 Core
                   daily for 50 days.
                   <br />
                   <br />
                   <FaRegCheckCircle />
-                  2nd Star Requires 500 Core (Self ID), 1,000 Core (Direct
+                  &nbsp;2nd Star Requires 500 Core (Self ID), 1,000 Core (Direct
                   Business), and 10,000 Core (Team Business), offering 10 Core
                   daily for 50 days.
                   <br />
                   <br />
                   <FaRegCheckCircle />
-                  3rd Star Requires 1,000 Core (Self ID), 2,000 Core (Direct
-                  Business), and 20,000 Core (Team Business), offering 20 Core
-                  daily for 50 days.
+                  &nbsp;3rd Star Requires 1,000 Core (Self ID), 2,000 Core
+                  (Direct Business), and 20,000 Core (Team Business), offering
+                  20 Core daily for 50 days.
                   <br />
                   <br />
                   <FaRegCheckCircle />
-                  4th Star Requires 2,000 Core (Self ID), 4,000 Core (Direct
-                  Business), and 40,000 Core (Team Business), offering 40 Core
-                  daily for 50 days.
+                  &nbsp; 4th Star Requires 2,000 Core (Self ID), 4,000 Core
+                  (Direct Business), and 40,000 Core (Team Business), offering
+                  40 Core daily for 50 days.
                   <br />
                   <br />
                   <FaRegCheckCircle />
-                  5th Star Requires 4,000 Core (Self ID), 8,000 Core (Direct
-                  Business), and 80,000 Core (Team Business), offering 80 Core
-                  daily for 50 days.
+                  &nbsp; 5th Star Requires 4,000 Core (Self ID), 8,000 Core
+                  (Direct Business), and 80,000 Core (Team Business), offering
+                  80 Core daily for 50 days.
                   <br />
                   <br />
                   <FaRegCheckCircle />
-                  6th Star Requires 8,000 Core (Self ID), 16,000 Core (Direct
-                  Business), and 1,60,000 Core (Team Business), offering 160
-                  Core daily for 50 days.
+                  &nbsp;6th Star Requires 8,000 Core (Self ID), 16,000 Core
+                  (Direct Business), and 1,60,000 Core (Team Business), offering
+                  160 Core daily for 50 days.
                   <br />
                   <br />
                   <FaRegCheckCircle />
-                  7th Star Requires 16,000 Core (Self ID), 32,000 Core (Direct
-                  Business), and 3,20,000 Core (Team Business), offering 320
-                  Core daily for 50 days.
+                  &nbsp;7th Star Requires 16,000 Core (Self ID), 32,000 Core
+                  (Direct Business), and 3,20,000 Core (Team Business), offering
+                  320 Core daily for 50 days.
                   <br />
                   <br />
                   <FaRegCheckCircle />
-                  8th Star Requires 32,000 Core (Self ID), 64,000 Core (Direct
-                  Business), and 6,40,000 Core (Team Business), offering 640
-                  Core daily for 50 days.
+                  &nbsp; 8th Star Requires 32,000 Core (Self ID), 64,000 Core
+                  (Direct Business), and 6,40,000 Core (Team Business), offering
+                  640 Core daily for 50 days.
                   <br />
                   <br />
-                  <FaRegCheckCircle /> Offer valid for 50 days from your TOP-UP
-                  Day.
+                  <FaRegCheckCircle />
+                  &nbsp; Offer valid for 50 days from your TOP-UP Day.
                   <br />
                   <br />
                 </div>
