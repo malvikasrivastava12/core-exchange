@@ -37,7 +37,7 @@ const Navbar = () => {
   const toggleMakeDepositModal = () => {
     setShowMakeDepositModal(!showMakeDepositModal);
     setIsFetch(!isFetch);
-    console.log(isFetch, ":::::::::::::::::");
+    // console.log(isFetch, ":::::::::::::::::");
   };
   const toggleWalletStatisticsModal = () =>
     setShowWalletStatisticsModal(!showWalletStatisticsModal);
