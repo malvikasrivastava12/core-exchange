@@ -372,10 +372,11 @@ const MainContent = () => {
                 data-aos="fade-right"
               >
                 <h3>Unlimited earnings with always growing rates</h3>
-                We provide investment conditions with growing percentage,
-                depending on basic interest rate, smart-contract total balance
-                bonus and personal "hold-bonus". Maximal available profit: +100%
-                Core of referral's daily reward
+                Forex Fusion offers high-yield investments with increasing
+                profits based on the base interest rate, smart contract balance
+                bonus, and personal hold-bonus. Earn up to +100% profit, with
+                additional daily referral rewards. The longer you hold, the more
+                you earn!
               </div>
               <div
                 className="mainaboutitem aboutitemgrad2 "
@@ -403,13 +404,13 @@ const MainContent = () => {
                   </h3>
                 </a>
                 <h3>
-                  Reliability of DAO smart-contract.
+                  Secure & Reliable
                   <br />
-                  Scam is impossible!
+                  with DAO Smart Contracts
                 </h3>
-                Smart-contract technology ensures full safety of all
-                participants' funds. Nobody can steal funds, or change contract
-                functions.
+                At Forex Fusion, security is our top priority. Powered by DAO
+                smart-contract technology, our system ensures complete
+                transparency and safety for all participants.
               </div>
             </div>
           </div>

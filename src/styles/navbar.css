@@ -32674,7 +32674,7 @@ body.no-scroll {
   z-index: 400;
   transition: 0.2s; */
   /* background: url(../assets/Images/ForeXMobile.png) no-repeat; */
-  
+
   position: absolute;
   width: 373px;
   height: 376px;
@@ -33579,7 +33579,7 @@ color:#83d8f1
   height: 140px;
   padding: 28px 0;
   text-align: center;
-  background-color: #282828;
+  background-color: black;
   border-radius: 50%;
   box-shadow: inset 0 0 50px #1b1b1b;
   display: block;
@@ -34804,6 +34804,7 @@ html.remodal-is-locked {
 }
 
 .modallink:hover {
+  color: #83d8f1;
   text-decoration: none;
 }
 

@@ -140,7 +140,7 @@ const Navbar = () => {
               <a
                 href="#"
                 id="depositDeal"
-                onClick={toggleMakeDepositModal}
+                // onClick={toggleMakeDepositModal}
                 data-toggle="modal"
                 data-target="#exampleModalLong"
               >
@@ -150,7 +150,7 @@ const Navbar = () => {
               <a
                 href="#"
                 id="wallet_static"
-                onClick={toggleWalletStatisticsModal}
+                // onClick={toggleWalletStatisticsModal}
               >
                 <FaWallet /> Wallet statistic
               </a>
