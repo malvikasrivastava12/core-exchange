@@ -124,7 +124,7 @@ const Navbar = () => {
                 About us
               </a>
 
-              <a href="#investments" className="scrollto">
+              <a href="#steps" className="scrollto">
                 Investments
               </a>
 

@@ -50,8 +50,8 @@ export default function WarningModel({ closeModal, showWarningModal }) {
                 <ul>
                   <li>
                     Our official website is{" "}
-                    <a href="https://core-exchange.com/" className="gt">
-                      https://core-exchange.com
+                    <a href="https://forexfusion.online/" className="gt">
+                      https://forexfusion.online
                     </a>
                   </li>
                   <li>We have not launched any new websites or platforms.</li>
@@ -65,8 +65,8 @@ export default function WarningModel({ closeModal, showWarningModal }) {
                 <ul>
                   <li>
                     - Check the URL carefully. Our official website URL is{" "}
-                    <a href="https://core-exchange.com/" className="gt">
-                      https://core-exchange.com
+                    <a href="https://forexfusion.online/" className="gt">
+                      https://forexfusion.online
                     </a>
                   </li>
                   <li>

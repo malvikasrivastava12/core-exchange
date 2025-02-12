@@ -252,9 +252,8 @@ const MainContent = () => {
                   <h1>Reliable investments with</h1>
                   <img src={LogoWhite} className="mainico" alt="Tron Full" />
                   <h1>
-                    Get <span style={{ color: "#83d8f1" }}>free 10 </span> Core
-                    Rewards by free registration and also get benifit free
-                    refferal program up to 11 Levels
+                    Register for free and start earning Forex Fusion rewards
+                    instantly
                   </h1>
                   <div className="maindesc">
                     <div className="maindesctext">
@@ -331,7 +330,7 @@ const MainContent = () => {
                       </p> */}
                       <div className="maindesclink">
                         <a
-                          href="https://scan.coredao.org/address/0x7a51DAF63E620DC00be296A2c237aE47Dd3B31A6"
+                          href=""
                           className="maindesclink"
                           target="_blank"
                           rel="noopener noreferrer"
@@ -374,7 +373,7 @@ const MainContent = () => {
                 <h3>Unlimited earnings with always growing rates</h3>
                 Forex Fusion offers high-yield investments with increasing
                 profits based on the base interest rate, smart contract balance
-                bonus, and personal hold-bonus. Earn up to +100% profit, with
+                bonus, and personal hold-bonus. Earn up to full profit, with
                 additional daily referral rewards. The longer you hold, the more
                 you earn!
               </div>
@@ -389,28 +388,27 @@ const MainContent = () => {
                 us and get your profit!
               </div>
               <div className="mainaboutitem2 aboutitemgrad" data-aos="fade-up">
-                <a href="#" target="_blank" rel="noopener noreferrer">
+                {/* <a href="#" target="_blank" rel="noopener noreferrer">
                   <h3 style={{ color: "#83d8f1", fontWeight: "bold" }}>
-                    See Core Scan
+                    See FORE Scan
                   </h3>
                 </a>
-                <a
-                  href="https://coinmarketcap.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
+                <a href="" target="_blank" rel="noopener noreferrer">
                   <h3 style={{ color: "#83d8f1", fontWeight: "bold" }}>
-                    See Core Coin at Coin Market Cap
+                    See FORE Coin at Coin Market Cap
                   </h3>
-                </a>
-                <h3>
+                </a> */}
+                <h3 style={{ color: "#83d8f1", fontWeight: "bold" }}>
                   Secure & Reliable
                   <br />
-                  with DAO Smart Contracts
+                  with Smart Contracts
                 </h3>
-                At Forex Fusion, security is our top priority. Powered by DAO
-                smart-contract technology, our system ensures complete
-                transparency and safety for all participants.
+                Forex Fusion prioritizes security and transparency with
+                smart-contract technology. Our powerful investment model ensures
+                sustainable earnings, growing continuously through smart
+                contract bonuses and personal hold rewards. Maximize your
+                profits effortlessly with a system designed for long-term
+                financial success!
               </div>
             </div>
           </div>
@@ -433,29 +431,29 @@ const MainContent = () => {
               <div className="stepslinewrap">
                 <h3>Step #1: Sign Up</h3>
                 <div className="stepsblock ">
-                  <h4>Get CORE (DAO)</h4>
+                  <h4>Get FORE </h4>
                   We recommend to use:{" "}
                   <b style={{ color: "#83d8f1" }}>Token Pocket</b> /{" "}
                   <b style={{ color: "#83d8f1" }}>MetaMask</b> browsers
                   extensions.
-                  <br /> You can get DAO coins via popular exchangers.
+                  <br /> You can get FORE coins via popular exchangers.
                   <a
                     href="#"
                     data-remodal-target="tron"
                     className="maindescbut"
                     onClick={toggleShowDAOModal}
                   >
-                    How to get DAO
+                    How to get FORE
                   </a>
                 </div>
                 <div className="stepsblock ">
-                  <h4>Must have some DAO for fee</h4>
-                  Empowering users through decentralized design, distribution,
-                  and direction. <b style={{ color: "#83d8f1" }}>
-                    #CoreDAO{" "}
-                  </b>{" "}
-                  is the 3D blockchain that is changing the way you interact
-                  with crypto.
+                  <h4>Must have some FORE for fee</h4>
+                  Empowering users through a decentralized investment model,
+                  Forex Fusion ensures transparent fee distribution and
+                  user-driven growth. Built on advanced blockchain technology,
+                  it revolutionizes the way you engage with forex and crypto
+                  investments, offering a secure, scalable, and community-driven
+                  financial ecosystem.
                   <a
                     href="javascript:void(0)"
                     // onClick={() => Register(this)}
@@ -476,7 +474,7 @@ const MainContent = () => {
                   <img src={usericon} alt="" />
                 </div>
                 <form className="maincontform">
-                  <label>Your DAO wallet address:</label>
+                  <label>Your FORE wallet address:</label>
                   <input
                     type="text"
                     className="trxWallet authTrue"
@@ -505,28 +503,44 @@ const MainContent = () => {
               <div
                 className="stepslinewrap stepslinewrapright "
                 data-aos="fade-right"
+                style={{ paddingTop: "20px" }}
               >
-                <h3>Step #2: Get Dao earnings</h3>
+                <h3>Step #2: Get FORE earnings</h3>
                 <div className="stepsblock stepsblockfull">
-                  <h4>Get your DAO every moment</h4>
-                  Free Refferal Core Rewards Programme .
+                  <h4>Earn Forex Fusion (FOREX) Rewards Instantly!</h4>
+                  Start earning Forex Fusion (FOREX) rewards instantly! Our Free
+                  Referral Rewards Program lets you maximize your earnings
+                  effortlessly.
                   <br />
-                  <br /> Get free 10 Core Coin Reward just by free registration
-                  and also get benefit free referral program up to 11 Levels
-                  <u>Additional earnings with this program:</u>
-                  <br /> Direct team's Reward:{" "}
-                  <b style={{ color: "#83d8f1" }}>
-                    You will get benefit of 1 DAO from every level up to 11
-                    Levels
-                  </b>
-                  <br /> Self - <b style={{ color: "#83d8f1" }}>10 Core</b>
-                  <br /> Each Level ={" "}
-                  <b style={{ color: "#83d8f1" }}> 1 Core</b>
+                  <br />
+                  Simply register for free and claim your welcome rewards.
+                  Additionally, take advantage of our referral program, where
+                  you continue to earn through your growing network. The more
+                  you share, the more you earn!
+                  {/* <span>
+                    Start earning Forex Fusion (FOREX) rewards from the moment
+                    you join! Our Free Referral Rewards Program is designed to
+                    help you maximize your income effortlessly.
+                  </span> */}
+                  <br />
+                  {/* <br />
+                  <FaRegCheckCircle /> Get 20 FREE FOREX Coins just by
+                  registering!
+                  <br />
+                  <br />
+                  <FaRegCheckCircle /> Unlock Additional Earnings through our
+                  15-level referral program:
+                  <br />
+                  <br />
+                  <FaRegCheckCircle /> Direct Team Reward – Earn 2 FOREX from
+                  every level up to 15 levels.
+                  <br />
+                  <br /> */}
                   <a
                     href="#"
                     data-remodal-target="wallet"
                     className="maindescbut"
-                    onClick={toggleWalletStatisticsModal}
+                    // onClick={toggleWalletStatisticsModal}
                   >
                     Your wallet statistics
                   </a>
@@ -538,19 +552,24 @@ const MainContent = () => {
             <div className="stepsline" data-aos="fade-up">
               <div className="bigsteplinecic1"></div>
               <div className="stepslinewrap ">
-                <h3>Step #3: Get Benefit of C50</h3>
+                <h3>
+                  Step #3: Unlock the Power of Elite Growth Plan with Forex
+                  Fusion
+                </h3>
                 <div className="stepsblock stepsblockfull2">
-                  <h4>Get your DAO Program</h4>
-                  <FaRegCheckCircle /> Get a Huge Team in{" "}
-                  <b style={{ color: "#83d8f1" }}>C50 Program</b>
+                  <h4>Get your FORE Program</h4>
+                  <FaRegCheckCircle /> Grow your wealth with consistent daily
+                  returns on your investment.
                   <br />
                   <br />
-                  <FaRegCheckCircle /> C50 Program is Designed and Developed by
-                  Unique and Smart Way from which You will get a Huge Team
+                  <FaRegCheckCircle /> Leverage Team Growth – Receive earnings
+                  again and again from your network
                   <br />
                   <br />
-                  <FaRegCheckCircle /> You will Receive again and again Earnings
-                  from the Team up to 4% Daily of your investment
+                  <FaRegCheckCircle /> Decentralized & Transparent – Powered by
+                  smart contract technology
+                  <br />
+                  <br />
                 </div>
               </div>
             </div>
@@ -558,10 +577,19 @@ const MainContent = () => {
               <div className="bigstepline"></div>
               <div className="bigsteplinecic1"></div>
               <div className="stepslinewrap stepslinewrapright ">
-                <h3>Step #4: Get Benefit of Magic Income</h3>
+                <h3>Step #4:Unlock Power Earnings with Forex Fusion</h3>
                 <div className="stepsblock stepsblockfull2">
-                  <h4>Magic Income Program</h4>
-                  <FaRegCheckCircle /> Magic Income will be distributed Weekly
+                  <h4>Income with Forex Fusion</h4>
+                  Forex Fusion’s Power Earnings Program offers a unique
+                  opportunity to earn weekly rewards based on the expansion of
+                  your network. As your business structure grows, your earnings
+                  increase, allowing you to maximize your passive income. The
+                  program ensures higher returns as more direct connections are
+                  made, with no limits on earnings and payouts extending to
+                  unlimited levels. With its smart distribution system, Forex
+                  Fusion provides a stable and scalable income stream, making it
+                  easier than ever to achieve financial growth.
+                  {/* <FaRegCheckCircle /> Magic Income will be distributed Weekly
                   Basis according to your Front Business Legs.
                   <br />
                   <br />
@@ -586,31 +614,41 @@ const MainContent = () => {
                   <FaRegCheckCircle /> It will be distributed up to unlimited
                   Depth of Levels.
                   <br />
-                  <br />
+                  <br /> */}
                 </div>
               </div>
             </div>
 
             <div className="stepsline" data-aos="fade-up">
-              <div className="bigstepline"></div>
+              {/* <div className="bigstepline"></div> */}
               <div className="bigsteplinecic1"></div>
               <div className="stepslinewrap ">
-                <h3>Step #5: Get Benefit of Pre Launching Bonanza</h3>
+                <h3>Step #5: Take Advantage of the Pre-Launching Bonanza</h3>
                 <div className="stepsblock stepsblockfull2">
-                  <h4>Pre Launching Program</h4>
-                  <FaRegCheckCircle /> Get 100% Direct income from your Active
-                  Direct's Only first deposit Package.
+                  <h4> Exclusive Pre-Launch Offer – Limited Time!</h4>
+                  <FaRegCheckCircle /> Earn direct income from your active
+                  referrals' first deposit package.
                   <br />
                   <br />
-                  <FaRegCheckCircle /> Offer valid for 30 days from your TOP-UP
-                  Day.
+                  <FaRegCheckCircle /> Offer valid for a limited period from
+                  your top-up day.
                   <br />
                   <br />
+                  <FaRegCheckCircle /> Maximize early earnings and gain a strong
+                  financial start.
+                  <br />
+                  <br />
+                  <FaRegCheckCircle /> No limits on direct rewards during the
+                  promotional period.
+                  <br />
+                  <br />
+                  Join Forex Fusion now and take full advantage of this
+                  limited-time opportunity!
                 </div>
               </div>
             </div>
 
-            <div className="stepsline" data-aos="fade-up">
+            {/* <div className="stepsline" data-aos="fade-up">
               <div className="bigsteplinecic1"></div>
               <div className="stepslinewrap ">
                 <h3>Step #6: Get Rank and Reward</h3>
@@ -670,7 +708,7 @@ const MainContent = () => {
                   <br />
                 </div>
               </div>
-            </div>
+            </div> */}
             {showWalletStatisticsModal && (
               <WalletStatisticModal
                 toggleWalletStatisticsModal={() =>

@@ -72,7 +72,7 @@ const Footer = () => {
           <div className="footblock">
             <a
               href="#"
-              style={{ height: "40px", lineHeight: "42px", fontSize: "20px" }}
+              style={{ height: "40px", lineHeight: "42px", fontSize: "18px" }}
               className="maindescbut"
               data-remodal-target="invest"
               onClick={toggleMakeDepositModal}
@@ -82,7 +82,7 @@ const Footer = () => {
 
             <a
               href="#"
-              style={{ height: "40px", lineHeight: "42px", fontSize: "20px" }}
+              style={{ height: "40px", lineHeight: "42px", fontSize: "18px" }}
               className="maindescbut"
               data-remodal-target="wallet"
               onClick={toggleWalletStatisticsModal}

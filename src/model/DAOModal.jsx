@@ -34,25 +34,25 @@ export default function DAOModal({ closeDAOModal, showDAOModal }) {
               onClick={closeDAOModal}
             ></button>
             <div className="DAOLogo">
-              <img src={DAOIcon} className="modallogo" alt="Core Logo" />
+              <img src={DAOIcon} className="modallogo" alt="FORE Logo" />
             </div>
 
             {/* Modal Description */}
             <div className="modaldesc">
               {/* Core Logo and Description */}
               {/* <img src={DAOFavIcon} alt="Core Logo" /> */}
-              <b>CORE (DAO)</b>{" "}
+              <b>FORE Protocol</b>{" "}
               <span className="Modalopacity">
                 - one of the largest blockchain-based operating systems in the
-                world. The world needs a decentralized, secure, and scalable
-                blockchain at its Core.
+                world.The world needs a decentralized, secure, and scalable
+                blockchain at its FORE, and FORE Protocol delivers exactly that.
               </span>
               {/* How to Get DAO Section */}
               <h3 className="Modalopacity" style={{ fontSize: "20px" }}>
-                How to get DAO?
+                How to get FORE?
               </h3>
               <p className="Modalopacity">
-                You can easily get DAO on every popular exchanger like{" "}
+                You can easily get FORE on every popular exchanger like{" "}
                 <a
                   href="https://binance.com/"
                   className="modallink"
@@ -120,7 +120,7 @@ export default function DAOModal({ closeDAOModal, showDAOModal }) {
                 <br />- <b>Mobile crypto wallets</b>.{" "}
                 <span className="Modalopacity">
                   You can use any personal crypto wallet that supports DAO
-                  cryptocurrency and "CORE dapps" technology, for example:{" "}
+                  cryptocurrency and "FORE dapps" technology, for example:{" "}
                 </span>
                 <a
                   href="https://tronwallet.me/"

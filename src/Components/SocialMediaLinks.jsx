@@ -19,7 +19,7 @@ const SocialMediaLinks = () => {
         <img src={whatsapp} alt="WhatsApp" />
       </a>
       <a
-        href="https://youtube.com/@coreexhangeofficial?si=AXhAUNu6Mcz9ctwM"
+        href=""
         target="_blank"
         title="Youtube"
         className="langwrapp langwrap_fa"
@@ -28,7 +28,7 @@ const SocialMediaLinks = () => {
         <img src={youtube} alt="Youtube" />
       </a>
       <a
-        href="https://t.me/coreexchangeoffcial"
+        href=""
         target="_blank"
         title="Telegram"
         className="langwrapp langwrap_ru"
@@ -79,7 +79,7 @@ const SocialMediaLinks = () => {
         />
       </a> */}
       <a
-        href="https://www.instagram.com/coreexhangeofficial/?igsh=MWdqNDcwcmkzdzVrcA%3D%3D#"
+        href=""
         target="_blank"
         title="Instagram"
         className="langwrapp langwrap_tr"

@@ -32585,8 +32585,8 @@ cbp-af-header.cbp-af-header-shrink {
 } */
 
 .cbp-af-header nav a:hover {
-  color: #fff;
-  border-top: 6px solid #83d8f1 !important;
+  color: #83d8f1;
+  /* border-top: 6px solid #83d8f1 !important; */
 }
 
 .cbp-af-header nav a small {
@@ -32789,7 +32789,7 @@ color:#83d8f1
 }*/
 
 .mainico {
-  height: 50px;
+  height: 100px;
 }
 
 .maindesc {
@@ -32828,7 +32828,7 @@ color:#83d8f1
   margin-top: 30px;
   line-height: 42px;
   text-align: center;
-  font-size: 18px;
+  font-size: 15px;
   color: #fff;
   background: #83d8f1;
   border-radius: 25px;
@@ -33562,7 +33562,7 @@ color:#83d8f1
 }
 
 .stepslinewrapright {
-  text-align: right !important;
+  text-align: center !important;
 }
 
 .stepsline h3 {
@@ -33690,7 +33690,7 @@ color:#83d8f1
 
 .bigstepline {
   position: absolute;
-  top: 165px;
+  top: 20px;
   left: 50%;
   margin-left: -1px;
   width: 3px;
@@ -34129,7 +34129,7 @@ color:#83d8f1
 .maincontform input[type="text"] {
   height: 40px;
   line-height: 40px;
-  background-color: #282828;
+  background-color: black;
   border-radius: 10px;
   box-shadow: inset 0 0 50px #1b1b1b;
   color: #fff;
@@ -34193,9 +34193,9 @@ color:#83d8f1
 }
 
 .footblock {
-  width: 30% !important;
-  line-height: 1.4 !important;
-  font-size: 13px !important;
+  width: 30%;
+  line-height: 1.4;
+  font-size: 13px;
 }
 
 .footblock:lang(es) {
@@ -34800,7 +34800,8 @@ html.remodal-is-locked {
 }
 
 .modallink {
-  color: #83d8f1;
+  color: #34c2eb;
+  font-weight: 500;
 }
 
 .modallink:hover {

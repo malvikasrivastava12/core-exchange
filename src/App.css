@@ -502,7 +502,7 @@ cbp-af-header.cbp-af-header-shrink {
 
 @media screen and (max-width: 768px) {
   .wrap {
-    width: 550px;
+    width: 550px !important;
   }
   .cbp-af-header nav a:nth-child(-n + 3) {
     display: none;
@@ -514,7 +514,7 @@ cbp-af-header.cbp-af-header-shrink {
     padding: 15px 0 !important;
   }
   .mainbackdesc {
-    margin: 120px 20px 0;
+    margin: 120px 20px 0 !important;
   }
   .maindesctext span {
     font-size: 14.5px;
@@ -770,6 +770,12 @@ cbp-af-header.cbp-af-header-shrink {
   }
   .footer {
     height: inherit;
+  }
+}
+
+@media (min-width: 577px) and (max-width: 768px) {
+  .footblock {
+    width: 48% !important;
   }
 }
 
@@ -1203,7 +1209,7 @@ cbp-af-header.cbp-af-header-shrink {
     font-size: 16px !important;
   }
   .mainico {
-    height: 35px !important;
+    height: 50px !important;
   }
   .mainabout {
     padding: 0 !important;
@@ -1693,7 +1699,7 @@ html .km-pane-wrapper .k-header {
 .DAOLogo {
   display: flex;
   justify-content: center;
-  padding: 25px;
+  padding-bottom: 25px;
 }
 
 .Modalopacity {
