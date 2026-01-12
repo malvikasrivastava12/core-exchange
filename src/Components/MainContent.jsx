@@ -243,7 +243,7 @@ const MainContent = () => {
                 <div className="dash2"></div>
                 <div className="dash3"></div>
                 <div className="dash4"></div>
-                <div className="perfection">perfection in details</div>
+                <div className="perfection">perfection  in details</div>
               </div>
               <div className="mainbackwrap">
                 <div className="mainbackdesc" data-aos="fade-left">
